@@ -1,3 +1,4 @@
+*/ *
 package com.uce.auth_service;
 
 import org.springframework.boot.SpringApplication;
