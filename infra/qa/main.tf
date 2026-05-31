@@ -18,37 +18,10 @@ provider "aws" {
 }
 
 # --- 1. EL GUARDIA DE SEGURIDAD (AÑADIMOS EL 8081) ---
-resource "aws_security_group" "qa_sg" {
-  name        = "qa_security_group"
-  description = "Permitir trafico web y microservicios Java"
-
-  ingress {
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
-    from_port   = 8080
-    to_port     = 8081 # <--- Abrimos ambos puertos para los microservicios
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-}
-
-# --- 2. EL SERVIDOR ---
 resource "aws_instance" "backend_qa_server" {
-  ami           = "ami-0c7217cdde317cfec" 
-  instance_type = "t2.micro"              
-  
+  ami           = "ami-0c7217cdde317cfec"
+  instance_type = "t2.micro"
+
   vpc_security_group_ids = [aws_security_group.qa_sg.id]
 
   user_data_replace_on_change = true
@@ -61,7 +34,7 @@ resource "aws_instance" "backend_qa_server" {
               mkswap /swapfile
               swapon /swapfile
 
-              # 1. Actualizar e instalar dependencias basicas
+              # 1. Actualizar e instalar dependencias básicas
               apt-get update -y
               apt-get install -y openjdk-17-jdk apache2 git curl
 
@@ -73,26 +46,32 @@ resource "aws_instance" "backend_qa_server" {
               systemctl start apache2
               systemctl enable apache2
 
-              # 4. Descargar tu codigo
+              # 4. Descargar tu código
               git clone -b QA https://github.com/gisselamuzo49-commits/FINAL-PROJECT-.git /tmp/proyecto
 
-              # 5. Entrar a la carpeta del Frontend
+              # 5. Frontend
               cd /tmp/proyecto/apps/frontend-web
               npm install > /var/www/html/log_npm.txt 2>&1
               npm run build >> /var/www/html/log_npm.txt 2>&1
-
-              # 6. Mover el proyecto
               cp -r dist/* /var/www/html/
 
-              # 7. ENCENDER SERVICIOS CON LOGS
-              # Usamos 'mvn clean install' y 'java -jar' para asegurar que arranquen
+              # 6. Auth Service
               cd /tmp/proyecto/apps/auth-service
+              chmod +x mvnw                         # <-- nuevo
               ./mvnw clean install -DskipTests
-              nohup java -jar target/*.jar > /var/www/html/log_auth.txt 2>&1 &
-              
+              nohup java -jar $(ls target/*.jar) > /var/www/html/log_auth.txt 2>&1 &
+
+              # 7. Internship Service
               cd /tmp/proyecto/apps/internship-service
+              chmod +x mvnw                         # <-- nuevo
               ./mvnw clean install -DskipTests
-              nohup java -jar target/*.jar > /var/www/html/log_internship.txt 2>&1 &
+              nohup java -jar $(ls target/*.jar) > /var/www/html/log_internship.txt 2>&1 &
+
+              # 8. Reiniciar Apache para que sirva los últimos archivos
+              systemctl restart apache2
+
+              # ----- FORZAR REDEPLOY EN TF ----- 
+              # redeploy 2026‑05‑31‑v2
               EOF
 
   tags = {
