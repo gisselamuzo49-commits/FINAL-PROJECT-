@@ -73,8 +73,8 @@ resource "aws_instance" "backend_qa_server" {
               systemctl start apache2
               systemctl enable apache2
 
-              # 4. Descargar tu codigo desde GitHub
-              git clone https://github.com/gisselamuzo49-commits/FINAL-PROJECT-.git /tmp/proyecto
+              # 4. Descargar tu codigo desde GitHub (¡AHORA DESDE LA RAMA QA!)
+              git clone -b QA https://github.com/gisselamuzo49-commits/FINAL-PROJECT-.git /tmp/proyecto
 
               # 5. Entrar a la carpeta del Frontend, instalar y empaquetar
               cd /tmp/proyecto/apps/frontend-web
