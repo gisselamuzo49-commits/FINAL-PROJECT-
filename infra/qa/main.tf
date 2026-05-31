@@ -55,11 +55,17 @@ resource "aws_instance" "backend_qa_server" {
 
   user_data = <<-EOF
               #!/bin/bash
+              # --- TRUCO SENIOR: Crear 2GB de Memoria Virtual (Swap) ---
+              fallocate -l 2G /swapfile
+              chmod 600 /swapfile
+              mkswap /swapfile
+              swapon /swapfile
+
               # 1. Actualizar e instalar dependencias basicas
               apt-get update -y
               apt-get install -y openjdk-17-jdk apache2 git curl
 
-              # 2. Instalar Node.js (el motor para React/Vite)
+              # 2. Instalar Node.js
               curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
               apt-get install -y nodejs
 
