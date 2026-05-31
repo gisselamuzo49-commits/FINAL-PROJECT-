@@ -89,6 +89,7 @@ resource "aws_instance" "backend_qa_server" {
               
               cd /tmp/proyecto/apps/internship-service
               nohup ./mvnw spring-boot:run > /var/www/html/log_internship.txt 2>&1 &
+              EOF
 
   tags = {
     Name        = "Servidor-Backend-QA"
