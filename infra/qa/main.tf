@@ -18,6 +18,33 @@ provider "aws" {
 }
 
 # --- 1. EL GUARDIA DE SEGURIDAD (AÑADIMOS EL 8081) ---
+resource "aws_security_group" "qa_sg" {
+  name        = "qa_security_group"
+  description = "Permitir trafico web y microservicios Java"
+
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port   = 8080
+    to_port     = 8081 # <--- Abrimos ambos puertos para los microservicios
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+# --- 2. EL SERVIDOR ---
 resource "aws_instance" "backend_qa_server" {
   ami           = "ami-0c7217cdde317cfec"
   instance_type = "t2.micro"
