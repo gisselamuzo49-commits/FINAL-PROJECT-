@@ -1,2 +1,5 @@
 com\uce\auth_service\AuthController.class
+com\uce\auth_service\models\User.class
 com\uce\auth_service\AuthServiceApplication.class
+com\uce\auth_service\repositories\UserRepository.class
+com\uce\auth_service\services\AuthService.class
