@@ -17,7 +17,7 @@ provider "aws" {
   region = "us-east-1"
 }
 
-# --- 1. EL GUARDIA DE SEGURIDAD (¡Este bloque faltaba!) ---
+# --- 1. EL GUARDIA DE SEGURIDAD ---
 resource "aws_security_group" "qa_sg" {
   name        = "qa_security_group"
   description = "Permitir trafico web y backend"
@@ -44,7 +44,7 @@ resource "aws_security_group" "qa_sg" {
   }
 }
 
-# --- 2. TU SERVIDOR ACTUALIZADO ---
+# --- 2. TU SERVIDOR EC2 (CON FRONTEND Y BACKEND) ---
 resource "aws_instance" "backend_qa_server" {
   ami           = "ami-0c7217cdde317cfec" 
   instance_type = "t2.micro"              
@@ -55,11 +55,29 @@ resource "aws_instance" "backend_qa_server" {
 
   user_data = <<-EOF
               #!/bin/bash
+              # 1. Actualizar e instalar dependencias basicas
               apt-get update -y
-              apt-get install -y openjdk-17-jdk apache2
+              apt-get install -y openjdk-17-jdk apache2 git curl
+
+              # 2. Instalar Node.js (el motor para React/Vite)
+              curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
+              apt-get install -y nodejs
+
+              # 3. Encender el servidor web
               systemctl start apache2
               systemctl enable apache2
-              echo "<h1>¡Felicidades Gissela! Tu servidor automatizado con GitOps esta vivo.</h1><p>Java ya esta instalado y listo para el backend de tu Sistema de Pasantias.</p>" > /var/www/html/index.html
+
+              # 4. Descargar tu codigo desde GitHub
+              git clone https://github.com/gisselamuzo49-commits/FINAL-PROJECT-.git /tmp/proyecto
+
+              # 5. Entrar a la carpeta del Frontend, instalar y empaquetar
+              cd /tmp/proyecto/apps/frontend-web
+              npm install
+              npm run build
+
+              # 6. Mover el proyecto final a la carpeta publica de Apache
+              rm -rf /var/www/html/*
+              cp -r dist/* /var/www/html/
               EOF
 
   tags = {
@@ -68,4 +86,3 @@ resource "aws_instance" "backend_qa_server" {
     Project     = "Sistema de Pasantias"
   }
 }
-
