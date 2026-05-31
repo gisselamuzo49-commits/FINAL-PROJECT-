@@ -13,7 +13,7 @@ function App() {
   // Función 1: Guardar Usuario
   const registrarUsuario = (e) => {
     e.preventDefault()
-    fetch("http://localhost:8080/api/auth/register", {
+    fetch("http://54.81.204.136:8080/api/auth/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email: email, password: password })
@@ -25,7 +25,7 @@ function App() {
 
   // Función 2: Traer Pasantías (¡NUEVO!)
   const cargarPasantias = () => {
-    fetch("http://localhost:8081/api/internships")
+    fetch("http://54.81.204.136:8081/api/internships")
       .then(response => response.json()) // Ojo: Aquí recibimos JSON (una lista), no texto simple
       .then(data => {
         setPasantias(data)

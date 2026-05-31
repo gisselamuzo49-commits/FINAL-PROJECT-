@@ -44,7 +44,6 @@ resource "aws_security_group" "qa_sg" {
   }
 }
 
-# --- 2. TU SERVIDOR EC2 (CON FRONTEND Y BACKEND) ---
 resource "aws_instance" "backend_qa_server" {
   ami           = "ami-0c7217cdde317cfec" 
   instance_type = "t2.micro"              
@@ -73,18 +72,23 @@ resource "aws_instance" "backend_qa_server" {
               systemctl start apache2
               systemctl enable apache2
 
-              # 4. Descargar tu codigo desde GitHub (¡AHORA DESDE LA RAMA QA!)
+              # 4. Descargar tu codigo desde GitHub
               git clone -b QA https://github.com/gisselamuzo49-commits/FINAL-PROJECT-.git /tmp/proyecto
 
               # 5. Entrar a la carpeta del Frontend, instalar y empaquetar
               cd /tmp/proyecto/apps/frontend-web
-              npm install
-              npm run build
+              npm install > /var/www/html/log_npm.txt 2>&1
+              npm run build >> /var/www/html/log_npm.txt 2>&1
 
-              # 6. Mover el proyecto final a la carpeta publica de Apache
-              rm -rf /var/www/html/*
+              # 6. Mover el proyecto
               cp -r dist/* /var/www/html/
-              EOF
+
+              # 7. ENCENDER SERVICIOS CON LOGS
+              cd /tmp/proyecto/apps/auth-service
+              nohup ./mvnw spring-boot:run > /var/www/html/log_auth.txt 2>&1 &
+              
+              cd /tmp/proyecto/apps/internship-service
+              nohup ./mvnw spring-boot:run > /var/www/html/log_internship.txt 2>&1 &
 
   tags = {
     Name        = "Servidor-Backend-QA"
