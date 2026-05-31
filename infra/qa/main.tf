@@ -74,6 +74,7 @@ resource "aws_instance" "backend_qa_server" {
               systemctl enable apache2
 
               # 4. Descargar tu código
+              rm -rf /tmp/proyecto
               git clone -b QA https://github.com/gisselamuzo49-commits/FINAL-PROJECT-.git /tmp/proyecto
 
               # 5. Frontend
@@ -84,21 +85,35 @@ resource "aws_instance" "backend_qa_server" {
 
               # 6. Auth Service
               cd /tmp/proyecto/apps/auth-service
-              chmod +x mvnw                         # <-- nuevo
-              ./mvnw clean install -DskipTests
-              nohup java -jar $(ls target/*.jar) > /var/www/html/log_auth.txt 2>&1 &
+              tr -d '\r' < mvnw > mvnw.lf && mv mvnw.lf mvnw # <-- Convertir CRLF a LF
+              chmod +x mvnw
+              echo "--- Iniciando compilación de auth-service ---" > /var/www/html/log_auth.txt
+              ./mvnw clean install -DskipTests >> /var/www/html/log_auth.txt 2>&1
+              if ls target/*.jar >/dev/null 2>&1; then
+                  echo "--- Iniciando auth-service ---" >> /var/www/html/log_auth.txt
+                  nohup java -jar target/*.jar >> /var/www/html/log_auth.txt 2>&1 &
+              else
+                  echo "ERROR: No se pudo compilar el archivo JAR de auth-service" >> /var/www/html/log_auth.txt
+              fi
 
               # 7. Internship Service
               cd /tmp/proyecto/apps/internship-service
-              chmod +x mvnw                         # <-- nuevo
-              ./mvnw clean install -DskipTests
-              nohup java -jar $(ls target/*.jar) > /var/www/html/log_internship.txt 2>&1 &
+              tr -d '\r' < mvnw > mvnw.lf && mv mvnw.lf mvnw # <-- Convertir CRLF a LF
+              chmod +x mvnw
+              echo "--- Iniciando compilación de internship-service ---" > /var/www/html/log_internship.txt
+              ./mvnw clean install -DskipTests >> /var/www/html/log_internship.txt 2>&1
+              if ls target/*.jar >/dev/null 2>&1; then
+                  echo "--- Iniciando internship-service ---" >> /var/www/html/log_internship.txt
+                  nohup java -jar target/*.jar >> /var/www/html/log_internship.txt 2>&1 &
+              else
+                  echo "ERROR: No se pudo compilar el archivo JAR de internship-service" >> /var/www/html/log_internship.txt
+              fi
 
               # 8. Reiniciar Apache para que sirva los últimos archivos
               systemctl restart apache2
 
               # ----- FORZAR REDEPLOY EN TF ----- 
-              # redeploy 2026‑05‑31‑v2
+              # redeploy 2026‑05‑31‑v3
               EOF
 
   tags = {
