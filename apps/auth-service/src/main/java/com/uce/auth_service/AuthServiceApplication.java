@@ -8,10 +8,10 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @SpringBootApplication
-public class AuthServiceApp { 
+public class AuthServiceApplication { 
 
     public static void main(String[] args) {
-        SpringApplication.run(AuthServiceApp.class, args);
+        SpringApplication.run(AuthServiceApplication.class, args);
     }
 
     // --- ESTO ES LO QUE SOLUCIONA EL ERROR DE CORS ---

@@ -9,7 +9,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/internships")
-@CrossOrigin(origins = "http://localhost:5173") // Permitimos que React se conecte
+ // Permitimos que React se conecte
 public class InternshipController {
 
     @Autowired

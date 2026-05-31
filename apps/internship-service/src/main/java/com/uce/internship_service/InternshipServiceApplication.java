@@ -11,7 +11,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class InternshipServiceApplication { 
 
     public static void main(String[] args) {
-        SpringApplication.run(AuthServiceApp.class, args);
+        SpringApplication.run(InternshipServiceApplication.class, args);
     }
 
     // --- ESTO ES LO QUE SOLUCIONA EL ERROR DE CORS ---
