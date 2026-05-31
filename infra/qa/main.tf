@@ -17,10 +17,10 @@ provider "aws" {
   region = "us-east-1"
 }
 
-# --- 1. EL GUARDIA DE SEGURIDAD ---
+# --- 1. EL GUARDIA DE SEGURIDAD (AÑADIMOS EL 8081) ---
 resource "aws_security_group" "qa_sg" {
   name        = "qa_security_group"
-  description = "Permitir trafico web y backend"
+  description = "Permitir trafico web y microservicios Java"
 
   ingress {
     from_port   = 80
@@ -31,7 +31,7 @@ resource "aws_security_group" "qa_sg" {
 
   ingress {
     from_port   = 8080
-    to_port     = 8080
+    to_port     = 8081 # <--- Abrimos ambos puertos para los microservicios
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
@@ -44,6 +44,7 @@ resource "aws_security_group" "qa_sg" {
   }
 }
 
+# --- 2. EL SERVIDOR ---
 resource "aws_instance" "backend_qa_server" {
   ami           = "ami-0c7217cdde317cfec" 
   instance_type = "t2.micro"              
@@ -72,10 +73,10 @@ resource "aws_instance" "backend_qa_server" {
               systemctl start apache2
               systemctl enable apache2
 
-              # 4. Descargar tu codigo desde GitHub
+              # 4. Descargar tu codigo
               git clone -b QA https://github.com/gisselamuzo49-commits/FINAL-PROJECT-.git /tmp/proyecto
 
-              # 5. Entrar a la carpeta del Frontend, instalar y empaquetar
+              # 5. Entrar a la carpeta del Frontend
               cd /tmp/proyecto/apps/frontend-web
               npm install > /var/www/html/log_npm.txt 2>&1
               npm run build >> /var/www/html/log_npm.txt 2>&1
