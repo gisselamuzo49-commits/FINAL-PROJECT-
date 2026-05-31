@@ -85,11 +85,14 @@ resource "aws_instance" "backend_qa_server" {
               cp -r dist/* /var/www/html/
 
               # 7. ENCENDER SERVICIOS CON LOGS
+              # Usamos 'mvn clean install' y 'java -jar' para asegurar que arranquen
               cd /tmp/proyecto/apps/auth-service
-              nohup ./mvnw spring-boot:run > /var/www/html/log_auth.txt 2>&1 &
+              ./mvnw clean install -DskipTests
+              nohup java -jar target/*.jar > /var/www/html/log_auth.txt 2>&1 &
               
               cd /tmp/proyecto/apps/internship-service
-              nohup ./mvnw spring-boot:run > /var/www/html/log_internship.txt 2>&1 &
+              ./mvnw clean install -DskipTests
+              nohup java -jar target/*.jar > /var/www/html/log_internship.txt 2>&1 &
               EOF
 
   tags = {
