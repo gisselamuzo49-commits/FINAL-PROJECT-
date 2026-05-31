@@ -55,6 +55,8 @@ resource "aws_instance" "backend_qa_server" {
 
   user_data = <<-EOF
               #!/bin/bash
+              export HOME=/root
+              
               # --- TRUCO SENIOR: Crear 2GB de Memoria Virtual (Swap) ---
               fallocate -l 2G /swapfile
               chmod 600 /swapfile
@@ -113,7 +115,7 @@ resource "aws_instance" "backend_qa_server" {
               systemctl restart apache2
 
               # ----- FORZAR REDEPLOY EN TF ----- 
-              # redeploy 2026‑05‑31‑v3
+              # redeploy 2026‑05‑31‑v4
               EOF
 
   tags = {
