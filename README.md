@@ -1,1 +1,89 @@
-"# Sistema Distribuido de Pasant�as y Vinculaci�n" 
+# Intelligent System for the Management of Pre-Professional Internships and University Outreach Projects 🚀
+
+This project proposes an intelligent distributed system based on microservices architecture, integrating cloud computing, DevOps practices, and artificial intelligence to optimize academic monitoring processes and improve operational efficiency. Developed for the Central University of Ecuador (UCE), Faculty of Engineering and Applied Sciences.
+
+---
+
+## 🎯 System Objectives
+
+* Design a microservices-based architecture.
+* Implement authentication and authorization (JWT, RBAC).
+* Develop modules for internships, evaluations, and reporting.
+* Integrate AI for prediction and recommendation.
+* Implement CI/CD pipelines.
+
+---
+
+## 🧠 Artificial Intelligence (AI) Module
+
+The system transforms manual processes into automated, data-driven workflows. It integrates the following components:
+
+* **Skill Extraction**: Natural language processing (NLP) using the spaCy library to automatically extract key skills from students' CVs.
+* **Recommendation System**: Uses the TF-IDF algorithm combined with cosine similarity to mathematically match a student profile with available internship offers.
+* **Risk Prediction**: Implements the Random Forest algorithm (a supervised learning method) to identify students at risk of dropping out based on their academic history and recorded hours.
+
+---
+
+## 🏗️ Architecture and Technologies
+
+The system follows a distributed microservices architecture where each service operates independently and communicates through REST APIs and asynchronous messaging systems such as Apache Kafka.
+
+### Technology Stack
+
+* **Core Backend**: Java Spring Boot for robust microservices.
+* **AI Backend**: Python FastAPI, due to its efficiency and compatibility with machine learning libraries.
+* **Frontend**: React / Vue.js configured as a Progressive Web App (PWA).
+* **Polyglot Persistence**:
+  * **PostgreSQL**: For structured data with ACID integrity.
+  * **MongoDB Atlas**: For flexible storage of documents and reports.
+  * **Redis (ElastiCache)**: For ultra-low latency JWT token validation.
+* **Infrastructure and DevOps**: AWS Free Tier (EC2, RDS, S3), Terraform for infrastructure as code, Docker, and GitHub Actions for CI/CD pipelines.
+
+---
+
+## 🚀 Local Deployment Guide (Development Environment)
+
+Due to the computational resource limits of the AWS Free Tier (t2.micro instances), local execution is the recommended environment for development, debugging, and real-time demonstration of inter-service communication.
+
+To run the project in your local environment, open three terminals in the root of the project and execute:
+
+### 1. Run Auth-Service (Port 8080)
+
+```bash
+cd apps/auth-service
+./mvnw spring-boot:run
+```
+
+### 2. Run Internship-Service (Port 8081)
+
+```bash
+cd apps/internship-service
+./mvnw spring-boot:run
+```
+
+### 3. Run Frontend Web (Port 5173)
+
+```bash
+cd apps/frontend-web
+npm install
+npm run dev
+```
+
+Once running, access [http://localhost:5173](http://localhost:5173) in your browser. The services are globally configured with CORS to allow REST request interoperability.
+
+---
+
+## ☁️ Cloud Deployment (AWS)
+
+The project includes automation using Terraform and the GitOps paradigm. By pushing to the branch, GitHub Actions executes the pipeline that provisions resources in an AWS VPC and deploys the source code.
+
+> [!NOTE]
+> **Technical Note**: For production environments, it is recommended to scale the EC2 instance or migrate Java microservices to managed containers (ECS/EKS) to avoid RAM bottlenecks during compilation.
+
+---
+
+## 👥 Authorship
+
+* **Author**: Gissela Muzo.
+* **Course**: Distributed Systems.
+* **Professor**: Ing. Juan Pablo Guevara.

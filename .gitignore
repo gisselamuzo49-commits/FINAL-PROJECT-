@@ -1,0 +1,5 @@
+# Archivos ignorados 
+# Ignorar dependencias locales de Terraform
+.terraform/
+*.tfstate
+*.tfstate.backup
