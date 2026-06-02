@@ -115,7 +115,7 @@ resource "aws_instance" "backend_qa_server" {
               systemctl restart apache2
 
               # ----- FORZAR REDEPLOY EN TF ----- 
-              # redeploy 2026‑05‑31‑v4
+              # redeploy 2026‑05‑31‑v5
               EOF
 
   tags = {
