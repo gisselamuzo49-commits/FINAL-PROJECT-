@@ -1,9 +1,11 @@
 import { useState } from 'react'
 
 function App() {
-  // --- DETECCIÓN DINÁMICA DE LA IP ---
+  // --- DETECCIÓN DINÁMICA DE LA IP Y PUERTOS ---
   // window.location.hostname devuelve la IP o dominio donde está abierta la página
   const API_URL = `http://${window.location.hostname}`;
+  const AUTH_PORT = import.meta.env.VITE_AUTH_PORT || "8080";
+  const INTERNSHIP_PORT = import.meta.env.VITE_INTERNSHIP_PORT || "8081";
 
   // --- ESTADOS ---
   const [email, setEmail] = useState("")
@@ -12,10 +14,10 @@ function App() {
   const [pasantias, setPasantias] = useState([])
   const [mensajePasantias, setMensajePasantias] = useState("")
 
-  // Función 1: Guardar Usuario (apunta al puerto 8080)
+  // Función 1: Guardar Usuario (apunta al puerto configurado)
   const registrarUsuario = (e) => {
     e.preventDefault()
-    fetch(`${API_URL}:8080/api/auth/register`, {
+    fetch(`${API_URL}:${AUTH_PORT}/api/auth/register`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email: email, password: password })
@@ -25,9 +27,9 @@ function App() {
       .catch(error => setMensajeAuth("Error: " + error.message))
   }
 
-  // Función 2: Traer Pasantías (apunta al puerto 8081)
+  // Función 2: Traer Pasantías (apunta al puerto configurado)
   const cargarPasantias = () => {
-    fetch(`${API_URL}:8081/api/internships`)
+    fetch(`${API_URL}:${INTERNSHIP_PORT}/api/internships`)
       .then(response => response.json())
       .then(data => {
         setPasantias(data)
