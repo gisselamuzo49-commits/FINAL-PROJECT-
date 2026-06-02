@@ -17,10 +17,10 @@ provider "aws" {
   region = "us-east-1"
 }
 
-# --- 1. EL GUARDIA DE SEGURIDAD (AÑADIMOS EL 8081) ---
+# --- 1. THE SECURITY GUARD (WE ADD 8081) ---
 resource "aws_security_group" "qa_sg" {
   name        = "qa_security_group"
-  description = "Permitir trafico web y microservicios Java"
+  description = "Allow web traffic and Java microservices"
 
   ingress {
     from_port   = 80
@@ -31,7 +31,7 @@ resource "aws_security_group" "qa_sg" {
 
   ingress {
     from_port   = 8080
-    to_port     = 8081 # <--- Abrimos ambos puertos para los microservicios
+    to_port     = 8081 
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
@@ -44,7 +44,7 @@ resource "aws_security_group" "qa_sg" {
   }
 }
 
-# --- 2. EL SERVIDOR ---
+# --- 2. THE SERVER ---
 resource "aws_instance" "backend_qa_server" {
   ami           = "ami-0c7217cdde317cfec"
   instance_type = "t2.micro"
@@ -89,33 +89,33 @@ resource "aws_instance" "backend_qa_server" {
               cd /tmp/proyecto/apps/auth-service
               tr -d '\r' < mvnw > mvnw.lf && mv mvnw.lf mvnw # <-- Convertir CRLF a LF
               chmod +x mvnw
-              echo "--- Iniciando compilación de auth-service ---" > /var/www/html/log_auth.txt
+              echo "--- Starting auth-service compilation ---" > /var/www/html/log_auth.txt
               ./mvnw clean install -DskipTests >> /var/www/html/log_auth.txt 2>&1
               if ls target/*.jar >/dev/null 2>&1; then
-                  echo "--- Iniciando auth-service ---" >> /var/www/html/log_auth.txt
+                  echo "--- Starting auth-service ---" >> /var/www/html/log_auth.txt
                   nohup java -jar target/*.jar >> /var/www/html/log_auth.txt 2>&1 &
               else
-                  echo "ERROR: No se pudo compilar el archivo JAR de auth-service" >> /var/www/html/log_auth.txt
+                  echo "ERROR: Could not compile auth-service JAR file" >> /var/www/html/log_auth.txt
               fi
 
               # 7. Internship Service
               cd /tmp/proyecto/apps/internship-service
               tr -d '\r' < mvnw > mvnw.lf && mv mvnw.lf mvnw # <-- Convertir CRLF a LF
               chmod +x mvnw
-              echo "--- Iniciando compilación de internship-service ---" > /var/www/html/log_internship.txt
+              echo "--- Starting internship-service compilation ---" > /var/www/html/log_internship.txt
               ./mvnw clean install -DskipTests >> /var/www/html/log_internship.txt 2>&1
               if ls target/*.jar >/dev/null 2>&1; then
-                  echo "--- Iniciando internship-service ---" >> /var/www/html/log_internship.txt
+                  echo "--- Starting internship-service ---" >> /var/www/html/log_internship.txt
                   nohup java -jar target/*.jar >> /var/www/html/log_internship.txt 2>&1 &
               else
-                  echo "ERROR: No se pudo compilar el archivo JAR de internship-service" >> /var/www/html/log_internship.txt
+                  echo "ERROR: Could not compile internship-service JAR file" >> /var/www/html/log_internship.txt
               fi
 
               # 8. Reiniciar Apache para que sirva los últimos archivos
               systemctl restart apache2
 
-              # ----- FORZAR REDEPLOY EN TF ----- 
-              # redeploy 2026‑05‑31‑v5
+              # ----- FORCE REDEPLOY ON TF ----- 
+              # redeploy 2026‑05‑31‑v7
               EOF
 
   tags = {

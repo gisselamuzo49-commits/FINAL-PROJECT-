@@ -17,10 +17,10 @@ provider "aws" {
   region = "us-east-1"
 }
 
-# --- 1. EL GUARDIA DE SEGURIDAD (PUERTOS DE PRODUCCIÓN 9080 Y 9081) ---
+# --- 1. THE SECURITY GUARD (PRODUCTION PORTS 9080 AND 9081) ---
 resource "aws_security_group" "prod_sg" {
   name        = "prod_security_group"
-  description = "Permitir trafico web y microservicios Java en Produccion"
+  description = "Allow web traffic and Java microservices in Production"
 
   ingress {
     from_port   = 80
@@ -31,7 +31,7 @@ resource "aws_security_group" "prod_sg" {
 
   ingress {
     from_port   = 9080
-    to_port     = 9081 # <--- Puertos de produccion
+    to_port     = 9081 
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
@@ -44,7 +44,7 @@ resource "aws_security_group" "prod_sg" {
   }
 }
 
-# --- 2. EL SERVIDOR DE PRODUCCIÓN ---
+# --- 2. THE PRODUCTION SERVER ---
 resource "aws_instance" "backend_prod_server" {
   ami           = "ami-0c7217cdde317cfec"
   instance_type = "t2.micro"
@@ -57,17 +57,17 @@ resource "aws_instance" "backend_prod_server" {
               #!/bin/bash
               export HOME=/root
               
-              # --- TRUCO SENIOR: Crear 2GB de Memoria Virtual (Swap) ---
+              # --- SENIOR TRICK: Create 2GB of Virtual Memory (Swap) ---
               fallocate -l 2G /swapfile
               chmod 600 /swapfile
               mkswap /swapfile
               swapon /swapfile
 
-              # 1. Actualizar e instalar dependencias básicas
+              # 1. Update and install basic dependencies
               apt-get update -y
               apt-get install -y openjdk-17-jdk apache2 git curl
 
-              # 2. Instalar Node.js
+              # 2. Install Node.js
               curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
               apt-get install -y nodejs
 
@@ -75,11 +75,11 @@ resource "aws_instance" "backend_prod_server" {
               systemctl start apache2
               systemctl enable apache2
 
-              # 4. Descargar tu código de la rama MAIN (Producción)
+              # 4. Download your code from the MAIN branch (Production)
               rm -rf /tmp/proyecto
               git clone -b main https://github.com/gisselamuzo49-commits/FINAL-PROJECT-.git /tmp/proyecto
 
-              # 5. Frontend - Inyectar puertos de Producción antes de compilar
+              # 5. Frontend - Inject Production ports before compiling
               cd /tmp/proyecto/apps/frontend-web
               echo "VITE_AUTH_PORT=9080" > .env
               echo "VITE_INTERNSHIP_PORT=9081" >> .env
@@ -91,33 +91,33 @@ resource "aws_instance" "backend_prod_server" {
               cd /tmp/proyecto/apps/auth-service
               tr -d '\r' < mvnw > mvnw.lf && mv mvnw.lf mvnw # <-- Convertir CRLF a LF
               chmod +x mvnw
-              echo "--- Iniciando compilación de auth-service ---" > /var/www/html/log_auth.txt
+              echo "--- Starting auth-service compilation ---" > /var/www/html/log_auth.txt
               ./mvnw clean install -DskipTests >> /var/www/html/log_auth.txt 2>&1
               if ls target/*.jar >/dev/null 2>&1; then
-                  echo "--- Iniciando auth-service en puerto 9080 ---" >> /var/www/html/log_auth.txt
+                  echo "--- Starting auth-service  ---" >> /var/www/html/log_auth.txt
                   nohup java -jar target/*.jar --server.port=9080 >> /var/www/html/log_auth.txt 2>&1 &
               else
-                  echo "ERROR: No se pudo compilar el archivo JAR de auth-service" >> /var/www/html/log_auth.txt
+                  echo "ERROR: Could not compile auth-service JAR file" >> /var/www/html/log_auth.txt
               fi
 
               # 7. Internship Service (Puerto 9081)
               cd /tmp/proyecto/apps/internship-service
               tr -d '\r' < mvnw > mvnw.lf && mv mvnw.lf mvnw # <-- Convertir CRLF a LF
               chmod +x mvnw
-              echo "--- Iniciando compilación de internship-service ---" > /var/www/html/log_internship.txt
+              echo "--- Starting internship-service compilation ---" > /var/www/html/log_internship.txt
               ./mvnw clean install -DskipTests >> /var/www/html/log_internship.txt 2>&1
               if ls target/*.jar >/dev/null 2>&1; then
-                  echo "--- Iniciando internship-service en puerto 9081 ---" >> /var/www/html/log_internship.txt
+                  echo "--- Starting internship-service ---" >> /var/www/html/log_internship.txt
                   nohup java -jar target/*.jar --server.port=9081 >> /var/www/html/log_internship.txt 2>&1 &
               else
-                  echo "ERROR: No se pudo compilar el archivo JAR de internship-service" >> /var/www/html/log_internship.txt
+                  echo "ERROR: Could not compile internship-service JAR file" >> /var/www/html/log_internship.txt
               fi
 
-              # 8. Reiniciar Apache para que sirva los últimos archivos
+              # 8. Restart Apache to serve the latest files
               systemctl restart apache2
 
-              # ----- FORZAR REDEPLOY EN TF ----- 
-              # redeploy 2026-06-01-v1
+              # ----- FORCE REDEPLOY ON TF ----- 
+              # redeploy 2026-06-01-v2
               EOF
 
   tags = {
