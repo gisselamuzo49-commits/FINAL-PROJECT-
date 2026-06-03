@@ -1,0 +1,41 @@
+services:
+  auth-service:
+    build:
+      context: ./apps/auth-service
+      dockerfile: Dockerfile
+    container_name: auth-service-local
+    ports:
+      - "8080:8080"
+    volumes:
+      - auth-db-volume:/app
+    restart: always
+
+  internship-service:
+    build:
+      context: ./apps/internship-service
+      dockerfile: Dockerfile
+    container_name: internship-service-local
+    ports:
+      - "8081:8081"
+    volumes:
+      - internship-db-volume:/app
+    restart: always
+
+  frontend-web:
+    build:
+      context: ./apps/frontend-web
+      dockerfile: Dockerfile
+      args:
+        - VITE_AUTH_PORT=8080
+        - VITE_INTERNSHIP_PORT=8081
+    container_name: frontend-web-local
+    ports:
+      - "80:80"
+    depends_on:
+      - auth-service
+      - internship-service
+    restart: always
+
+volumes:
+  auth-db-volume:
+  internship-db-volume:
