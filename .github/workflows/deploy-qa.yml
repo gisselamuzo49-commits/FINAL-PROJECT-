@@ -28,21 +28,21 @@ jobs:
 
     - name: 🐳 Compilar y subir Auth Service
       run: |
-        docker build -t gisselamuzo49/auth-service:latest ./apps/auth-service
-        docker push gisselamuzo49/auth-service:latest
+        docker build -t gdmuzo/auth-service:latest ./apps/auth-service
+        docker push gdmuzo/auth-service:latest
 
     - name: 🐳 Compilar y subir Internship Service
       run: |
-        docker build -t gisselamuzo49/internship-service:latest ./apps/internship-service
-        docker push gisselamuzo49/internship-service:latest
+        docker build -t gdmuzo/internship-service:latest ./apps/internship-service
+        docker push gdmuzo/internship-service:latest
 
     - name: 🐳 Compilar y subir Frontend Web
       run: |
         docker build \
           --build-arg VITE_AUTH_PORT=8080 \
           --build-arg VITE_INTERNSHIP_PORT=8081 \
-          -t gisselamuzo49/frontend-web:latest ./apps/frontend-web
-        docker push gisselamuzo49/frontend-web:latest
+          -t gdmuzo/frontend-web:latest ./apps/frontend-web
+        docker push gdmuzo/frontend-web:latest
 
     - name: 🛠️ Instalar Terraform
       uses: hashicorp/setup-terraform@v2

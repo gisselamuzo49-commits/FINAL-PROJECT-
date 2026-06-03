@@ -77,7 +77,7 @@ resource "aws_instance" "backend_prod_server" {
                 -m 300m \
                 -v /var/lib/pasantias/auth.db:/app/auth.db \
                 --restart always \
-                gisselamuzo49/auth-service:latest
+                gdmuzo/auth-service:latest
 
               docker run -d \
                 --name internship-service \
@@ -85,17 +85,17 @@ resource "aws_instance" "backend_prod_server" {
                 -m 300m \
                 -v /var/lib/pasantias/internship.db:/app/internship.db \
                 --restart always \
-                gisselamuzo49/internship-service:latest
+                gdmuzo/internship-service:latest
 
               docker run -d \
                 --name frontend-web \
                 -p 80:80 \
                 -m 150m \
                 --restart always \
-                gisselamuzo49/frontend-web:latest
+                gdmuzo/frontend-web:latest
 
               # ----- FORCE REDEPLOY ON TF ----- 
-              # redeploy docker-v1
+              # redeploy docker-v2
               EOF
 
   tags = {
