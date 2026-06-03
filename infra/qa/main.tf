@@ -17,10 +17,10 @@ provider "aws" {
   region = "us-east-1"
 }
 
-# --- 1. EL GUARDIA DE SEGURIDAD (AÑADIMOS EL 8081) ---
+# --- 1. THE SECURITY GUARD (WE ADD 8081) ---
 resource "aws_security_group" "qa_sg" {
   name        = "qa_security_group"
-  description = "Permitir trafico web y microservicios Java"
+  description = "Allow web traffic and Java microservices"
 
   ingress {
     from_port   = 80
@@ -31,7 +31,7 @@ resource "aws_security_group" "qa_sg" {
 
   ingress {
     from_port   = 8080
-    to_port     = 8081 # <--- Abrimos ambos puertos para los microservicios
+    to_port     = 8081 
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
@@ -44,7 +44,7 @@ resource "aws_security_group" "qa_sg" {
   }
 }
 
-# --- 2. EL SERVIDOR ---
+# --- 2. THE SERVER ---
 resource "aws_instance" "backend_qa_server" {
   ami           = "ami-0c7217cdde317cfec"
   instance_type = "t2.micro"
@@ -57,65 +57,45 @@ resource "aws_instance" "backend_qa_server" {
               #!/bin/bash
               export HOME=/root
               
-              # --- TRUCO SENIOR: Crear 2GB de Memoria Virtual (Swap) ---
-              fallocate -l 2G /swapfile
-              chmod 600 /swapfile
-              mkswap /swapfile
-              swapon /swapfile
-
-              # 1. Actualizar e instalar dependencias básicas
+              # 1. Instalar Docker
               apt-get update -y
-              apt-get install -y openjdk-17-jdk apache2 git curl
+              apt-get install -y docker.io curl
+              systemctl start docker
+              systemctl enable docker
 
-              # 2. Instalar Node.js
-              curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
-              apt-get install -y nodejs
+              # 2. Crear directorios para persistir bases de datos SQLite locales
+              mkdir -p /var/lib/pasantias
 
-              # 3. Encender el servidor web
-              systemctl start apache2
-              systemctl enable apache2
+              # 3. Detener y remover contenedores viejos si existen
+              docker stop auth-service internship-service frontend-web || true
+              docker rm auth-service internship-service frontend-web || true
 
-              # 4. Descargar tu código
-              rm -rf /tmp/proyecto
-              git clone -b QA https://github.com/gisselamuzo49-commits/FINAL-PROJECT-.git /tmp/proyecto
+              # 4. Correr contenedores con límites de memoria
+              docker run -d \
+                --name auth-service \
+                -p 8080:8080 \
+                -m 300m \
+                -v /var/lib/pasantias/auth.db:/app/auth.db \
+                --restart always \
+                gisselamuzo49/auth-service:latest
 
-              # 5. Frontend
-              cd /tmp/proyecto/apps/frontend-web
-              npm install > /var/www/html/log_npm.txt 2>&1
-              npm run build >> /var/www/html/log_npm.txt 2>&1
-              cp -r dist/* /var/www/html/
+              docker run -d \
+                --name internship-service \
+                -p 8081:8081 \
+                -m 300m \
+                -v /var/lib/pasantias/internship.db:/app/internship.db \
+                --restart always \
+                gisselamuzo49/internship-service:latest
 
-              # 6. Auth Service
-              cd /tmp/proyecto/apps/auth-service
-              tr -d '\r' < mvnw > mvnw.lf && mv mvnw.lf mvnw # <-- Convertir CRLF a LF
-              chmod +x mvnw
-              echo "--- Iniciando compilación de auth-service ---" > /var/www/html/log_auth.txt
-              ./mvnw clean install -DskipTests >> /var/www/html/log_auth.txt 2>&1
-              if ls target/*.jar >/dev/null 2>&1; then
-                  echo "--- Iniciando auth-service ---" >> /var/www/html/log_auth.txt
-                  nohup java -jar target/*.jar >> /var/www/html/log_auth.txt 2>&1 &
-              else
-                  echo "ERROR: No se pudo compilar el archivo JAR de auth-service" >> /var/www/html/log_auth.txt
-              fi
+              docker run -d \
+                --name frontend-web \
+                -p 80:80 \
+                -m 150m \
+                --restart always \
+                gisselamuzo49/frontend-web:latest
 
-              # 7. Internship Service
-              cd /tmp/proyecto/apps/internship-service
-              tr -d '\r' < mvnw > mvnw.lf && mv mvnw.lf mvnw # <-- Convertir CRLF a LF
-              chmod +x mvnw
-              echo "--- Iniciando compilación de internship-service ---" > /var/www/html/log_internship.txt
-              ./mvnw clean install -DskipTests >> /var/www/html/log_internship.txt 2>&1
-              if ls target/*.jar >/dev/null 2>&1; then
-                  echo "--- Iniciando internship-service ---" >> /var/www/html/log_internship.txt
-                  nohup java -jar target/*.jar >> /var/www/html/log_internship.txt 2>&1 &
-              else
-                  echo "ERROR: No se pudo compilar el archivo JAR de internship-service" >> /var/www/html/log_internship.txt
-              fi
-
-              # 8. Reiniciar Apache para que sirva los últimos archivos
-              systemctl restart apache2
-
-              # ----- FORZAR REDEPLOY EN TF ----- 
-              # redeploy 2026‑05‑31‑v4
+              # ----- FORCE REDEPLOY ON TF ----- 
+              # redeploy docker-v1
               EOF
 
   tags = {

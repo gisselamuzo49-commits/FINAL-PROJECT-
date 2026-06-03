@@ -1,0 +1,55 @@
+name: GitOps - Infraestructura PROD
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  terraform:
+    name: 'Desplegar Terraform en PROD'
+    runs-on: ubuntu-latest
+    
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+
+    steps:
+    - name: 📥 Descargar código
+      uses: actions/checkout@v3
+
+    - name: 🔑 Log in to Docker Hub
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+    - name: 🐳 Compilar y subir Auth Service
+      run: |
+        docker build -t gisselamuzo49/auth-service:latest ./apps/auth-service
+        docker push gisselamuzo49/auth-service:latest
+
+    - name: 🐳 Compilar y subir Internship Service
+      run: |
+        docker build -t gisselamuzo49/internship-service:latest ./apps/internship-service
+        docker push gisselamuzo49/internship-service:latest
+
+    - name: 🐳 Compilar y subir Frontend Web
+      run: |
+        docker build \
+          --build-arg VITE_AUTH_PORT=9080 \
+          --build-arg VITE_INTERNSHIP_PORT=9081 \
+          -t gisselamuzo49/frontend-web:latest ./apps/frontend-web
+        docker push gisselamuzo49/frontend-web:latest
+
+    - name: 🛠️ Instalar Terraform
+      uses: hashicorp/setup-terraform@v2
+
+    - name: 🚀 Inicializar Terraform
+      run: terraform init
+      working-directory: ./infra/prod
+
+    - name: 🏗️ Construir Infraestructura
+      run: terraform apply -auto-approve
+      working-directory: ./infra/prod
