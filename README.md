@@ -75,7 +75,14 @@ Once running, access [http://localhost:5173](http://localhost:5173) in your brow
 
 ## ☁️ Cloud Deployment (AWS)
 
-The project includes automation using Terraform and the GitOps paradigm. By pushing to the branch, GitHub Actions executes the pipeline that provisions resources in an AWS VPC and deploys the source code.
+The project includes automation using Terraform and the GitOps paradigm. 
+
+### QA Environment Deployment
+
+By merging/pushing code to the `QA` branch, a GitHub Actions workflow (`deploy-qa.yml`) is automatically triggered to:
+1. Build and tag the Docker images (`gdmuzo/auth-service:qa`, `gdmuzo/internship-service:qa`, `gdmuzo/frontend-web:qa`).
+2. Push the Docker images to Docker Hub.
+3. Initialize and apply the Terraform configuration located in the `./infra/qa` directory to provision/update AWS resources.
 
 > [!NOTE]
 > **Technical Note**: For production environments, it is recommended to scale the EC2 instance or migrate Java microservices to managed containers (ECS/EKS) to avoid RAM bottlenecks during compilation.
