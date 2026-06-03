@@ -57,20 +57,20 @@ resource "aws_instance" "backend_qa_server" {
               #!/bin/bash
               export HOME=/root
               
-              # 1. Instalar Docker
+              # 1. Install Docker
               apt-get update -y
               apt-get install -y docker.io curl
               systemctl start docker
               systemctl enable docker
 
-              # 2. Crear directorios para persistir bases de datos SQLite locales
+              # 2. Create directories to persist local SQLite databases
               mkdir -p /var/lib/pasantias
 
-              # 3. Detener y remover contenedores viejos si existen
+              # 3. Stop and remove old containers if they exist
               docker stop auth-service internship-service frontend-web || true
               docker rm auth-service internship-service frontend-web || true
 
-              # 4. Correr contenedores con límites de memoria
+              # 4. Run containers with memory limits
               docker run -d \
                 --name auth-service \
                 -p 8080:8080 \
@@ -99,8 +99,8 @@ resource "aws_instance" "backend_qa_server" {
               EOF
 
   tags = {
-    Name        = "Servidor-Backend-QA"
+    Name        = "Backend-QA-Server"
     Environment = "QA"
-    Project     = "Sistema de Pasantias"
+    Project     = "System for Managing Internships and University Outreach Projects"
   }
 }
