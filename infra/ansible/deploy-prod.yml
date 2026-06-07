@@ -1,0 +1,93 @@
+---
+# ─────────────────────────────────────────
+# Ansible Playbook — Deploy PROD
+# Despliega los 3 servicios en el EC2 privado de PROD
+# vía bastion host (el ProxyCommand lo configura el workflow)
+# ─────────────────────────────────────────
+- name: Deploy PROD — auth-service, internship-service, frontend-web
+  hosts: all
+  become: true
+
+  vars:
+    docker_image_auth:        "gdmuzo/auth-service:latest"
+    docker_image_internship:  "gdmuzo/internship-service:latest"
+    docker_image_frontend:    "gdmuzo/frontend-web:latest"
+    db_dir:                   "/var/lib/pasantias"
+
+  tasks:
+
+    # ── Prerequisitos ────────────────────
+    - name: Asegurar que Docker está corriendo
+      service:
+        name: docker
+        state: started
+        enabled: true
+
+    - name: Crear directorio para bases de datos SQLite
+      file:
+        path: "{{ db_dir }}"
+        state: directory
+        mode: "0755"
+        owner: root
+        group: root
+
+    - name: Asegurar que los archivos .db existen (evitar que Docker monte directorios)
+      file:
+        path: "{{ db_dir }}/{{ item }}"
+        state: touch
+        mode: "0644"
+      loop:
+        - auth.db
+        - internship.db
+
+    # ── Pull de imágenes ─────────────────
+    - name: Pull auth-service image
+      shell: docker pull {{ docker_image_auth }}
+
+    - name: Pull internship-service image
+      shell: docker pull {{ docker_image_internship }}
+
+    - name: Pull frontend-web image
+      shell: docker pull {{ docker_image_frontend }}
+
+    # ── Detener y remover contenedores viejos ──
+    - name: Detener y remover contenedores existentes
+      shell: |
+        docker stop auth-service internship-service frontend-web 2>/dev/null || true
+        docker rm   auth-service internship-service frontend-web 2>/dev/null || true
+
+    # ── Levantar contenedores ────────────
+    - name: Levantar auth-service
+      shell: |
+        docker run -d \
+          --name auth-service \
+          --restart always \
+          -p 8080:8080 \
+          -v {{ db_dir }}/auth.db:/app/auth.db \
+          {{ docker_image_auth }}
+
+    - name: Levantar internship-service
+      shell: |
+        docker run -d \
+          --name internship-service \
+          --restart always \
+          -p 8081:8081 \
+          -v {{ db_dir }}/internship.db:/app/internship.db \
+          {{ docker_image_internship }}
+
+    - name: Levantar frontend-web
+      shell: |
+        docker run -d \
+          --name frontend-web \
+          --restart always \
+          -p 80:80 \
+          {{ docker_image_frontend }}
+
+    # ── Verificación ─────────────────────
+    - name: Estado de los contenedores
+      shell: docker ps --format "table {{ '{{' }}.Names{{ '}}' }}\t{{ '{{' }}.Status{{ '}}' }}\t{{ '{{' }}.Ports{{ '}}' }}"
+      register: container_status
+
+    - name: Mostrar estado
+      debug:
+        var: container_status.stdout_lines
