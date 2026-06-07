@@ -1,13 +1,16 @@
+# ─────────────────────────────────────────
+# TERRAFORM BACKEND — S3 remote state QA
+# ─────────────────────────────────────────
 terraform {
+  required_version = ">= 1.5.0"
   required_providers {
     aws = {
       source  = "hashicorp/aws"
       version = "~> 5.0"
     }
   }
-  
   backend "s3" {
-    bucket = "estado-pasantias-gisse-2026" 
+    bucket = "estado-pasantias-gisse-2026"
     key    = "qa/terraform.tfstate"
     region = "us-east-1"
   }
@@ -17,163 +20,226 @@ provider "aws" {
   region = "us-east-1"
 }
 
-# --- 1. THE SECURITY GUARD (WE ADD 8081) ---
-resource "aws_security_group" "qa_sg" {
-  name        = "qa_security_group"
-  description = "Allow web traffic and Java microservices"
+# ─────────────────────────────────────────
+# VPC
+# ─────────────────────────────────────────
+resource "aws_vpc" "main" {
+  cidr_block           = "10.0.0.0/16"
+  enable_dns_hostnames = true
+  enable_dns_support   = true
+  tags = { Name = "pasantias-qa-vpc" }
+}
+
+# ─────────────────────────────────────────
+# SUBNETS
+# ─────────────────────────────────────────
+resource "aws_subnet" "public_1a" {
+  vpc_id                  = aws_vpc.main.id
+  cidr_block              = "10.0.1.0/24"
+  availability_zone       = "us-east-1a"
+  map_public_ip_on_launch = true
+  tags = { Name = "pasantias-qa-public-1a" }
+}
+
+resource "aws_subnet" "private_1a" {
+  vpc_id            = aws_vpc.main.id
+  cidr_block        = "10.0.3.0/24"
+  availability_zone = "us-east-1a"
+  tags = { Name = "pasantias-qa-private-1a" }
+}
+
+# ─────────────────────────────────────────
+# INTERNET GATEWAY
+# ─────────────────────────────────────────
+resource "aws_internet_gateway" "igw" {
+  vpc_id = aws_vpc.main.id
+  tags   = { Name = "pasantias-qa-igw" }
+}
+
+resource "aws_route_table" "public" {
+  vpc_id = aws_vpc.main.id
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_internet_gateway.igw.id
+  }
+  tags = { Name = "pasantias-qa-public-rt" }
+}
+
+resource "aws_route_table_association" "public_1a" {
+  subnet_id      = aws_subnet.public_1a.id
+  route_table_id = aws_route_table.public.id
+}
+
+# ─────────────────────────────────────────
+# NAT GATEWAY — permite a la subnet privada
+#               hacer docker pull sin IP pública
+# ─────────────────────────────────────────
+resource "aws_eip" "nat" {
+  domain = "vpc"
+  tags   = { Name = "pasantias-qa-nat-eip" }
+}
+
+resource "aws_nat_gateway" "nat" {
+  allocation_id = aws_eip.nat.id
+  subnet_id     = aws_subnet.public_1a.id
+  tags          = { Name = "pasantias-qa-nat" }
+  depends_on    = [aws_internet_gateway.igw]
+}
+
+resource "aws_route_table" "private" {
+  vpc_id = aws_vpc.main.id
+  route {
+    cidr_block     = "0.0.0.0/0"
+    nat_gateway_id = aws_nat_gateway.nat.id
+  }
+  tags = { Name = "pasantias-qa-private-rt" }
+}
+
+resource "aws_route_table_association" "private_1a" {
+  subnet_id      = aws_subnet.private_1a.id
+  route_table_id = aws_route_table.private.id
+}
+
+# ─────────────────────────────────────────
+# SECURITY GROUPS
+# ─────────────────────────────────────────
+
+# Bastion: solo SSH desde internet
+resource "aws_security_group" "sg_bastion" {
+  name        = "pasantias-qa-bastion"
+  description = "SSH access to bastion host"
+  vpc_id      = aws_vpc.main.id
 
   ingress {
-    from_port   = 80
-    to_port     = 80
+    from_port   = 22
+    to_port     = 22
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
-
-  ingress {
-    from_port   = 8080
-    to_port     = 8081 
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
   egress {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+  tags = { Name = "pasantias-qa-bastion" }
 }
 
-# --- 2. THE SERVER ---
-resource "aws_instance" "backend_qa_server" {
-  ami           = "ami-0c7217cdde317cfec"
-  instance_type = "t2.micro"
+# Private: servicios accesibles dentro de la VPC + SSH desde bastion
+resource "aws_security_group" "sg_private" {
+  name        = "pasantias-qa-private"
+  description = "Private EC2 - auth, internship, frontend"
+  vpc_id      = aws_vpc.main.id
 
-  vpc_security_group_ids = [aws_security_group.qa_sg.id]
-
-  user_data_replace_on_change = true
-
-  user_data = <<-EOF
-              #!/bin/bash
-              export HOME=/root
-              
-              # 1. Instalar Docker
-              apt-get update -y
-              apt-get install -y docker.io curl
-              systemctl start docker
-              systemctl enable docker
-
-              # 2. Corregir y asegurar archivos SQLite válidos (evitar que Docker monte directorios)
-              mkdir -p /var/lib/pasantias
-              for db_file in auth.db internship.db; do
-                if [ -d "/var/lib/pasantias/$db_file" ]; then
-                  rm -rf "/var/lib/pasantias/$db_file"
-                fi
-                touch "/var/lib/pasantias/$db_file"
-              done
-
-              # 3. Configurar Directorio de Diagnóstico
-              mkdir -p /var/log/pasantias-diag
-              cat << 'ERR' > /var/log/pasantias-diag/index.html
-              <!DOCTYPE html>
-              <html>
-              <head>
-                <meta http-equiv="refresh" content="5">
-                <title>Diagnóstico Pasantías (Inicializando...)</title>
-                <style>
-                  body { font-family: monospace; background: #121212; color: #ffeb3b; padding: 20px; }
-                </style>
-              </head>
-              <body>
-                <h1>📋 Iniciando sistema de diagnóstico y descargando contenedores...</h1>
-                <p>Por favor espera, la página se recargará automáticamente.</p>
-              </body>
-              </html>
-              ERR
-
-              # 4. Detener y remover contenedores viejos si existen
-              docker stop auth-service internship-service frontend-web || true
-              docker rm auth-service internship-service frontend-web || true
-
-              # 5. Descargar nuevas imágenes y arrancar contenedores
-              docker pull gdmuzo/auth-service:qa
-              docker pull gdmuzo/internship-service:qa
-              docker pull gdmuzo/frontend-web:qa
-
-              docker run -d \
-                --name auth-service \
-                -p 8080:8080 \
-                -m 300m \
-                -v /var/lib/pasantias/auth.db:/app/auth.db \
-                --restart always \
-                gdmuzo/auth-service:qa
-
-              docker run -d \
-                --name internship-service \
-                -p 8081:8081 \
-                -m 300m \
-                -v /var/lib/pasantias/internship.db:/app/internship.db \
-                --restart always \
-                gdmuzo/internship-service:qa
-
-              docker run -d \
-                --name frontend-web \
-                -p 80:80 \
-                -m 150m \
-                -v /var/log/pasantias-diag:/usr/share/nginx/html/status \
-                --restart always \
-                gdmuzo/frontend-web:qa
-
-              # 6. Bucle de actualización para el Dashboard de Diagnóstico
-              (
-              while true; do
-                cat << 'DASHBOARD' > /var/log/pasantias-diag/index.html
-              <!DOCTYPE html>
-              <html>
-              <head>
-                <meta http-equiv="refresh" content="10">
-                <title>Estado de Contenedores QA</title>
-                <style>
-                  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace; background: #0f172a; color: #e2e8f0; padding: 20px; margin: 0; }
-                  .container { max-width: 1200px; margin: 0 auto; }
-                  h1 { color: #38bdf8; border-bottom: 2px solid #334155; padding-bottom: 10px; }
-                  h2 { color: #f59e0b; margin-top: 30px; font-size: 1.2rem; }
-                  pre { background: #1e293b; padding: 15px; border-radius: 8px; overflow-x: auto; border: 1px solid #334155; color: #34d399; font-size: 0.9rem; }
-                  .footer { margin-top: 40px; text-align: center; color: #64748b; font-size: 0.8rem; }
-                </style>
-              </head>
-              <body>
-                <div class="container">
-                  <h1>📋 Dashboard de Diagnóstico - QA (Actualizado: $(date -u) UTC)</h1>
-                  
-                  <h2>🐳 Estado de los Contenedores Docker</h2>
-                  <pre>$(docker ps -a --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}")</pre>
-
-                  <h2>🔑 Logs del Servicio de Autenticación (auth-service)</h2>
-                  <pre>$(docker logs --tail 30 auth-service 2>&1)</pre>
-
-                  <h2>💼 Logs del Servicio de Pasantías (internship-service)</h2>
-                  <pre>$(docker logs --tail 30 internship-service 2>&1)</pre>
-
-                  <h2>🌐 Logs del Servidor Frontend Nginx</h2>
-                  <pre>$(docker logs --tail 30 frontend-web 2>&1)</pre>
-                  
-                  <div class="footer">Recarga automática cada 10 segundos</div>
-                </div>
-              </body>
-              </html>
-              DASHBOARD
-                sleep 10
-              done
-              ) &
-              
-              # ----- FORCE REDEPLOY ON TF ----- 
-              # redeploy docker-v3
-              EOF
-
-  tags = {
-    Name        = "Backend-QA-Server"
-    Environment = "QA"
-    Project     = "System for Managing Internships and University Outreach Projects"
+  # Todo el tráfico interno de la VPC (health checks, comunicación entre servicios)
+  ingress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["10.0.0.0/16"]
   }
+  # SSH solo desde el bastion
+  ingress {
+    from_port       = 22
+    to_port         = 22
+    protocol        = "tcp"
+    security_groups = [aws_security_group.sg_bastion.id]
+  }
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  tags = { Name = "pasantias-qa-private" }
+}
+
+# ─────────────────────────────────────────
+# KEY PAIR — QA key ya creada en AWS
+# ─────────────────────────────────────────
+data "aws_key_pair" "qa_key" {
+  key_name = "QA"
+}
+
+# ─────────────────────────────────────────
+# AMI — Ubuntu 24.04 LTS (última versión)
+# ─────────────────────────────────────────
+data "aws_ami" "ubuntu" {
+  most_recent = true
+  owners      = ["099720109477"] # Canonical
+  filter {
+    name   = "name"
+    values = ["ubuntu/images/hvm-ssd*ubuntu*24.04*amd64*"]
+  }
+}
+
+# ─────────────────────────────────────────
+# BASTION HOST — jump host público
+# NOTA: la IP pública cambia en cada sesión de AWS Academy.
+#       Después de cada "terraform apply -refresh-only" actualiza
+#       el secret QA_BASTION_IP en GitHub Actions.
+# ─────────────────────────────────────────
+resource "aws_instance" "bastion" {
+  ami                    = data.aws_ami.ubuntu.id
+  instance_type          = "t3.micro"
+  subnet_id              = aws_subnet.public_1a.id
+  key_name               = data.aws_key_pair.qa_key.key_name
+  vpc_security_group_ids = [aws_security_group.sg_bastion.id]
+  tags                   = { Name = "pasantias-qa-bastion" }
+}
+
+# ─────────────────────────────────────────
+# EC2 — QA Services (auth + internship + frontend)
+# ─────────────────────────────────────────
+resource "aws_instance" "qa_auth_jobs" {
+  ami                    = data.aws_ami.ubuntu.id
+  instance_type          = "t3.small"
+  subnet_id              = aws_subnet.private_1a.id
+  key_name               = data.aws_key_pair.qa_key.key_name
+  vpc_security_group_ids = [aws_security_group.sg_private.id]
+
+  # user_data solo instala Docker; los contenedores los despliega Ansible
+  user_data = <<-EOF
+    #!/bin/bash
+    apt-get update -y
+    apt-get install -y ca-certificates curl gnupg apt-transport-https
+    install -m 0755 -d /etc/apt/keyrings
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+    chmod a+r /etc/apt/keyrings/docker.gpg
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu noble stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
+    apt-get update -y
+    apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
+    systemctl enable docker
+    systemctl start docker
+    usermod -aG docker ubuntu
+  EOF
+
+  root_block_device {
+    volume_size = 20
+    volume_type = "gp3"
+  }
+
+  tags = { Name = "pasantias-qa-ec2-services" }
+
+  # Evitar que Terraform destruya y recree la instancia cuando
+  # Ansible modifica los contenedores o cuando cambia la AMI
+  lifecycle {
+    ignore_changes = [user_data, ami]
+  }
+}
+
+# ─────────────────────────────────────────
+# OUTPUTS
+# Comandos para obtener los valores:
+#   terraform apply -refresh-only
+#   terraform output
+# ─────────────────────────────────────────
+output "bastion_public_ip" {
+  description = "IP pública del bastion (cambia cada sesión — actualizar QA_BASTION_IP en GitHub Secrets)"
+  value       = aws_instance.bastion.public_ip
+}
+
+output "qa_auth_jobs_private_ip" {
+  description = "IP privada del EC2 de servicios (actualizar QA_AUTH_JOBS_IP en GitHub Secrets)"
+  value       = aws_instance.qa_auth_jobs.private_ip
 }

@@ -1,4 +1,4 @@
-name: GitOps - Infraestructura PROD
+name: Deploy to PROD
 
 on:
   push:
@@ -6,50 +6,73 @@ on:
       - main
 
 jobs:
-  terraform:
-    name: 'Desplegar Terraform en PROD'
+  deploy:
     runs-on: ubuntu-latest
-    
-    env:
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
 
     steps:
-    - name: 📥 Descargar código
-      uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: 🔑 Log in to Docker Hub
-      uses: docker/login-action@v2
-      with:
-        username: ${{ secrets.DOCKERHUB_USERNAME }}
-        password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Run tests - auth-service
+        run: |
+          cd apps/auth-service
+          chmod +x mvnw
+          ./mvnw test
 
-    - name: 🐳 Compilar y subir Auth Service
-      run: |
-        docker build -t gdmuzo/auth-service:prod ./apps/auth-service
-        docker push gdmuzo/auth-service:prod
+      - name: Run tests - internship-service
+        run: |
+          cd apps/internship-service
+          chmod +x mvnw
+          ./mvnw test
 
-    - name: 🐳 Compilar y subir Internship Service
-      run: |
-        docker build -t gdmuzo/internship-service:prod ./apps/internship-service
-        docker push gdmuzo/internship-service:prod
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-    - name: 🐳 Compilar y subir Frontend Web
-      run: |
-        docker build \
-          --build-arg VITE_AUTH_PORT=9080 \
-          --build-arg VITE_INTERNSHIP_PORT=9081 \
-          -t gdmuzo/frontend-web:prod ./apps/frontend-web
-        docker push gdmuzo/frontend-web:prod
+      - name: Build and push auth-service
+        uses: docker/build-push-action@v5
+        with:
+          context: ./apps/auth-service
+          push: true
+          tags: gdmuzo/auth-service:latest
 
-    - name: 🛠️ Instalar Terraform
-      uses: hashicorp/setup-terraform@v2
+      - name: Build and push internship-service
+        uses: docker/build-push-action@v5
+        with:
+          context: ./apps/internship-service
+          push: true
+          tags: gdmuzo/internship-service:latest
 
-    - name: 🚀 Inicializar Terraform
-      run: terraform init
-      working-directory: ./infra/prod
+      - name: Build and push frontend-web
+        uses: docker/build-push-action@v5
+        with:
+          context: ./apps/frontend-web
+          push: true
+          tags: gdmuzo/frontend-web:latest
+          build-args: |
+            VITE_AUTH_PORT=8080
+            VITE_INTERNSHIP_PORT=8081
 
-    - name: 🏗️ Construir Infraestructura
-      run: terraform apply -auto-approve
-      working-directory: ./infra/prod
+      - name: Setup SSH keys
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.PROD_SSH_KEY }}" > ~/.ssh/PROD.pem
+          chmod 400 ~/.ssh/PROD.pem
+          ssh-keyscan -H ${{ secrets.PROD_BASTION_IP }} >> ~/.ssh/known_hosts
+          ssh -i ~/.ssh/PROD.pem -o StrictHostKeyChecking=no ubuntu@${{ secrets.PROD_BASTION_IP }} \
+            "ssh-keyscan -H ${{ secrets.PROD_AUTH_JOBS_IP }}" >> ~/.ssh/known_hosts
+
+      - name: Create Ansible inventory
+        run: |
+          cat > /tmp/prod_inventory.ini << EOF
+          [prod_ec2]
+          ${{ secrets.PROD_AUTH_JOBS_IP }} ansible_user=ubuntu ansible_ssh_private_key_file=~/.ssh/PROD.pem ansible_ssh_common_args='-o StrictHostKeyChecking=no -o ProxyCommand="ssh -W %h:%p -i ~/.ssh/PROD.pem -o StrictHostKeyChecking=no ubuntu@${{ secrets.PROD_BASTION_IP }}"'
+          EOF
+
+      - name: Deploy via Ansible
+        run: |
+          pip install ansible
+          ansible-playbook infra/ansible/deploy-prod.yml \
+            -i /tmp/prod_inventory.ini
