@@ -13,6 +13,7 @@
     docker_image_internship:  "gdmuzo/internship-service:qa"
     docker_image_user:        "gdmuzo/user-service:qa"
     docker_image_linkage:     "gdmuzo/linkage-service:qa"
+    docker_image_gateway:     "gdmuzo/gateway-service:qa"
     docker_image_frontend:    "gdmuzo/frontend-web:qa"
     db_dir:                   "/var/lib/pasantias"
 
@@ -44,6 +45,9 @@
         - user.db
         - linkage.db
 
+    - name: Asegurar que existe la red de Docker para intercomunicación
+      shell: docker network create pasantias-net 2>/dev/null || true
+
     # ── Pull de imágenes ─────────────────
     - name: Pull auth-service image
       shell: docker pull {{ docker_image_auth }}
@@ -57,20 +61,24 @@
     - name: Pull linkage-service image
       shell: docker pull {{ docker_image_linkage }}
 
+    - name: Pull gateway-service image
+      shell: docker pull {{ docker_image_gateway }}
+
     - name: Pull frontend-web image
       shell: docker pull {{ docker_image_frontend }}
 
     # ── Detener y remover contenedores viejos ──
     - name: Detener y remover contenedores existentes
       shell: |
-        docker stop auth-service internship-service user-service linkage-service frontend-web 2>/dev/null || true
-        docker rm   auth-service internship-service user-service linkage-service frontend-web 2>/dev/null || true
+        docker stop auth-service internship-service user-service linkage-service gateway-service frontend-web 2>/dev/null || true
+        docker rm   auth-service internship-service user-service linkage-service gateway-service frontend-web 2>/dev/null || true
 
     # ── Levantar contenedores ────────────
     - name: Levantar auth-service
       shell: |
         docker run -d \
           --name auth-service \
+          --network pasantias-net \
           --restart always \
           -p 8080:8080 \
           -v {{ db_dir }}/auth.db:/app/auth.db \
@@ -80,6 +88,7 @@
       shell: |
         docker run -d \
           --name internship-service \
+          --network pasantias-net \
           --restart always \
           -p 8081:8081 \
           -v {{ db_dir }}/internship.db:/app/internship.db \
@@ -89,6 +98,7 @@
       shell: |
         docker run -d \
           --name user-service \
+          --network pasantias-net \
           --restart always \
           -p 8083:8083 \
           -v {{ db_dir }}/user.db:/app/user.db \
@@ -98,15 +108,31 @@
       shell: |
         docker run -d \
           --name linkage-service \
+          --network pasantias-net \
           --restart always \
           -p 8084:8084 \
           -v {{ db_dir }}/linkage.db:/app/linkage.db \
           {{ docker_image_linkage }}
 
+    - name: Levantar gateway-service
+      shell: |
+        docker run -d \
+          --name gateway-service \
+          --network pasantias-net \
+          --restart always \
+          -p 8082:8082 \
+          -e AUTH_SERVICE_URL=http://auth-service:8080 \
+          -e INTERNSHIP_SERVICE_URL=http://internship-service:8081 \
+          -e USER_SERVICE_URL=http://user-service:8083 \
+          -e LINKAGE_SERVICE_URL=http://linkage-service:8084 \
+          -e JWT_SECRET=v9y$B&E)H@McQfTjWmZq4t7w!z%C*F-JaNdRgUkXp2r5u8x/A?D(G+KbPeShVmYq \
+          {{ docker_image_gateway }}
+
     - name: Levantar frontend-web
       shell: |
         docker run -d \
           --name frontend-web \
+          --network pasantias-net \
           --restart always \
           -p 80:80 \
           {{ docker_image_frontend }}
