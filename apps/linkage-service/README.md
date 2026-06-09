@@ -9,7 +9,7 @@ The **Outreach Projects Service** (Vinculación) is a Spring Boot microservice t
 * **Create Projects**: Allows coordinators to register outreach projects.
 * **List Projects**: Shows all social projects currently planned, in progress, or completed.
 * **Health Endpoint**: Native `/health` check routed through the gateway to monitor operational state.
-* **SQLite Storage**: Persistent lightweight relational database (`linkage.db`).
+* **PostgreSQL Storage**: Persistent relational database storage.
 
 ---
 
@@ -18,7 +18,7 @@ The **Outreach Projects Service** (Vinculación) is a Spring Boot microservice t
 * **Java 17**
 * **Spring Boot 4.0.6**
 * **Spring Data JPA**
-* **SQLite JDBC & Hibernate Dialect**
+* **PostgreSQL JDBC & Hibernate Dialect**
 
 ---
 
@@ -45,7 +45,7 @@ Key settings in `src/main/resources/application.properties`:
 | Property Name | Default Value | Description |
 |---|---|---|
 | `server.port` | `8084` | Port on which the service runs. |
-| `spring.datasource.url` | `jdbc:sqlite:linkage.db` | Location of the SQLite database. |
+| `spring.datasource.url` | `jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/linkage_db` | Connection URL for the PostgreSQL database. |
 
 ---
 
@@ -105,6 +105,10 @@ docker run -d \
   --name linkage-service \
   --network pasantias-net \
   -p 8084:8084 \
-  -v /var/lib/pasantias/linkage.db:/app/linkage.db \
+  -e DB_HOST=postgres-db \
+  -e DB_PORT=5432 \
+  -e DB_NAME=linkage_db \
+  -e DB_USER=postgres \
+  -e DB_PASSWORD=postgres \
   gdmuzo/linkage-service:latest
 ```

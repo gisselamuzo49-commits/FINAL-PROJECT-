@@ -1,4 +1,19 @@
 services:
+  postgres-db:
+    image: postgres:15-alpine
+    container_name: postgres-db-local
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres
+      - POSTGRES_MULTIPLE_DATABASES=auth_db,internship_db,user_db,linkage_db
+    volumes:
+      - postgres-data-volume:/var/lib/postgresql/data
+      - ./postgres-init:/docker-entrypoint-initdb.d
+    restart: always
+
   auth-service:
     build:
       context: ./apps/auth-service
@@ -6,10 +21,15 @@ services:
     container_name: auth-service-local
     ports:
       - "8080:8080"
-    volumes:
-      - auth-db-volume:/app
     environment:
       - JWT_SECRET=v9y$B&E)H@McQfTjWmZq4t7w!z%C*F-JaNdRgUkXp2r5u8x/A?D(G+KbPeShVmYq
+      - DB_HOST=postgres-db
+      - DB_PORT=5432
+      - DB_NAME=auth_db
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+    depends_on:
+      - postgres-db
     restart: always
 
   internship-service:
@@ -19,8 +39,14 @@ services:
     container_name: internship-service-local
     ports:
       - "8081:8081"
-    volumes:
-      - internship-db-volume:/app
+    environment:
+      - DB_HOST=postgres-db
+      - DB_PORT=5432
+      - DB_NAME=internship_db
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+    depends_on:
+      - postgres-db
     restart: always
 
   user-service:
@@ -30,8 +56,14 @@ services:
     container_name: user-service-local
     ports:
       - "8083:8083"
-    volumes:
-      - user-db-volume:/app
+    environment:
+      - DB_HOST=postgres-db
+      - DB_PORT=5432
+      - DB_NAME=user_db
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+    depends_on:
+      - postgres-db
     restart: always
 
   linkage-service:
@@ -41,8 +73,14 @@ services:
     container_name: linkage-service-local
     ports:
       - "8084:8084"
-    volumes:
-      - linkage-db-volume:/app
+    environment:
+      - DB_HOST=postgres-db
+      - DB_PORT=5432
+      - DB_NAME=linkage_db
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+    depends_on:
+      - postgres-db
     restart: always
 
   gateway-service:
@@ -53,8 +91,6 @@ services:
     ports:
       - "8082:8082"
     environment:
-      # Aquí inyectamos los nombres de los contenedores Docker
-      # En Docker Compose, los contenedores se resuelven por su container_name
       - AUTH_SERVICE_URL=http://auth-service-local:8080
       - INTERNSHIP_SERVICE_URL=http://internship-service-local:8081
       - USER_SERVICE_URL=http://user-service-local:8083
@@ -85,7 +121,4 @@ services:
     restart: always
 
 volumes:
-  auth-db-volume:
-  internship-db-volume:
-  user-db-volume:
-  linkage-db-volume:
+  postgres-data-volume:
