@@ -65,19 +65,18 @@ Once Terraform sets up the network and hardware, Ansible playbooks configure the
 
 ### Playbook Tasks:
 1. **Docker Engine Verification**: Checks if Docker is active.
-2. **Persistent Directory Creation**: Creates `/var/lib/pasantias` on the host to store SQLite databases.
-3. **Database Initialization**: Sets up empty `.db` files (`auth.db`, `internship.db`, `user.db`, `linkage.db`) to prevent Docker from creating directories when mounting volumes.
-4. **Docker Network Configuration**: Creates a custom bridge network (`pasantias-net`) allowing microservices to resolve each other by container name.
-5. **Image Pulling**: Fetches updated Docker images from Docker Hub.
-6. **Container Replacement**: Gracefully stops and removes existing service containers.
-7. **Container Launch**: Launches all containers attached to `pasantias-net`:
+2. **Database Initialization**: Sets up a PostgreSQL initialization script (`init-multiple-dbs.sh`) in the host to automatically initialize `auth_db`, `internship_db`, `user_db`, and `linkage_db`.
+3. **Docker Network Configuration**: Creates a custom bridge network (`pasantias-net`) allowing microservices to resolve each other by container name.
+4. **Image Pulling**: Fetches updated Docker images from Docker Hub.
+5. **Container Replacement**: Gracefully stops and removes existing service containers.
+6. **Container Launch**: Launches all containers attached to `pasantias-net`:
    * **`auth-service`** (Port 8080)
    * **`internship-service`** (Port 8081)
    * **`user-service`** (Port 8083)
    * **`linkage-service`** (Port 8084)
    * **`gateway-service`** (Port 8082)
    * **`frontend-web`** (Port 80)
-8. **Verification**: Queries container execution statuses and prints them to the pipeline logs.
+7. **Verification**: Queries container execution statuses and prints them to the pipeline logs.
 
 ---
 
