@@ -8,7 +8,7 @@ The **Authentication Service** is a core microservice built on Spring Boot that 
 
 * **User Registration**: Registers new users with password hashing.
 * **JWT Issuance**: Authenticates users and issues signed JWT tokens for downstream authorization.
-* **SQLite Database**: Lightweight SQL storage configured for fast verification.
+* **PostgreSQL Database**: Relational database storage configured for fast verification.
 * **Spring Boot 4.x & Spring Security**: Modern application backbone with security-oriented defaults.
 
 ---
@@ -19,7 +19,7 @@ The **Authentication Service** is a core microservice built on Spring Boot that 
 * **Spring Boot 4.0.6**
 * **Spring Security & Crypto** (for secure password hashing)
 * **JSON Web Token (jjwt 0.13.0)** (for API token generation)
-* **SQLite JDBC & Hibernate Dialect** (for database interaction)
+* **PostgreSQL JDBC & Hibernate Dialect** (for database interaction)
 
 ---
 
@@ -46,7 +46,7 @@ Key settings are configured in `src/main/resources/application.properties` (or m
 |---|---|---|
 | `server.port` | `8080` | Port on which the service runs. |
 | `JWT_SECRET` | *(Standard 256-bit String)* | Used to sign the issued authentication tokens. |
-| `spring.datasource.url` | `jdbc:sqlite:auth.db` | Path to the SQLite database. |
+| `spring.datasource.url` | `jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/auth_db` | Connection URL for the PostgreSQL database. |
 
 ---
 

@@ -1,6 +1,6 @@
 # Internship Service (`internship-service`) 💼
 
-The **Internship Service** is a Spring Boot microservice that handles the publication, listing, and lifecycle management of pre-professional internship offers. It interfaces with SQLite for persistence.
+The **Internship Service** is a Spring Boot microservice that handles the publication, listing, and lifecycle management of pre-professional internship offers. It interfaces with PostgreSQL for persistence.
 
 ---
 
@@ -9,7 +9,7 @@ The **Internship Service** is a Spring Boot microservice that handles the public
 * **Create Internships**: Exposes endpoints to post new internship offers with details like company name, title, description, and status.
 * **List Internships**: Retrieves available internship positions.
 * **Secure Communications**: Downstream requests are validated at the Gateway.
-* **Lightweight Storage**: SQLite-backed JPA layer.
+* **Robust Storage**: PostgreSQL-backed JPA layer.
 
 ---
 
@@ -18,7 +18,7 @@ The **Internship Service** is a Spring Boot microservice that handles the public
 * **Java 17**
 * **Spring Boot 4.0.6**
 * **Spring Data JPA**
-* **SQLite JDBC & Hibernate Dialect**
+* **PostgreSQL JDBC & Hibernate Dialect**
 
 ---
 
@@ -45,7 +45,7 @@ Key settings in `src/main/resources/application.properties`:
 | Property Name | Default Value | Description |
 |---|---|---|
 | `server.port` | `8081` | Port on which the service runs. |
-| `spring.datasource.url` | `jdbc:sqlite:internship.db` | Location of the SQLite database file. |
+| `spring.datasource.url` | `jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/internship_db` | Connection URL for the PostgreSQL database. |
 
 ---
 
@@ -98,6 +98,10 @@ docker run -d \
   --name internship-service \
   --network pasantias-net \
   -p 8081:8081 \
-  -v /var/lib/pasantias/internship.db:/app/internship.db \
+  -e DB_HOST=postgres-db \
+  -e DB_PORT=5432 \
+  -e DB_NAME=internship_db \
+  -e DB_USER=postgres \
+  -e DB_PASSWORD=postgres \
   gdmuzo/internship-service:latest
 ```

@@ -1,6 +1,6 @@
 # User Profile Service (`user-service`) 👤
 
-The **User Profile Service** is a Spring Boot microservice responsible for maintaining detailed profiles of students, tutors, and career coordinators. It tracks contact details, academic roles, and identity metrics, utilizing SQLite for persistence.
+The **User Profile Service** is a Spring Boot microservice responsible for maintaining detailed profiles of students, tutors, and career coordinators. It tracks contact details, academic roles, and identity metrics, utilizing PostgreSQL for persistence.
 
 ---
 
@@ -9,7 +9,7 @@ The **User Profile Service** is a Spring Boot microservice responsible for maint
 * **Create User Profiles**: Registers descriptive user details mapping name, role, email, and phone.
 * **List User Profiles**: Displays all registered profiles in the system.
 * **Security Middleware Integration**: Gateway enforces JWT validations for endpoints.
-* **SQLite Backend**: Independent persistence using `user.db`.
+* **PostgreSQL Backend**: Independent persistence using `user_db`.
 
 ---
 
@@ -18,7 +18,7 @@ The **User Profile Service** is a Spring Boot microservice responsible for maint
 * **Java 17**
 * **Spring Boot 4.0.6**
 * **Spring Data JPA**
-* **SQLite JDBC & Hibernate Dialect**
+* **PostgreSQL JDBC & Hibernate Dialect**
 
 ---
 
@@ -45,7 +45,7 @@ Key settings in `src/main/resources/application.properties`:
 | Property Name | Default Value | Description |
 |---|---|---|
 | `server.port` | `8083` | Port on which the service runs. |
-| `spring.datasource.url` | `jdbc:sqlite:user.db` | Location of the SQLite database. |
+| `spring.datasource.url` | `jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/user_db` | Connection URL for the PostgreSQL database. |
 
 ---
 
@@ -107,6 +107,10 @@ docker run -d \
   --name user-service \
   --network pasantias-net \
   -p 8083:8083 \
-  -v /var/lib/pasantias/user.db:/app/user.db \
+  -e DB_HOST=postgres-db \
+  -e DB_PORT=5432 \
+  -e DB_NAME=user_db \
+  -e DB_USER=postgres \
+  -e DB_PASSWORD=postgres \
   gdmuzo/user-service:latest
 ```
