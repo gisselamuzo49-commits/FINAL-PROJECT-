@@ -1,1 +1,17 @@
-{} 
+{
+  "name": "sistema-pasantias-vinculacion",
+  "private": true,
+  "packageManager": "npm@11.13.0",
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "build": "turbo run build",
+    "test": "turbo run test",
+    "lint": "turbo run lint"
+  },
+  "devDependencies": {
+    "turbo": "^2.0.0",
+    "lefthook": "^1.6.0"
+  }
+}

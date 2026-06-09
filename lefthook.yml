@@ -1,0 +1,10 @@
+# Lefthook Git Hooks Configuration
+# https://github.com/evilmartians/lefthook
+
+pre-commit:
+  parallel: true
+  commands:
+    turbo-lint:
+      run: npx turbo run lint
+    turbo-build:
+      run: npx turbo run build

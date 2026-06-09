@@ -1,0 +1,9 @@
+{
+  "name": "internship-service",
+  "private": true,
+  "scripts": {
+    "build": "node -e \"const { execSync } = require('child_process'); const cmd = process.platform === 'win32' ? 'mvnw.cmd clean package -DskipTests' : './mvnw clean package -DskipTests'; execSync(cmd, { stdio: 'inherit' });\"",
+    "test": "node -e \"const { execSync } = require('child_process'); const cmd = process.platform === 'win32' ? 'mvnw.cmd test' : './mvnw test'; execSync(cmd, { stdio: 'inherit' });\"",
+    "lint": "echo 'No lint script configured for internship-service'"
+  }
+}

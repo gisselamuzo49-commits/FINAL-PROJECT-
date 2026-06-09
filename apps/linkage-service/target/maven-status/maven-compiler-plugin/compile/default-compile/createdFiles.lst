@@ -1,6 +1,5 @@
 com\uce\linkage_service\LinkageServiceApplication.class
-com\uce\linkage_service\services\LinkageService.class
-com\uce\linkage_service\LinkageServiceApplication$1.class
 com\uce\linkage_service\LinkageController.class
 com\uce\linkage_service\models\LinkageProject.class
 com\uce\linkage_service\repositories\LinkageProjectRepository.class
+com\uce\linkage_service\services\LinkageService.class

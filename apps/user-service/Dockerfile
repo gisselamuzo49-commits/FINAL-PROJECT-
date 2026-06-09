@@ -7,6 +7,6 @@ RUN chmod +x mvnw && ./mvnw clean package -DskipTests
 # Etapa 2: Imagen ligera de ejecución
 FROM eclipse-temurin:17-jre-alpine
 WORKDIR /app
-COPY --from=build /app/target/*.jar app.jar
+COPY --from=build /app/target/*.jar /app-bin/app.jar
 EXPOSE 8083
-CMD ["java", "-jar", "app.jar"]
+CMD ["java", "-jar", "/app-bin/app.jar"]
