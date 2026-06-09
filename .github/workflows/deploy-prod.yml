@@ -13,6 +13,13 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: 'maven'
+
       - name: Run tests - auth-service
         run: |
           cd apps/auth-service
@@ -22,6 +29,24 @@ jobs:
       - name: Run tests - internship-service
         run: |
           cd apps/internship-service
+          chmod +x mvnw
+          ./mvnw test
+
+      - name: Run tests - user-service
+        run: |
+          cd apps/user-service
+          chmod +x mvnw
+          ./mvnw test
+
+      - name: Run tests - linkage-service
+        run: |
+          cd apps/linkage-service
+          chmod +x mvnw
+          ./mvnw test
+
+      - name: Run tests - gateway-service
+        run: |
+          cd apps/gateway-service
           chmod +x mvnw
           ./mvnw test
 
@@ -45,6 +70,27 @@ jobs:
           push: true
           tags: gdmuzo/internship-service:latest
 
+      - name: Build and push user-service
+        uses: docker/build-push-action@v5
+        with:
+          context: ./apps/user-service
+          push: true
+          tags: gdmuzo/user-service:latest
+
+      - name: Build and push linkage-service
+        uses: docker/build-push-action@v5
+        with:
+          context: ./apps/linkage-service
+          push: true
+          tags: gdmuzo/linkage-service:latest
+
+      - name: Build and push gateway-service
+        uses: docker/build-push-action@v5
+        with:
+          context: ./apps/gateway-service
+          push: true
+          tags: gdmuzo/gateway-service:latest
+
       - name: Build and push frontend-web
         uses: docker/build-push-action@v5
         with:
@@ -52,8 +98,7 @@ jobs:
           push: true
           tags: gdmuzo/frontend-web:latest
           build-args: |
-            VITE_AUTH_PORT=8080
-            VITE_INTERNSHIP_PORT=8081
+            VITE_GATEWAY_PORT=8082
 
       - name: Setup SSH keys
         run: |

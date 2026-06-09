@@ -166,6 +166,27 @@ resource "aws_security_group" "sg_elb" {
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
+  ingress {
+    description = "User service"
+    from_port   = 8083
+    to_port     = 8083
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  ingress {
+    description = "Gateway service"
+    from_port   = 8082
+    to_port     = 8082
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  ingress {
+    description = "Linkage service"
+    from_port   = 8084
+    to_port     = 8084
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
   egress {
     from_port   = 0
     to_port     = 0
@@ -214,6 +235,27 @@ resource "aws_security_group" "sg_private" {
     description     = "Internship service desde ELB"
     from_port       = 8081
     to_port         = 8081
+    protocol        = "tcp"
+    security_groups = [aws_security_group.sg_elb.id]
+  }
+  ingress {
+    description     = "User service desde ELB"
+    from_port       = 8083
+    to_port         = 8083
+    protocol        = "tcp"
+    security_groups = [aws_security_group.sg_elb.id]
+  }
+  ingress {
+    description     = "Gateway service desde ELB"
+    from_port       = 8082
+    to_port         = 8082
+    protocol        = "tcp"
+    security_groups = [aws_security_group.sg_elb.id]
+  }
+  ingress {
+    description     = "Linkage service desde ELB"
+    from_port       = 8084
+    to_port         = 8084
     protocol        = "tcp"
     security_groups = [aws_security_group.sg_elb.id]
   }
@@ -330,6 +372,54 @@ resource "aws_lb_target_group" "internship_tg" {
   tags = { Name = "pasantias-prod-internship-tg" }
 }
 
+resource "aws_lb_target_group" "user_tg" {
+  name     = "pasantias-prod-user-tg"
+  port     = 8083
+  protocol = "HTTP"
+  vpc_id   = aws_vpc.main.id
+
+  health_check {
+    path                = "/health"
+    interval            = 30
+    timeout             = 5
+    healthy_threshold   = 2
+    unhealthy_threshold = 3
+  }
+  tags = { Name = "pasantias-prod-user-tg" }
+}
+
+resource "aws_lb_target_group" "linkage_tg" {
+  name     = "pasantias-prod-linkage-tg"
+  port     = 8084
+  protocol = "HTTP"
+  vpc_id   = aws_vpc.main.id
+
+  health_check {
+    path                = "/health"
+    interval            = 30
+    timeout             = 5
+    healthy_threshold   = 2
+    unhealthy_threshold = 3
+  }
+  tags = { Name = "pasantias-prod-linkage-tg" }
+}
+
+resource "aws_lb_target_group" "gateway_tg" {
+  name     = "pasantias-prod-gateway-tg"
+  port     = 8082
+  protocol = "HTTP"
+  vpc_id   = aws_vpc.main.id
+
+  health_check {
+    path                = "/api/users/health"
+    interval            = 30
+    timeout             = 5
+    healthy_threshold   = 2
+    unhealthy_threshold = 3
+  }
+  tags = { Name = "pasantias-prod-gateway-tg" }
+}
+
 # ─────────────────────────────────────────
 # ELB LISTENERS — 3 puertos separados
 #   :80   → frontend-web
@@ -366,6 +456,39 @@ resource "aws_lb_listener" "internship_listener" {
   default_action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.internship_tg.arn
+  }
+}
+
+resource "aws_lb_listener" "user_listener" {
+  load_balancer_arn = aws_lb.prod_elb.arn
+  port              = 8083
+  protocol          = "HTTP"
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.user_tg.arn
+  }
+}
+
+resource "aws_lb_listener" "linkage_listener" {
+  load_balancer_arn = aws_lb.prod_elb.arn
+  port              = 8084
+  protocol          = "HTTP"
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.linkage_tg.arn
+  }
+}
+
+resource "aws_lb_listener" "gateway_listener" {
+  load_balancer_arn = aws_lb.prod_elb.arn
+  port              = 8082
+  protocol          = "HTTP"
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.gateway_tg.arn
   }
 }
 
@@ -428,6 +551,24 @@ resource "aws_lb_target_group_attachment" "internship_attachment" {
   target_group_arn = aws_lb_target_group.internship_tg.arn
   target_id        = aws_instance.prod_auth_jobs.id
   port             = 8081
+}
+
+resource "aws_lb_target_group_attachment" "user_attachment" {
+  target_group_arn = aws_lb_target_group.user_tg.arn
+  target_id        = aws_instance.prod_auth_jobs.id
+  port             = 8083
+}
+
+resource "aws_lb_target_group_attachment" "linkage_attachment" {
+  target_group_arn = aws_lb_target_group.linkage_tg.arn
+  target_id        = aws_instance.prod_auth_jobs.id
+  port             = 8084
+}
+
+resource "aws_lb_target_group_attachment" "gateway_attachment" {
+  target_group_arn = aws_lb_target_group.gateway_tg.arn
+  target_id        = aws_instance.prod_auth_jobs.id
+  port             = 8082
 }
 
 # ─────────────────────────────────────────

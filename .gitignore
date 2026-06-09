@@ -4,3 +4,17 @@
 *.tfstate
 *.tfstate.backup
 .agent/
+
+# Node.js
+node_modules/
+
+# Turborepo
+.turbo/
+
+# Java / Maven
+**/target/
+*.db
+
+# OS
+.DS_Store
+Thumbs.db

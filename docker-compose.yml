@@ -8,6 +8,8 @@ services:
       - "8080:8080"
     volumes:
       - auth-db-volume:/app
+    environment:
+      - JWT_SECRET=v9y$B&E)H@McQfTjWmZq4t7w!z%C*F-JaNdRgUkXp2r5u8x/A?D(G+KbPeShVmYq
     restart: always
 
   internship-service:
@@ -21,6 +23,50 @@ services:
       - internship-db-volume:/app
     restart: always
 
+  user-service:
+    build:
+      context: ./apps/user-service
+      dockerfile: Dockerfile
+    container_name: user-service-local
+    ports:
+      - "8083:8083"
+    volumes:
+      - user-db-volume:/app
+    restart: always
+
+  linkage-service:
+    build:
+      context: ./apps/linkage-service
+      dockerfile: Dockerfile
+    container_name: linkage-service-local
+    ports:
+      - "8084:8084"
+    volumes:
+      - linkage-db-volume:/app
+    restart: always
+
+  gateway-service:
+    build:
+      context: ./apps/gateway-service
+      dockerfile: Dockerfile
+    container_name: gateway-service-local
+    ports:
+      - "8082:8082"
+    environment:
+      # Aquí inyectamos los nombres de los contenedores Docker
+      # En Docker Compose, los contenedores se resuelven por su container_name
+      - AUTH_SERVICE_URL=http://auth-service-local:8080
+      - INTERNSHIP_SERVICE_URL=http://internship-service-local:8081
+      - USER_SERVICE_URL=http://user-service-local:8083
+      - LINKAGE_SERVICE_URL=http://linkage-service-local:8084
+      - JWT_SECRET=v9y$B&E)H@McQfTjWmZq4t7w!z%C*F-JaNdRgUkXp2r5u8x/A?D(G+KbPeShVmYq
+    depends_on:
+      - auth-service
+      - internship-service
+      - user-service
+      - linkage-service
+    restart: always
+
   frontend-web:
     build:
       context: ./apps/frontend-web
@@ -28,14 +74,18 @@ services:
       args:
         - VITE_AUTH_PORT=8080
         - VITE_INTERNSHIP_PORT=8081
+        - VITE_USER_PORT=8083
+        - VITE_LINKAGE_PORT=8084
+        - VITE_GATEWAY_PORT=8082
     container_name: frontend-web-local
     ports:
       - "80:80"
     depends_on:
-      - auth-service
-      - internship-service
+      - gateway-service
     restart: always
 
 volumes:
   auth-db-volume:
   internship-db-volume:
+  user-db-volume:
+  linkage-db-volume:
