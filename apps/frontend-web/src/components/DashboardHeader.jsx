@@ -2,7 +2,7 @@ function DashboardHeader({ userEmail, GATEWAY_PORT, healthStatus, checkHealth, l
   return (
     <header className="dashboard-header">
       <div className="header-title-section">
-        <h1>UCE Vinculación y Pasantías 🚀</h1>
+        <h1>Sistema de Vinculación y Pasantías UCE 🎓🚀</h1>
         <p>
           Sesión: <code>{userEmail}</code> | Gateway Port: <code>{GATEWAY_PORT}</code>
         </p>
