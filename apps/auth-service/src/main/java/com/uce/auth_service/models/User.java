@@ -7,7 +7,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "users") // Usamos "users" en plural porque "user" a veces da problemas en SQL
+@Table(name = "users") 
 public class User {
 
     @Id

@@ -1,91 +1,137 @@
-import { useState } from 'react'
+/* eslint-disable react-hooks/set-state-in-effect */
+import { useState, useEffect } from 'react';
+import './App.css';
+import LoginCard from './components/LoginCard';
+import DashboardHeader from './components/DashboardHeader';
+import TabsNavigation from './components/TabsNavigation';
+import InternshipsTab from './components/InternshipsTab';
+import ProfilesTab from './components/ProfilesTab';
+import LinkageTab from './components/LinkageTab';
 
 function App() {
-  // --- DETECCIÓN DINÁMICA DE LA IP Y PUERTOS ---
-  // window.location.hostname devuelve la IP o dominio donde está abierta la página
   const API_URL = `http://${window.location.hostname}`;
-  const AUTH_PORT = import.meta.env.VITE_AUTH_PORT || "8080";
-  const INTERNSHIP_PORT = import.meta.env.VITE_INTERNSHIP_PORT || "8081";
+  const GATEWAY_PORT = import.meta.env.VITE_GATEWAY_PORT || "8082";
 
-  // --- ESTADOS ---
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [mensajeAuth, setMensajeAuth] = useState("")
-  const [pasantias, setPasantias] = useState([])
-  const [mensajePasantias, setMensajePasantias] = useState("")
+  // --- AUTHENTICATION STATE ---
+  const [token, setToken] = useState(localStorage.getItem("token") || null);
+  const [userEmail, setUserEmail] = useState(localStorage.getItem("userEmail") || "");
 
-  // Función 1: Guardar Usuario (apunta al puerto configurado)
-  const registrarUsuario = (e) => {
-    e.preventDefault()
-    fetch(`${API_URL}:${AUTH_PORT}/api/auth/register`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email: email, password: password })
-    })
-      .then(response => response.text())
-      .then(data => setMensajeAuth(data))
-      .catch(error => setMensajeAuth("Error: " + error.message))
-  }
+  // --- GENERAL STATE ---
+  const [activeTab, setActiveTab] = useState("internships");
+  const [healthStatus, setHealthStatus] = useState({
+    auth: "checking",
+    internships: "checking",
+    users: "checking",
+    linkage: "checking"
+  });
 
-  // Función 2: Traer Pasantías (apunta al puerto configurado)
-  const cargarPasantias = () => {
-    fetch(`${API_URL}:${INTERNSHIP_PORT}/api/internships`)
-      .then(response => response.json())
-      .then(data => {
-        setPasantias(data)
-        setMensajePasantias("¡Ofertas cargadas exitosamente!")
+  // Headers with Auth Token
+  const getHeaders = () => {
+    const headers = { "Content-Type": "application/json" };
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`;
+    }
+    return headers;
+  };
+
+  // Logout / Cerrar Sesión
+  const logout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("userEmail");
+    setToken(null);
+    setUserEmail("");
+  };
+
+  // Verificar la salud de los servicios a través del Gateway
+  const checkHealth = () => {
+    setHealthStatus({
+      auth: "checking",
+      internships: "checking",
+      users: "checking",
+      linkage: "checking"
+    });
+
+    fetch(`${API_URL}:${GATEWAY_PORT}/api/auth/hello`)
+      .then(res => setHealthStatus(prev => ({ ...prev, auth: res.ok ? "up" : "down" })))
+      .catch(() => setHealthStatus(prev => ({ ...prev, auth: "down" })));
+
+    fetch(`${API_URL}:${GATEWAY_PORT}/api/internships`, { headers: getHeaders() })
+      .then(res => {
+        if (res.status === 401) return setHealthStatus(prev => ({ ...prev, internships: "up" }));
+        setHealthStatus(prev => ({ ...prev, internships: res.ok ? "up" : "down" }));
       })
-      .catch(error => setMensajePasantias("Error al conectar: " + error.message))
+      .catch(() => setHealthStatus(prev => ({ ...prev, internships: "down" })));
+
+    fetch(`${API_URL}:${GATEWAY_PORT}/api/users/health`)
+      .then(res => setHealthStatus(prev => ({ ...prev, users: res.ok ? "up" : "down" })))
+      .catch(() => setHealthStatus(prev => ({ ...prev, users: "down" })));
+
+    fetch(`${API_URL}:${GATEWAY_PORT}/api/linkage/health`)
+      .then(res => setHealthStatus(prev => ({ ...prev, linkage: res.ok ? "up" : "down" })))
+      .catch(() => setHealthStatus(prev => ({ ...prev, linkage: "down" })));
+  };
+
+  useEffect(() => {
+    checkHealth();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [token]);
+
+  if (!token) {
+    return (
+      <LoginCard
+        API_URL={API_URL}
+        GATEWAY_PORT={GATEWAY_PORT}
+        setToken={setToken}
+        setUserEmail={setUserEmail}
+      />
+    );
   }
 
   return (
-    <div style={{ textAlign: 'center', marginTop: '30px', fontFamily: 'sans-serif' }}>
-      <h1>Sistema de Pasantías 🚀</h1>
-      <p>Servidor conectado automáticamente a: {window.location.hostname}</p>
+    <div className="dashboard-container">
+      <DashboardHeader
+        userEmail={userEmail}
+        GATEWAY_PORT={GATEWAY_PORT}
+        healthStatus={healthStatus}
+        checkHealth={checkHealth}
+        logout={logout}
+      />
 
-      <div style={{ display: 'flex', justifyContent: 'center', gap: '20px', flexWrap: 'wrap', marginTop: '30px' }}>
+      <TabsNavigation
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+      />
 
-        {/* --- COLUMNA 1: USUARIOS --- */}
-        <div style={{ width: '350px', textAlign: 'left', padding: '20px', backgroundColor: '#e0f7fa', borderRadius: '8px', border: '2px solid #006064' }}>
-          <h2 style={{ color: '#006064', marginTop: 0 }}>👤 1. Registro (Auth-Service)</h2>
-          <form onSubmit={registrarUsuario}>
-            <div style={{ marginBottom: '10px' }}>
-              <label>Correo Electrónico:</label><br />
-              <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required style={{ padding: '8px', width: '90%' }} />
-            </div>
-            <div style={{ marginBottom: '15px' }}>
-              <label>Contraseña:</label><br />
-              <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required style={{ padding: '8px', width: '90%' }} />
-            </div>
-            <button type="submit" style={{ padding: '10px', width: '95%', backgroundColor: '#006064', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer' }}>
-              Crear Cuenta
-            </button>
-          </form>
-          {mensajeAuth && <p style={{ color: '#004d40', fontWeight: 'bold', marginTop: '15px' }}>{mensajeAuth}</p>}
-        </div>
+      <main className="tab-content">
+        {activeTab === 'internships' && (
+          <InternshipsTab
+            API_URL={API_URL}
+            GATEWAY_PORT={GATEWAY_PORT}
+            getHeaders={getHeaders}
+            logout={logout}
+          />
+        )}
 
-        {/* --- COLUMNA 2: PASANTÍAS --- */}
-        <div style={{ width: '350px', textAlign: 'left', padding: '20px', backgroundColor: '#e8f5e9', borderRadius: '8px', border: '2px solid #2e7d32' }}>
-          <h2 style={{ color: '#2e7d32', marginTop: 0 }}>💼 2. Tablero (Internship-Service)</h2>
-          <button onClick={cargarPasantias} style={{ padding: '10px', width: '100%', backgroundColor: '#2e7d32', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer', marginBottom: '15px' }}>
-            Traer Ofertas de Trabajo
-          </button>
-          {mensajePasantias && <p style={{ color: '#1b5e20', fontWeight: 'bold' }}>{mensajePasantias}</p>}
+        {activeTab === 'profiles' && (
+          <ProfilesTab
+            API_URL={API_URL}
+            GATEWAY_PORT={GATEWAY_PORT}
+            getHeaders={getHeaders}
+            logout={logout}
+          />
+        )}
 
-          {pasantias.map((pasantia) => (
-            <div key={pasantia.id} style={{ backgroundColor: 'white', padding: '15px', borderRadius: '5px', marginBottom: '10px', borderLeft: '5px solid #2e7d32', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
-              <h3 style={{ margin: '0 0 5px 0', fontSize: '18px' }}>{pasantia.title}</h3>
-              <p style={{ margin: '0 0 5px 0', fontSize: '14px' }}><strong>🏢 Empresa:</strong> {pasantia.company}</p>
-              <p style={{ margin: '0 0 10px 0', fontSize: '14px', color: '#555' }}>{pasantia.description}</p>
-              <span style={{ backgroundColor: '#c8e6c9', color: '#1b5e20', padding: '4px 8px', borderRadius: '12px', fontSize: '12px', fontWeight: 'bold' }}>
-                {pasantia.status}
-              </span>
-            </div>
-          ))}
-        </div>
-      </div>
+        {activeTab === 'linkage' && (
+          <LinkageTab
+            API_URL={API_URL}
+            GATEWAY_PORT={GATEWAY_PORT}
+            getHeaders={getHeaders}
+            logout={logout}
+          />
+        )}
+      </main>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
