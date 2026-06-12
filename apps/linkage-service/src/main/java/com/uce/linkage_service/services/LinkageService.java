@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class LinkageService {
@@ -21,7 +22,7 @@ public class LinkageService {
         return linkageProjectRepository.findAll();
     }
 
-    public LinkageProject getProjectById(Long id) {
-        return linkageProjectRepository.findById(id).orElse(null);
+    public Optional<LinkageProject> getProjectById(Long id) {
+        return linkageProjectRepository.findById(id);
     }
 }
