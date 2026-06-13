@@ -1,105 +1,96 @@
-# Outreach Projects Service (`linkage-service`) 🔗
+# Servicio de Vinculación con la Sociedad (`linkage-service`) 🔗
 
-The **Outreach Projects Service** (Vinculación) is a Spring Boot microservice that manages university social outreach projects, tracking which external institutions are collaborating, the projects' statuses, and descriptions.
-
----
-
-## 🚀 Key Features
-
-* **Create Projects**: Allows coordinators to register outreach projects.
-* **List Projects**: Shows all social projects currently planned, in progress, or completed.
-* **Health Endpoint**: Native `/health` check routed through the gateway to monitor operational state.
-* **PostgreSQL Storage**: Persistent relational database storage.
+El **Servicio de Vinculación con la Sociedad** es un microservicio construido en Java 17 + Spring Boot que gestiona la planificación, registro y seguimiento de los proyectos de vinculación con la comunidad de la Universidad Central del Ecuador (UCE). Permite dar seguimiento a la colaboración con instituciones externas, el estado del proyecto y sus descripciones.
 
 ---
 
-## 🛠️ Technology Stack
+## 🚀 Propósito del Servicio
 
-* **Java 17**
-* **Spring Boot 4.0.6**
-* **Spring Data JPA**
-* **PostgreSQL JDBC & Hibernate Dialect**
+Permite que coordinadores y estudiantes administren los proyectos de vinculación de la universidad, almacenando los datos de las instituciones aliadas, los nombres y la descripción técnica de los proyectos, y el estado de desarrollo del proyecto.
 
 ---
 
-## 📦 Main Directory Structure
+## 🔌 API Endpoints y Contrato
 
-```text
-apps/linkage-service/
-├── src/main/java/com/uce/linkage_service/
-│   ├── LinkageServiceApplication.java   # App bootstrap & health endpoint
-│   ├── LinkageController.java          # REST handlers for outreach projects
-│   ├── models/                          # Data model representing a project
-│   ├── repositories/                    # Spring Data repository interface
-│   └── services/                        # Service layer handling project creation and fetch
-├── Dockerfile                           # Container configuration
-└── pom.xml                              # Build configuration
-```
+Todos los endpoints (a excepción de `/health` o `/health-check`) están protegidos y deben consumirse a través del **API Gateway** (`gateway-service` en el puerto `8082`), bajo la ruta `/api/linkage/**`. Estas peticiones requieren una cabecera de autorización JWT válida y están sujetas a políticas de **Rate Limiting** (límite de peticiones) gestionado por Redis.
 
----
-
-## ⚙️ Configuration Properties
-
-Key settings in `src/main/resources/application.properties`:
-
-| Property Name | Default Value | Description |
-|---|---|---|
-| `server.port` | `8084` | Port on which the service runs. |
-| `spring.datasource.url` | `jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/linkage_db` | Connection URL for the PostgreSQL database. |
-
----
-
-## 🔌 API Endpoints
-
-Endpoints are protected and must be accessed via the API Gateway.
-
-### 1. Health Status
-* **Endpoint**: `GET /api/linkage/health` (Exposed publicly via rewrite in the gateway)
-* **Response**:
+### 1. Health Check (Salud del Servicio)
+* **Ruta local**: `GET /health` (puerto `8084`)
+* **Ruta Gateway**: `GET /api/linkage/health` (Exhibida públicamente)
+* **Código de respuesta**: `200 OK`
+* **Cuerpo de respuesta**:
   ```text
-  "linkage-service is running"
+  linkage-service is running
   ```
 
-### 2. Retrieve All Projects
-* **Endpoint**: `GET /api/linkage`
-* **Security**: Enforced JWT authorization header.
-* **Response**: List of projects.
+### 2. Registrar Proyecto de Vinculación
+* **Ruta**: `POST /api/linkage`
+* **Seguridad**: JWT requerido.
+* **Cuerpo de Petición** (`application/json`):
+  ```json
+  {
+    "name": "Alfabetización Digital Rural",
+    "description": "Capacitación en computación básica a comunidades agrícolas.",
+    "institution": "GAD Municipal de Calderón",
+    "status": "PLANNED"
+  }
+  ```
+* **Validaciones**:
+  * `name`: No nulo ni vacío. (Retorna `400 Bad Request` en caso contrario)
+  * `institution`: No nulo ni vacío. (Retorna `400 Bad Request` en caso contrario)
+* **Respuestas**:
+  * `200 OK`: Proyecto creado con éxito (retorna objeto con ID generado).
+  * `400 Bad Request`: Parámetro requerido faltante o malformado.
+
+### 3. Obtener Todos los Proyectos
+* **Ruta**: `GET /api/linkage`
+* **Seguridad**: JWT requerido.
+* **Código de respuesta**: `200 OK`
+* **Cuerpo de respuesta**:
   ```json
   [
     {
       "id": 1,
-      "name": "Rural Digital Literacy",
-      "description": "Providing basic computing training to local agricultural communities.",
-      "institution": "Calderon Municipality GAD",
+      "name": "Alfabetización Digital Rural",
+      "description": "Capacitación en computación básica a comunidades...",
+      "institution": "GAD Municipal de Calderón",
       "status": "IN_PROGRESS"
     }
   ]
   ```
 
-### 3. Create Project
-* **Endpoint**: `POST /api/linkage`
-* **Security**: Enforced JWT authorization header.
-* **Body** (`application/json`):
-  ```json
-  {
-    "name": "Rural Digital Literacy",
-    "description": "Providing basic computing training to local agricultural communities.",
-    "institution": "Calderon Municipality GAD",
-    "status": "PLANNED"
-  }
-  ```
-* **Response**: The created project metadata.
+### 4. Obtener Proyecto por ID
+* **Ruta**: `GET /api/linkage/{id}`
+* **Seguridad**: JWT requerido.
+* **Respuestas**:
+  * `200 OK`: Si el proyecto existe. Retorna el detalle del proyecto.
+  * `404 Not Found`: Si el ID especificado no se encuentra registrado.
 
 ---
 
-## 🐳 Running inside Docker
+## ⚙️ Variables de Entorno (Configuración)
 
-### Build Image
+El servicio lee la siguiente configuración a través de variables de entorno (con fallbacks definidos para desarrollo local):
+
+| Variable de Entorno | Valor por Defecto | Descripción |
+|---|---|---|
+| `DB_HOST` | `localhost` | Dirección o host de la base de datos PostgreSQL. |
+| `DB_PORT` | `5432` | Puerto del servidor de base de datos PostgreSQL. |
+| `DB_NAME` | `linkage_db` | Nombre de la base de datos de vinculación. |
+| `DB_USER` | `postgres` | Nombre de usuario de conexión a la base de datos. |
+| `DB_PASSWORD` | `postgres` | Contraseña de conexión a la base de datos. |
+| `JWT_SECRET` | `v9y$B&E)H@McQfT...` | Clave secreta para la firma y validación de tokens JWT. |
+
+---
+
+## 🐳 Despliegue con Docker
+
+### Construir Imagen
 ```bash
 docker build -t gdmuzo/linkage-service:latest .
 ```
 
-### Run Container
+### Ejecutar Contenedor
 ```bash
 docker run -d \
   --name linkage-service \
@@ -111,4 +102,12 @@ docker run -d \
   -e DB_USER=postgres \
   -e DB_PASSWORD=postgres \
   gdmuzo/linkage-service:latest
+```
+
+---
+
+## 🧪 Pruebas Unitarias e Integración
+Para ejecutar las pruebas del microservicio:
+```bash
+./mvnw test
 ```

@@ -15,6 +15,7 @@
     docker_image_gateway:     "gdmuzo/gateway-service:qa"
     docker_image_frontend:    "gdmuzo/frontend-web:qa"
     postgres_image:           "postgres:15-alpine"
+    redis_image:              "redis:7-alpine"
 
   tasks:
 
@@ -60,6 +61,9 @@
     - name: Pull postgres image
       shell: docker pull {{ postgres_image }}
 
+    - name: Pull redis image
+      shell: docker pull {{ redis_image }}
+
     - name: Pull auth-service image
       shell: docker pull {{ docker_image_auth }}
 
@@ -81,8 +85,8 @@
     # ── Detener y remover contenedores viejos ──
     - name: Detener y remover contenedores existentes
       shell: |
-        docker stop auth-service internship-service user-service linkage-service gateway-service frontend-web postgres-db 2>/dev/null || true
-        docker rm   auth-service internship-service user-service linkage-service gateway-service frontend-web postgres-db 2>/dev/null || true
+        docker stop auth-service internship-service user-service linkage-service gateway-service frontend-web postgres-db redis 2>/dev/null || true
+        docker rm   auth-service internship-service user-service linkage-service gateway-service frontend-web postgres-db redis 2>/dev/null || true
 
     # ── Levantar contenedores ────────────
     - name: Levantar postgres-db
@@ -116,7 +120,7 @@
           -e DB_NAME=auth_db \
           -e DB_USER=postgres \
           -e DB_PASSWORD=postgres \
-          -e JWT_SECRET=v9y$B&E)H@McQfTjWmZq4t7w!z%C*F-JaNdRgUkXp2r5u8x/A?D(G+KbPeShVmYq \
+          -e JWT_SECRET='v9y$B&E)H@McQfTjWmZq4t7w!z%C*F-JaNdRgUkXp2r5u8x/A?D(G+KbPeShVmYq' \
           {{ docker_image_auth }}
 
     - name: Levantar internship-service
@@ -161,6 +165,15 @@
           -e DB_PASSWORD=postgres \
           {{ docker_image_linkage }}
 
+    - name: Levantar redis
+      shell: |
+        docker run -d \
+          --name redis \
+          --network pasantias-net \
+          --restart always \
+          -p 6379:6379 \
+          redis:7-alpine
+
     - name: Levantar gateway-service
       shell: |
         docker run -d \
@@ -172,7 +185,9 @@
           -e INTERNSHIP_SERVICE_URL=http://internship-service:8081 \
           -e USER_SERVICE_URL=http://user-service:8083 \
           -e LINKAGE_SERVICE_URL=http://linkage-service:8084 \
-          -e JWT_SECRET=v9y$B&E)H@McQfTjWmZq4t7w!z%C*F-JaNdRgUkXp2r5u8x/A?D(G+KbPeShVmYq \
+          -e REDIS_HOST=redis \
+          -e REDIS_PORT=6379 \
+          -e JWT_SECRET='v9y$B&E)H@McQfTjWmZq4t7w!z%C*F-JaNdRgUkXp2r5u8x/A?D(G+KbPeShVmYq' \
           {{ docker_image_gateway }}
 
     - name: Levantar frontend-web
