@@ -21,10 +21,10 @@
 
     # ── Prerequisitos ────────────────────
     - name: Asegurar que Docker está corriendo
-      service:
-        name: docker
-        state: started
-        enabled: true
+      shell: |
+        systemctl enable docker || true
+        systemctl is-active --quiet docker || systemctl start docker
+      changed_when: false
 
     - name: Asegurar que existe la red de Docker para intercomunicación
       shell: docker network create pasantias-net 2>/dev/null || true
