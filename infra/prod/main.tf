@@ -27,7 +27,7 @@ resource "aws_vpc" "main" {
   cidr_block           = "10.0.0.0/16"
   enable_dns_hostnames = true
   enable_dns_support   = true
-  tags = { Name = "pasantias-prod-vpc" }
+  tags                 = { Name = "pasantias-prod-vpc" }
 }
 
 # ─────────────────────────────────────────
@@ -38,7 +38,7 @@ resource "aws_subnet" "public_1a" {
   cidr_block              = "10.0.1.0/24"
   availability_zone       = "us-east-1a"
   map_public_ip_on_launch = true
-  tags = { Name = "pasantias-prod-public-1a" }
+  tags                    = { Name = "pasantias-prod-public-1a" }
 }
 
 resource "aws_subnet" "public_1b" {
@@ -46,14 +46,14 @@ resource "aws_subnet" "public_1b" {
   cidr_block              = "10.0.2.0/24"
   availability_zone       = "us-east-1b"
   map_public_ip_on_launch = true
-  tags = { Name = "pasantias-prod-public-1b" }
+  tags                    = { Name = "pasantias-prod-public-1b" }
 }
 
 resource "aws_subnet" "private_1a" {
   vpc_id            = aws_vpc.main.id
   cidr_block        = "10.0.3.0/24"
   availability_zone = "us-east-1a"
-  tags = { Name = "pasantias-prod-private-1a" }
+  tags              = { Name = "pasantias-prod-private-1a" }
 }
 
 # ─────────────────────────────────────────
@@ -299,6 +299,10 @@ resource "aws_instance" "bastion" {
   key_name               = data.aws_key_pair.prod_key.key_name
   vpc_security_group_ids = [aws_security_group.sg_bastion.id]
   tags                   = { Name = "pasantias-prod-bastion" }
+
+  lifecycle {
+    ignore_changes = [ami]
+  }
 }
 
 # Elastic IP fija — permanece aunque la instancia se reinicie
