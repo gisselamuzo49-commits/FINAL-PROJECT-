@@ -19,6 +19,17 @@
 
   tasks:
 
+    - name: Prune unused Docker images, containers and networks
+      shell: docker system prune -af || true
+
+    - name: Clean apt cache
+      shell: apt-get clean && rm -rf /var/lib/apt/lists/* || true
+
+    - name: Truncate large log files and vacuum journal
+      shell: |
+        find /var/log -type f -name "*.log" -size +10M -exec truncate -s 0 {} \; || true
+        journalctl --vacuum-size=50M || true
+
     # ── Prerequisitos ────────────────────
     - name: Asegurar que Docker está corriendo
       shell: |
