@@ -27,7 +27,7 @@ resource "aws_vpc" "main" {
   cidr_block           = "10.0.0.0/16"
   enable_dns_hostnames = true
   enable_dns_support   = true
-  tags = { Name = "pasantias-qa-vpc" }
+  tags                 = { Name = "pasantias-qa-vpc" }
 }
 
 # ─────────────────────────────────────────
@@ -38,14 +38,14 @@ resource "aws_subnet" "public_1a" {
   cidr_block              = "10.0.1.0/24"
   availability_zone       = "us-east-1a"
   map_public_ip_on_launch = true
-  tags = { Name = "pasantias-qa-public-1a" }
+  tags                    = { Name = "pasantias-qa-public-1a" }
 }
 
 resource "aws_subnet" "private_1a" {
   vpc_id            = aws_vpc.main.id
   cidr_block        = "10.0.3.0/24"
   availability_zone = "us-east-1a"
-  tags = { Name = "pasantias-qa-private-1a" }
+  tags              = { Name = "pasantias-qa-private-1a" }
 }
 
 # ─────────────────────────────────────────
@@ -186,6 +186,18 @@ resource "aws_instance" "bastion" {
   key_name               = data.aws_key_pair.qa_key.key_name
   vpc_security_group_ids = [aws_security_group.sg_bastion.id]
   tags                   = { Name = "pasantias-qa-bastion" }
+
+  lifecycle {
+    ignore_changes = [ami]
+  }
+}
+
+# Elastic IP fija — permanece aunque la instancia se reinicie
+resource "aws_eip" "bastion_eip" {
+  instance   = aws_instance.bastion.id
+  domain     = "vpc"
+  depends_on = [aws_internet_gateway.igw]
+  tags       = { Name = "pasantias-qa-bastion-eip" }
 }
 
 # ─────────────────────────────────────────
@@ -235,8 +247,8 @@ resource "aws_instance" "qa_auth_jobs" {
 #   terraform output
 # ─────────────────────────────────────────
 output "bastion_public_ip" {
-  description = "IP pública del bastion (cambia cada sesión — actualizar QA_BASTION_IP en GitHub Secrets)"
-  value       = aws_instance.bastion.public_ip
+  description = "QA Bastion EIP — fija entre sesiones de AWS Academy, no requiere actualizar QA_BASTION_IP"
+  value       = aws_eip.bastion_eip.public_ip
 }
 
 output "qa_auth_jobs_private_ip" {
