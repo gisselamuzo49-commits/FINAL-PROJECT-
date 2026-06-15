@@ -36,7 +36,7 @@ que reemplaza la planificación genérica original.
 - [ ] MongoDB Atlas (cuenta gratuita) configurado — usado por `hours-service` (esta
   semana), `document-service` y `report-service` (semana 3).
 - [/] `hours-service` (8085): CQRS — comandos REST escriben en `hours_db` (PostgreSQL),
-  evento `horas.registradas` a Kafka, proyección de lectura en MongoDB (Etapas 1, 2 y 3 completas, gRPC cliente pendiente de Etapa 4).
+  evento `horas.registradas` a Kafka, proyección de lectura en MongoDB (Etapas 1, 2, 3 y 4 completas; Etapa 5 de testcontainers/README/Swagger pendiente).
 - [ ] Quick wins en paralelo (bajo costo, alto impacto en backlog docente):
   - [ ] Logging estructurado (niveles INFO/DEBUG/WARN/ERROR) en los 5 servicios ya
     desplegados — backlog docente #1.

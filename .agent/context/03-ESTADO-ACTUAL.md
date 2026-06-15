@@ -22,12 +22,13 @@ _Última actualización: 2026-06-12 (verificación contra REPORTE-ESTADO.md gene
 - `linkage-service` (8084): **básico ya funcional** — `LinkageController` con
   create/getAll/getById, `LinkageProject`/repository/service, y endpoint `/health`
   (`"linkage-service is running"`). Mismo nivel que `internship-service`.
-- `hours-service` (8085): **Etapas 1, 2 y 3 implementadas y validadas con tests.**
+- `hours-service` (8085): **Etapas 1, 2, 3 y 4 implementadas y validadas con tests.**
   - **Etapa 1**: Persistencia en PostgreSQL (`RegistroHoras`), operaciones `POST /api/hours` y `PATCH /api/hours/{id}/validar`.
   - **Etapa 2**: Productor Kafka que emite el evento `horas.registradas` con clave `estudianteId` y payload JSON formateado en camelCase con serialización manual.
   - **Etapa 3**: Consumidor Kafka (`@KafkaListener`), proyección de lectura en MongoDB (`horas_resumen`), recalculo de totales y endpoint de consulta `GET /api/hours/student/{estudianteId}`.
+  - **Etapa 4**: Cliente gRPC (`UserServiceClient`) conectado a `user-service` para enriquecer la proyección de lectura con el `nombre` y `carrera` del estudiante de manera resiliente/best-effort.
 - `user-service` (8083): scaffolding + lógica básica + `/health` (`"user-service is
-  running"`). Falta: servidor gRPC (requisito #15).
+  running"`). Falta: servidor gRPC (implementado en rama `feature/user-service-grpc-server`, pendiente de mergear).
 - Monorepo gestionado con **Turbo** (`.turbo/`, `package.json` por servicio con scripts
   que envuelven `./mvnw build/test`). Esto es correcto y no debe "limpiarse".
 - `user.db` / `auth.db` / `linkage.db` son los fallbacks SQLite locales documentados

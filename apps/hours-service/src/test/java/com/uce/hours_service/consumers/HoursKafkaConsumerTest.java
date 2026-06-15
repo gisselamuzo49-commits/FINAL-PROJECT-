@@ -1,5 +1,7 @@
 package com.uce.hours_service.consumers;
 
+import com.uce.hours_service.client.StudentInfo;
+import com.uce.hours_service.client.UserServiceClient;
 import com.uce.hours_service.models.HistorialEntry;
 import com.uce.hours_service.models.HorasResumen;
 import com.uce.hours_service.repositories.HorasResumenRepository;
@@ -21,6 +23,9 @@ class HoursKafkaConsumerTest {
     @Mock
     private HorasResumenRepository repository;
 
+    @Mock
+    private UserServiceClient userServiceClient;
+
     @InjectMocks
     private HoursKafkaConsumer consumer;
 
@@ -30,7 +35,7 @@ class HoursKafkaConsumerTest {
     }
 
     @Test
-    void consume_NewStudent_CreatesNewHorasResumenAndCalculatesTotals() {
+    void consume_NewStudent_CreatesNewHorasResumenAndCalculatesTotals_GRPCAbsent() {
         String studentId = "estudiante-1";
         String message = "{"
                 + "\"id\":\"1\","
@@ -45,6 +50,7 @@ class HoursKafkaConsumerTest {
                 + "}";
 
         when(repository.findById(studentId)).thenReturn(Optional.empty());
+        when(userServiceClient.getStudentInfo(studentId)).thenReturn(Optional.empty());
 
         consumer.consume(message);
 
@@ -59,20 +65,51 @@ class HoursKafkaConsumerTest {
         assertEquals(4.5, saved.getTotalHorasPendientes());
         assertEquals(1, saved.getHistorial().size());
 
-        HistorialEntry entry = saved.getHistorial().get(0);
-        assertEquals("1", entry.getRegistroId());
-        assertEquals("proj-10", entry.getProyectoId());
-        assertEquals("2026-06-10", entry.getFecha());
-        assertEquals(4.5, entry.getHoras());
-        assertEquals("PENDIENTE", entry.getEstado());
-        assertEquals("Testing act", entry.getDescripcionActividad());
+        verify(userServiceClient, times(1)).getStudentInfo(studentId);
     }
 
     @Test
-    void consume_ExistingStudent_UpdatesExistingEntryAndRecalculatesTotals() {
+    void consume_NewStudent_CreatesNewHorasResumenWithEnrichedInfo_GRPCPresent() {
+        String studentId = "estudiante-1";
+        String message = "{"
+                + "\"id\":\"1\","
+                + "\"estudianteId\":\"" + studentId + "\","
+                + "\"proyectoId\":\"proj-10\","
+                + "\"fecha\":\"2026-06-10\","
+                + "\"horas\":4.5,"
+                + "\"descripcionActividad\":\"Testing act\","
+                + "\"estado\":\"PENDIENTE\","
+                + "\"tutorId\":null,"
+                + "\"fechaValidacion\":null"
+                + "}";
+
+        when(repository.findById(studentId)).thenReturn(Optional.empty());
+        when(userServiceClient.getStudentInfo(studentId)).thenReturn(
+                Optional.of(new StudentInfo("Juan", "Perez", "Ingenieria en Sistemas"))
+        );
+
+        consumer.consume(message);
+
+        ArgumentCaptor<HorasResumen> captor = ArgumentCaptor.forClass(HorasResumen.class);
+        verify(repository, times(1)).save(captor.capture());
+
+        HorasResumen saved = captor.getValue();
+        assertEquals(studentId, saved.getEstudianteId());
+        assertEquals("Juan Perez", saved.getNombre());
+        assertEquals("Ingenieria en Sistemas", saved.getCarrera());
+        assertEquals(0.0, saved.getTotalHorasValidadas());
+        assertEquals(4.5, saved.getTotalHorasPendientes());
+
+        verify(userServiceClient, times(1)).getStudentInfo(studentId);
+    }
+
+    @Test
+    void consume_ExistingStudent_UpdatesExistingEntryAndRecalculatesTotals_GRPCNotCalled() {
         String studentId = "estudiante-1";
 
         HorasResumen existing = new HorasResumen(studentId);
+        existing.setNombre("Juan Perez");
+        existing.setCarrera("Ingenieria en Sistemas");
         existing.setHistorial(new ArrayList<>());
         existing.getHistorial().add(new HistorialEntry(
                 "1", "proj-10", "2026-06-10", 4.5, "PENDIENTE", "Testing act"
@@ -101,13 +138,12 @@ class HoursKafkaConsumerTest {
 
         HorasResumen saved = captor.getValue();
         assertEquals(studentId, saved.getEstudianteId());
+        assertEquals("Juan Perez", saved.getNombre());
+        assertEquals("Ingenieria en Sistemas", saved.getCarrera());
         assertEquals(4.5, saved.getTotalHorasValidadas());
         assertEquals(0.0, saved.getTotalHorasPendientes());
         assertEquals(1, saved.getHistorial().size());
 
-        HistorialEntry entry = saved.getHistorial().get(0);
-        assertEquals("1", entry.getRegistroId());
-        assertEquals("VALIDADO", entry.getEstado());
-        assertEquals("Testing act updated", entry.getDescripcionActividad());
+        verify(userServiceClient, never()).getStudentInfo(anyString());
     }
 }

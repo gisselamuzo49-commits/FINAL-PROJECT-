@@ -38,6 +38,9 @@ class HoursServiceApplicationTests {
 	@MockitoBean
 	private com.uce.hours_service.repositories.HorasResumenRepository resumenRepository;
 
+	@MockitoBean
+	private com.uce.hours_service.client.UserServiceClient userServiceClient;
+
 	@Test
 	void contextLoads() {
 	}

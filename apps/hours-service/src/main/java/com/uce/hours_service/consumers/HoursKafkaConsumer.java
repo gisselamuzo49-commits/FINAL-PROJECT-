@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.uce.hours_service.models.HistorialEntry;
 import com.uce.hours_service.models.HorasResumen;
 import com.uce.hours_service.repositories.HorasResumenRepository;
+import com.uce.hours_service.client.UserServiceClient;
+import com.uce.hours_service.client.StudentInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
@@ -16,6 +18,9 @@ public class HoursKafkaConsumer {
     @Autowired
     private HorasResumenRepository repository;
 
+    @Autowired
+    private UserServiceClient userServiceClient;
+
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @KafkaListener(topics = "horas.registradas", groupId = "hours-service-group")
@@ -27,7 +32,14 @@ public class HoursKafkaConsumer {
             }
 
             HorasResumen resumen = repository.findById(event.getEstudianteId())
-                    .orElseGet(() -> new HorasResumen(event.getEstudianteId()));
+                    .orElseGet(() -> {
+                        HorasResumen newResumen = new HorasResumen(event.getEstudianteId());
+                        userServiceClient.getStudentInfo(event.getEstudianteId()).ifPresent(info -> {
+                            newResumen.setNombre(info.getNombre() + " " + info.getApellido());
+                            newResumen.setCarrera(info.getCarrera());
+                        });
+                        return newResumen;
+                    });
 
             // Find existing entry in history
             boolean updated = false;
