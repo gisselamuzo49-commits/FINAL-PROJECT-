@@ -3,12 +3,14 @@ package com.uce.hours_service;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 /**
  * Verifies the full Spring context boots correctly with H2 (in-memory) and
  * a mocked KafkaTemplate — no Kafka broker needed for this smoke test.
  */
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 @SpringBootTest(
 	classes = HoursServiceApplication.class,
 	properties = {

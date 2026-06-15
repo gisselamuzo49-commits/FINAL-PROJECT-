@@ -20,7 +20,9 @@ public class UserServiceClientImpl implements UserServiceClient {
                     .setEstudianteId(estudianteId)
                     .build();
 
-            com.uce.user_service.grpc.StudentInfo response = userServiceStub.getStudentInfo(request);
+            com.uce.user_service.grpc.StudentInfo response = userServiceStub
+                    .withDeadlineAfter(2, java.util.concurrent.TimeUnit.SECONDS)
+                    .getStudentInfo(request);
 
             if (response != null && response.getEncontrado()) {
                 return Optional.of(new StudentInfo(

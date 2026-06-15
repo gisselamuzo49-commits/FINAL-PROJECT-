@@ -35,8 +35,8 @@ que reemplaza la planificación genérica original.
 - [x] Kafka + RabbitMQ + MongoDB en `docker-compose` local (sin AWS).
 - [ ] MongoDB Atlas (cuenta gratuita) configurado — usado por `hours-service` (esta
   semana), `document-service` y `report-service` (semana 3).
-- [/] `hours-service` (8085): CQRS — comandos REST escriben en `hours_db` (PostgreSQL),
-  evento `horas.registradas` a Kafka, proyección de lectura en MongoDB (Etapas 1, 2, 3 y 4 completas; Etapa 5 de testcontainers/README/Swagger pendiente).
+- [x] `hours-service` (8085): CQRS — comandos REST escriben en `hours_db` (PostgreSQL),
+  evento `horas.registradas` a Kafka, proyección de lectura en MongoDB (Etapas 1, 2, 3, 4 y 5 completadas y validadas con tests).
 - [ ] Quick wins en paralelo (bajo costo, alto impacto en backlog docente):
   - [ ] Logging estructurado (niveles INFO/DEBUG/WARN/ERROR) en los 5 servicios ya
     desplegados — backlog docente #1.
