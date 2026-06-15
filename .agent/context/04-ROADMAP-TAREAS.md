@@ -1,0 +1,112 @@
+# 04 — Roadmap del Proyecto (convertido en tareas)
+
+Basado en las fases del documento de propuesta, ajustado con los hallazgos de la tabla de
+requerimientos. Cada tarea marcada `[ ]` debe pasar a `[x]` y reflejarse también en
+`03-ESTADO-ACTUAL.md` cuando se complete. La Fase 1 (Semanas 1-4 del plan original) está
+completa; las Fases 2-3 se detallan abajo como un plan de 6 semanas (acordado 13-14/jun),
+que reemplaza la planificación genérica original.
+
+## Fase 1 — Servicios Core y Autenticación (Semanas 1-4)
+
+- [x] `auth-service` (8080) — JWT, RBAC, hashing.
+- [x] `internship-service` (8081) — CRUD de ofertas.
+- [x] `user-service` (8083) — perfiles básicos implementados. Falta servidor gRPC.
+- [x] `linkage-service` (8084) — CRUD básico + `/health` implementados.
+- [x] `gateway-service` (8082) — rutas + JWT funcionando para los 4 servicios. Falta:
+  rate limiting, WebSocket, rutas de servicios futuros.
+- [x] Configurar 4 bases PostgreSQL lógicas (`auth_db`, `internship_db`, `user_db`,
+  `linkage_db`) — verificado en `infra/ansible/*.yml` vía `init-multiple-dbs.sh`.
+- [x] Frontend: flujos de login/registro + paneles para los 4 servicios — verificado
+  (`LoginCard`, `InternshipsTab`, `ProfilesTab`, `LinkageTab`, todo vía gateway con JWT).
+- [ ] Swagger/OpenAPI habilitado y documentado en cada servicio (requisito #21).
+- [ ] Conventional commits + plantilla de PR aplicados desde ahora (requisito #21).
+
+> ✅ **Fase 1 completa** (excepto Swagger/conventions, transversales y de bajo riesgo —
+> pueden hacerse en paralelo con la Fase 2).
+
+## Próximas 6 Semanas — Plan Detallado (reemplaza/detalla Fases 2 y 3)
+
+> Acordado en sesión del 13-14/jun. Cada semana usa AWS solo cuando es necesario — ver
+> `05-AWS-ACADEMY-ESTRATEGIA.md` para qué cuenta usar y cuándo destruir recursos.
+> Referencias a "09-ADOPCIONES" = `.agent/context/09-ADOPCIONES-OTRO-PROYECTO.md`
+> (uso interno).
+
+### Semana 1 — Fundación de mensajería + `hours-service` (CQRS)
+- [x] Kafka + RabbitMQ + MongoDB en `docker-compose` local (sin AWS).
+- [ ] MongoDB Atlas (cuenta gratuita) configurado — usado por `hours-service` (esta
+  semana), `document-service` y `report-service` (semana 3).
+- [/] `hours-service` (8085): CQRS — comandos REST escriben en `hours_db` (PostgreSQL),
+  evento `horas.registradas` a Kafka, proyección de lectura en MongoDB (Etapas 1, 2 y 3 completas, gRPC cliente pendiente de Etapa 4).
+- [ ] Quick wins en paralelo (bajo costo, alto impacto en backlog docente):
+  - [ ] Logging estructurado (niveles INFO/DEBUG/WARN/ERROR) en los 5 servicios ya
+    desplegados — backlog docente #1.
+  - [ ] Workspace de Postman compartido con el docente, todas las rutas actuales —
+    backlog docente #2 (parcial).
+  - [ ] Limpieza de disco en `infra/ansible/deploy-*.yml` (`docker system prune`,
+    `apt-get clean`, truncar logs >10MB, `journalctl --vacuum-size=50M`) — ver
+    09-ADOPCIONES #12.
+  - [ ] `terraform fmt -check -recursive` + `validate` como step de CI, sin `apply` —
+    ver 09-ADOPCIONES #1.
+
+### Semana 2 — Consumidores de eventos
+- [ ] `notification-service` (8087): consumidor Kafka del evento `horas.registradas` →
+  publica a MQTT → WebSocket al frontend.
+- [ ] `evaluation-service` (8086): Layered + servidor gRPC en `user-service` (pendiente
+  desde Fase 1) + cliente gRPC en `evaluation-service`.
+
+### Semana 3 — Servicios periféricos restantes
+- [ ] `document-service` (8088): consumidor Kafka + Webhook hacia n8n + Mongo/S3.
+- [ ] S3 configurado para CVs y documentos generados (usado por `document-service`).
+- [ ] Configurar n8n (self-hosted en cuenta DEV/Sandbox #1 o local) y conectar al menos
+  un flujo real (ej. notificación por correo cuando se aprueba una práctica).
+- [ ] `report-service` (8089): consumidor Kafka + endpoint SOAP + Mongo.
+- [ ] Swagger/OpenAPI (`springdoc-openapi-starter-webmvc-ui`) en los 6 microservicios
+  nuevos de esta fase — backlog docente #2.
+- [ ] PAAS secundario **Supabase** — módulo "Encuestas de satisfacción / feedback
+  post-práctica" (tabla en Supabase + integración desde frontend, decisión cerrada en
+  `03-ESTADO-ACTUAL.md`). Sin dependencias de otros servicios, puede hacerse cualquier
+  semana si sobra tiempo — colocado aquí por defecto.
+
+### Semana 4 — IA + primer deploy completo a QA
+- [ ] `ai-service` (8090, FastAPI): spaCy, TF-IDF + similitud de coseno, Random Forest
+  de riesgo de deserción, cola RabbitMQ (contenedor con healthcheck — ver
+  09-ADOPCIONES #4).
+- [ ] `gateway-service`: rutas para los 6 servicios nuevos + soporte WebSocket.
+- [ ] Deploy completo a QA (11 microservicios + Kafka + RabbitMQ + MongoDB + Redis +
+  Postgres). Posible necesidad temporal de `t3.medium` para esta validación — ver
+  riesgo de memoria en `03-ESTADO-ACTUAL.md`.
+
+### Semana 5 — Sesión de diseño + Terraform modular + infraestructura PROD
+Sesión de diseño dedicada **antes** de tocar Terraform de PROD — ver decisiones
+pendientes en 09-ADOPCIONES:
+- [ ] Decidir: reducir target groups del ALB de PROD de 6 a 2 (`frontend_tg`,
+  `gateway_tg`) — mejora requisito #5 (superficie de ataque) y simplifica ASG.
+- [ ] Agregar bloque ASG + launch template + políticas CloudWatch — versión
+  simplificada (no requiere rediseñar el deploy actual), ver 09-ADOPCIONES sección
+  ASG.
+- [ ] Modularizar Terraform: `infra/modules/{vpc,security_groups,ec2}` +
+  `infra/{qa,prod}/main.tf` que solo instancian — blueprint en 09-ADOPCIONES #6.
+- [ ] Migrar PostgreSQL → RDS (primary/standby multi-AZ, requisito #18, solo PROD,
+  usa subred `private_1b`).
+- [ ] Redis → ElastiCache (solo PROD).
+- [ ] Volumen EBS persistente para `postgres-db`/Docker — 09-ADOPCIONES #8.
+- [ ] Aplicar a PROD (cuenta #3) solo después de validar en cuenta DEV/Sandbox (#1).
+
+### Semana 6 — Monitoreo, backups, blue-green y cierre
+- [ ] Prometheus + Grafana en PROD — requisito #17.
+- [ ] Job de backup `pg_dump` → cuenta #4 (on-premise simulado, decisión ya cerrada).
+- [ ] Blue-green deployment vía GitHub Actions — backlog docente #4 (instancia nueva →
+  health check → swap → eliminar anterior si exitoso).
+- [ ] Video final de evidencia, ampliando el guion del 12/jun para cubrir todo lo
+  nuevo (logs por servicio, terraform output, Kafka/RabbitMQ, diagrama event-driven
+  justificado).
+- [ ] Revisión final completa de `01-REQUERIMIENTOS-MAESTROS.md`.
+- [ ] (Opcional) Evaluar Kubernetes solo si hay tiempo/crédito sobrante — cuenta #8.
+
+## Hitos de checkpoint sugeridos
+
+| Cuándo | Checkpoint |
+|---|---|
+| Fin Semana 1 | `hours-service` funcionando local con CQRS+Kafka demostrable (comando → evento → proyección de lectura). |
+| Fin Semana 4 | Demo: los 11 microservicios corriendo en Docker Compose local + deploy completo a QA, flujo de horas con CQRS+Kafka, notificaciones en tiempo real (WebSocket+MQTT), recomendación de IA end-to-end. |
+| Fin Semana 6 | Demo final: todo desplegado en AWS (QA y PROD), ASG+RDS+ElastiCache+EBS en PROD, monitoreo en vivo, CI/CD verde de extremo a extremo, blue-green demostrado, checklist de rúbrica al 100%. |

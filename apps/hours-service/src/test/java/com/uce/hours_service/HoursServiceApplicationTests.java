@@ -18,8 +18,11 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 		"spring.datasource.password=",
 		"spring.jpa.database-platform=org.hibernate.dialect.H2Dialect",
 		"spring.jpa.hibernate.ddl-auto=create-drop",
-		// Disable Kafka auto-config trying to connect to a real broker
-		"spring.autoconfigure.exclude=org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration"
+		// Disable Kafka and Mongo auto-config trying to connect to real brokers/servers
+		"spring.autoconfigure.exclude=" +
+			"org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration," +
+			"org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration," +
+			"org.springframework.boot.autoconfigure.data.mongo.MongoDataAutoConfiguration"
 	}
 )
 class HoursServiceApplicationTests {
@@ -31,6 +34,9 @@ class HoursServiceApplicationTests {
 	@MockitoBean
 	@SuppressWarnings("rawtypes")
 	private KafkaTemplate kafkaTemplate;
+
+	@MockitoBean
+	private com.uce.hours_service.repositories.HorasResumenRepository resumenRepository;
 
 	@Test
 	void contextLoads() {

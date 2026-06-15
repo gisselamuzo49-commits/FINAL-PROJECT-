@@ -2,6 +2,7 @@ package com.uce.hours_service;
 
 import com.uce.hours_service.models.EstadoHoras;
 import com.uce.hours_service.models.RegistroHoras;
+import com.uce.hours_service.models.HorasResumen;
 import com.uce.hours_service.services.HoursService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -168,5 +169,30 @@ class HoursControllerTest {
                         .content("{\"tutorId\":\"200\"}"))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string("El campo aprobado es obligatorio."));
+    }
+
+    @Test
+    void getStudentSummary_ExistentStudent_ReturnsOk() throws Exception {
+        HorasResumen mockResumen = new HorasResumen("100");
+        mockResumen.setTotalHorasValidadas(10.0);
+        mockResumen.setTotalHorasPendientes(5.0);
+
+        Mockito.when(hoursService.getStudentSummary("100"))
+                .thenReturn(Optional.of(mockResumen));
+
+        mockMvc.perform(get("/api/hours/student/100"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.estudianteId").value("100"))
+                .andExpect(jsonPath("$.totalHorasValidadas").value(10.0))
+                .andExpect(jsonPath("$.totalHorasPendientes").value(5.0));
+    }
+
+    @Test
+    void getStudentSummary_NonExistentStudent_ReturnsNotFound() throws Exception {
+        Mockito.when(hoursService.getStudentSummary("999"))
+                .thenReturn(Optional.empty());
+
+        mockMvc.perform(get("/api/hours/student/999"))
+                .andExpect(status().isNotFound());
     }
 }

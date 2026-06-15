@@ -2,7 +2,9 @@ package com.uce.hours_service.services;
 
 import com.uce.hours_service.models.EstadoHoras;
 import com.uce.hours_service.models.RegistroHoras;
+import com.uce.hours_service.models.HorasResumen;
 import com.uce.hours_service.repositories.RegistroHorasRepository;
+import com.uce.hours_service.repositories.HorasResumenRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
@@ -19,7 +21,18 @@ public class HoursService {
     private RegistroHorasRepository repository;
 
     @Autowired
+    private HorasResumenRepository resumenRepository;
+
+    @Autowired
     private KafkaTemplate<String, String> kafkaTemplate;
+
+    // -------------------------------------------------------------------------
+    // Queries
+    // -------------------------------------------------------------------------
+
+    public Optional<HorasResumen> getStudentSummary(String estudianteId) {
+        return resumenRepository.findById(estudianteId);
+    }
 
     // -------------------------------------------------------------------------
     // Commands

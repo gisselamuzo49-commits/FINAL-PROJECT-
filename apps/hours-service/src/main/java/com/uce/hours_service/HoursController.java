@@ -1,6 +1,7 @@
 package com.uce.hours_service;
 
 import com.uce.hours_service.models.RegistroHoras;
+import com.uce.hours_service.models.HorasResumen;
 import com.uce.hours_service.services.HoursService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +15,13 @@ public class HoursController {
 
     @Autowired
     private HoursService hoursService;
+
+    @GetMapping("/student/{estudianteId}")
+    public ResponseEntity<?> getStudentSummary(@PathVariable String estudianteId) {
+        return hoursService.getStudentSummary(estudianteId)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
 
     @PostMapping
     public ResponseEntity<?> createHoursRegistration(@RequestBody RegistroHoras registro) {
