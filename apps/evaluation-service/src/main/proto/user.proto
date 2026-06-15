@@ -1,0 +1,21 @@
+syntax = "proto3";
+package user;
+
+option java_multiple_files = true;
+option java_package = "com.uce.user_service.grpc";
+
+service UserService {
+  rpc GetStudentInfo(StudentRequest) returns (StudentInfo);
+}
+
+message StudentRequest {
+  string estudiante_id = 1;
+}
+
+message StudentInfo {
+  string id = 1;
+  string nombre = 2;
+  string apellido = 3;
+  string carrera = 4;
+  bool encontrado = 5;
+}
