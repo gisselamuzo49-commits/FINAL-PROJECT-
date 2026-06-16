@@ -92,6 +92,33 @@ Endpoints are protected and must be accessed via the API Gateway.
   ```
 * **Response**: The saved profile details including the assigned database ID.
 
+### 4. gRPC Service (Internal)
+* **Port**: `9083` (configurable via `grpc.server.port` / `GRPC_SERVER_PORT`)
+* **Service**: `user.UserService`
+* **Method**: `rpc GetStudentInfo(StudentRequest) returns (StudentInfo)`
+
+#### Protocol Buffers Definition (`user.proto`):
+```protobuf
+syntax = "proto3";
+package user;
+
+service UserService {
+  rpc GetStudentInfo(StudentRequest) returns (StudentInfo);
+}
+
+message StudentRequest {
+  string estudiante_id = 1;
+}
+
+message StudentInfo {
+  string id = 1;
+  string nombre = 2;
+  string apellido = 3;
+  string carrera = 4;
+  bool encontrado = 5;
+}
+```
+
 ---
 
 ## 🐳 Running inside Docker
@@ -107,10 +134,13 @@ docker run -d \
   --name user-service \
   --network pasantias-net \
   -p 8083:8083 \
+  -p 9083:9083 \
   -e DB_HOST=postgres-db \
   -e DB_PORT=5432 \
   -e DB_NAME=user_db \
   -e DB_USER=postgres \
   -e DB_PASSWORD=postgres \
+  -e GRPC_SERVER_PORT=9083 \
   gdmuzo/user-service:latest
 ```
+

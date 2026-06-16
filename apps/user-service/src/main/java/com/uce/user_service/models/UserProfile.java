@@ -19,6 +19,7 @@ public class UserProfile {
     private String email;
     private String phone;
     private String role; // STUDENT, TUTOR, COORDINATOR
+    private String carrera;
 
     // Getters y Setters
     public Long getId() { return id; }
@@ -38,4 +39,7 @@ public class UserProfile {
 
     public String getRole() { return role; }
     public void setRole(String role) { this.role = role; }
+
+    public String getCarrera() { return carrera; }
+    public void setCarrera(String carrera) { this.carrera = carrera; }
 }
