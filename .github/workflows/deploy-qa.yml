@@ -204,10 +204,11 @@ jobs:
       - name: Setup SSH key
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.QA_SSH_KEY }}" > ~/.ssh/QA.pem
+          printf '%s' "${{ secrets.QA_SSH_KEY }}" > ~/.ssh/QA.pem
           chmod 400 ~/.ssh/QA.pem
           ssh-keyscan -H ${{ secrets.QA_BASTION_IP }} >> ~/.ssh/known_hosts
-          ssh -i ~/.ssh/QA.pem -o StrictHostKeyChecking=no ubuntu@${{ secrets.QA_BASTION_IP }} \
+          ssh -i ~/.ssh/QA.pem -o StrictHostKeyChecking=no -o ConnectTimeout=10 \
+            ubuntu@${{ secrets.QA_BASTION_IP }} \
             "ssh-keyscan -H ${{ secrets.QA_AUTH_JOBS_IP }}" >> ~/.ssh/known_hosts
 
       - name: Create Ansible inventory
