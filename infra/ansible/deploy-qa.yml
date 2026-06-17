@@ -93,11 +93,42 @@
     - name: Pull frontend-web image
       shell: docker pull {{ docker_image_frontend }}
 
+    - name: Pull zookeeper image
+      shell: docker pull confluentinc/cp-zookeeper:7.6.0
+
+    - name: Pull kafka image
+      shell: docker pull confluentinc/cp-kafka:7.6.0
+
+    - name: Pull mongodb image
+      shell: docker pull mongo:7
+
+    - name: Pull rabbitmq image
+      shell: docker pull rabbitmq:3-management-alpine
+
+    - name: Pull hours-service image
+      shell: docker pull gdmuzo/hours-service:latest
+
+    - name: Pull evaluation-service image
+      shell: docker pull gdmuzo/evaluation-service:latest
+
+    - name: Pull notification-service image
+      shell: docker pull gdmuzo/notification-service:latest
+
+    - name: Pull document-service image
+      shell: docker pull gdmuzo/document-service:latest
+
+    - name: Pull report-service image
+      shell: docker pull gdmuzo/report-service:latest
+
+    - name: Pull ai-service image
+      shell: docker pull gdmuzo/ai-service:latest
+
     # ── Detener y remover contenedores viejos ──
     - name: Detener y remover contenedores existentes
       shell: |
-        docker stop auth-service internship-service user-service linkage-service gateway-service frontend-web postgres-db redis 2>/dev/null || true
-        docker rm   auth-service internship-service user-service linkage-service gateway-service frontend-web postgres-db redis 2>/dev/null || true
+        docker stop auth-service internship-service user-service linkage-service gateway-service frontend-web postgres-db redis zookeeper kafka mongodb rabbitmq hours-service evaluation-service notification-service document-service report-service ai-service 2>/dev/null || true
+        docker rm   auth-service internship-service user-service linkage-service gateway-service frontend-web postgres-db redis zookeeper kafka mongodb rabbitmq hours-service evaluation-service notification-service document-service report-service ai-service 2>/dev/null || true
+
 
     # ── Levantar contenedores ────────────
     - name: Levantar postgres-db
@@ -110,7 +141,7 @@
           -e POSTGRES_USER=postgres \
           -e POSTGRES_PASSWORD=postgres \
           -e POSTGRES_DB=postgres \
-          -e POSTGRES_MULTIPLE_DATABASES=auth_db,internship_db,user_db,linkage_db \
+          -e POSTGRES_MULTIPLE_DATABASES=auth_db,internship_db,user_db,linkage_db,hours_db,evaluation_db,notification_db,document_db,report_db \
           -v /var/lib/postgresql/data:/var/lib/postgresql/data \
           -v /opt/postgres-init:/docker-entrypoint-initdb.d \
           {{ postgres_image }}
@@ -184,6 +215,149 @@
           --restart always \
           -p 6379:6379 \
           redis:7-alpine
+
+    - name: Levantar zookeeper
+      shell: >
+        docker run -d --name zookeeper
+        --network pasantias-net
+        --restart always
+        -e ZOOKEEPER_CLIENT_PORT=2181
+        -e ZOOKEEPER_TICK_TIME=2000
+        confluentinc/cp-zookeeper:7.6.0
+
+    - name: Levantar kafka
+      shell: >
+        docker run -d --name kafka
+        --network pasantias-net
+        --restart always
+        -p 9092:9092
+        -e KAFKA_BROKER_ID=1
+        -e KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
+        -e KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
+        -e KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
+        confluentinc/cp-kafka:7.6.0
+
+    - name: Esperar a que Kafka esté listo
+      shell: sleep 20
+
+    - name: Levantar mongodb
+      shell: >
+        docker run -d --name mongodb
+        --network pasantias-net
+        --restart always
+        -p 27017:27017
+        mongo:7
+
+    - name: Levantar rabbitmq
+      shell: >
+        docker run -d --name rabbitmq
+        --network pasantias-net
+        --restart always
+        -p 5672:5672
+        -p 15672:15672
+        -e RABBITMQ_DEFAULT_USER=guest
+        -e RABBITMQ_DEFAULT_PASS=guest
+        rabbitmq:3-management-alpine
+
+    - name: Levantar hours-service
+      shell: >
+        docker run -d --name hours-service
+        --network pasantias-net
+        --restart always
+        -p 8085:8085
+        -e DB_HOST=postgres-db
+        -e DB_PORT=5432
+        -e DB_NAME=hours_db
+        -e DB_USER=postgres
+        -e DB_PASSWORD=postgres
+        -e JWT_SECRET='v9y$B&E)H@McQfTjWmZq4t7w!z%C*F-JaNdRgUkXp2r5u8x/A?D(G+KbPeShVmYq'
+        -e KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+        -e MONGO_URI=mongodb://mongodb:27017/hours_read_db
+        -e USER_SERVICE_GRPC_HOST=user-service
+        -e USER_SERVICE_GRPC_PORT=9083
+        gdmuzo/hours-service:latest
+
+    - name: Levantar evaluation-service
+      shell: >
+        docker run -d --name evaluation-service
+        --network pasantias-net
+        --restart always
+        -p 8086:8086
+        -e DB_HOST=postgres-db
+        -e DB_PORT=5432
+        -e DB_NAME=evaluation_db
+        -e DB_USER=postgres
+        -e DB_PASSWORD=postgres
+        -e JWT_SECRET='v9y$B&E)H@McQfTjWmZq4t7w!z%C*F-JaNdRgUkXp2r5u8x/A?D(G+KbPeShVmYq'
+        -e USER_SERVICE_GRPC_HOST=user-service
+        -e USER_SERVICE_GRPC_PORT=9083
+        gdmuzo/evaluation-service:latest
+
+    - name: Levantar notification-service
+      shell: >
+        docker run -d --name notification-service
+        --network pasantias-net
+        --restart always
+        -p 8087:8087
+        -e DB_HOST=postgres-db
+        -e DB_PORT=5432
+        -e DB_NAME=notification_db
+        -e DB_USER=postgres
+        -e DB_PASSWORD=postgres
+        -e KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+        -e MQTT_HOST=58567514d2724107bcd88d74e13a8bd8.s1.eu.hivemq.cloud
+        -e MQTT_PORT=8883
+        -e MQTT_USER=mqttuser
+        -e MQTT_PASSWORD=Mqtt2026@
+        gdmuzo/notification-service:latest
+
+    - name: Levantar document-service
+      shell: >
+        docker run -d --name document-service
+        --network pasantias-net
+        --restart always
+        -p 8088:8088
+        -e DB_HOST=postgres-db
+        -e DB_PORT=5432
+        -e DB_NAME=document_db
+        -e DB_USER=postgres
+        -e DB_PASSWORD=postgres
+        -e KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+        -e MONGO_URI=mongodb://mongodb:27017/document_read_db
+        -e S3_BUCKET_NAME=pasantias-documents-qa
+        -e AWS_ACCESS_KEY_ID={{ aws_access_key_id }}
+        -e AWS_SECRET_ACCESS_KEY={{ aws_secret_access_key }}
+        -e AWS_SESSION_TOKEN={{ aws_session_token }}
+        gdmuzo/document-service:latest
+
+    - name: Levantar report-service
+      shell: >
+        docker run -d --name report-service
+        --network pasantias-net
+        --restart always
+        -p 8089:8089
+        -e DB_HOST=postgres-db
+        -e DB_PORT=5432
+        -e DB_NAME=report_db
+        -e DB_USER=postgres
+        -e DB_PASSWORD=postgres
+        -e KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+        -e MONGO_URI=mongodb://mongodb:27017/report_read_db
+        -e DOCUMENT_SERVICE_URL=http://document-service:8088
+        gdmuzo/report-service:latest
+
+    - name: Levantar ai-service
+      shell: >
+        docker run -d --name ai-service
+        --network pasantias-net
+        --restart always
+        -p 8090:8090
+        -e RABBITMQ_HOST=rabbitmq
+        -e RABBITMQ_PORT=5672
+        -e RABBITMQ_USER=guest
+        -e RABBITMQ_PASSWORD=guest
+        gdmuzo/ai-service:latest
+
 
     - name: Levantar gateway-service
       shell: |
