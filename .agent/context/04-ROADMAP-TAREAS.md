@@ -32,11 +32,15 @@ que reemplaza la planificación genérica original.
 > (uso interno).
 
 ### Semana 1 — Fundación de mensajería + `hours-service` (CQRS)
-- [x] Kafka + RabbitMQ + MongoDB en `docker-compose` local (sin AWS).
-- [ ] MongoDB Atlas (cuenta gratuita) configurado — usado por `hours-service` (esta
-  semana), `document-service` y `report-service` (semana 3).
+- [ ] Kafka + RabbitMQ + MongoDB en `docker-compose` local (sin AWS).
+- [x] MongoDB Atlas (cuenta gratuita) configurado — usado por `hours-service` (esta
+  semana), `document-service` y `report-service` (semana 3). ✅ Cluster creado
+  13/jun, connection string pendiente de agregar como `MONGO_URI` (GitHub Secret) en
+  Semana 4.
 - [x] `hours-service` (8085): CQRS — comandos REST escriben en `hours_db` (PostgreSQL),
-  evento `horas.registradas` a Kafka, proyección de lectura en MongoDB (Etapas 1, 2, 3, 4 y 5 completadas y validadas con tests).
+  evento `horas.registradas` a Kafka, proyección de lectura en MongoDB. ✅ Completo
+  (5 etapas, 17/17 tests incl. integración end-to-end con Testcontainers). PR abierto
+  hacia `QA`, sin mergear — ver `03-ESTADO-ACTUAL.md`.
 - [ ] Quick wins en paralelo (bajo costo, alto impacto en backlog docente):
   - [ ] Logging estructurado (niveles INFO/DEBUG/WARN/ERROR) en los 5 servicios ya
     desplegados — backlog docente #1.
@@ -49,19 +53,22 @@ que reemplaza la planificación genérica original.
     ver 09-ADOPCIONES #1.
 
 ### Semana 2 — Consumidores de eventos
-- [ ] `notification-service` (8087): consumidor Kafka del evento `horas.registradas` →
-  publica a MQTT → WebSocket al frontend.
-- [ ] `evaluation-service` (8086): Layered + servidor gRPC en `user-service` (pendiente
-  desde Fase 1) + cliente gRPC en `evaluation-service`.
+- [x] `notification-service` (8087): consumidor Kafka `horas.registradas` → MQTT
+  HiveMQ Cloud (TLS, topic `notificaciones/{estudianteId}`) + PostgreSQL
+  `notification_db`. Conexión TLS real verificada manualmente. 10/10 tests.
+  PR abierto hacia QA, sin mergear — espera Semana 4.
+- [x] `evaluation-service` (8086): Layered + PostgreSQL `evaluation_db` + cliente gRPC
+  hacia `user-service` (puerto 9083, best-effort). Validación calificación 0-10.
+  12/12 tests. PR abierto hacia QA, sin mergear — espera Semana 4.
 
 ### Semana 3 — Servicios periféricos restantes
-- [ ] `document-service` (8088): consumidor Kafka + Webhook hacia n8n + Mongo/S3.
-- [ ] S3 configurado para CVs y documentos generados (usado por `document-service`).
+- [x] `document-service` (8088): consumidor Kafka + Webhook hacia n8n + Mongo/S3 (Completado y verificado con 8 tests passing).
+- [x] S3 configurado para CVs y documentos generados (usado por `document-service`) — Bucket `pasantias-documents-qa` en us-east-1 creado y versionado activado.
 - [ ] Configurar n8n (self-hosted en cuenta DEV/Sandbox #1 o local) y conectar al menos
   un flujo real (ej. notificación por correo cuando se aprueba una práctica).
 - [ ] `report-service` (8089): consumidor Kafka + endpoint SOAP + Mongo.
 - [ ] Swagger/OpenAPI (`springdoc-openapi-starter-webmvc-ui`) en los 6 microservicios
-  nuevos de esta fase — backlog docente #2.
+  nuevos de esta fase (Listo en `hours-service`, `evaluation-service`, `notification-service` y `document-service`) — backlog docente #2.
 - [ ] PAAS secundario **Supabase** — módulo "Encuestas de satisfacción / feedback
   post-práctica" (tabla en Supabase + integración desde frontend, decisión cerrada en
   `03-ESTADO-ACTUAL.md`). Sin dependencias de otros servicios, puede hacerse cualquier
