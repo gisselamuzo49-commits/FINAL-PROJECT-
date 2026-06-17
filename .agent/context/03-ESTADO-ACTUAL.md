@@ -22,14 +22,8 @@ _Última actualización: 2026-06-12 (verificación contra REPORTE-ESTADO.md gene
 - `linkage-service` (8084): **básico ya funcional** — `LinkageController` con
   create/getAll/getById, `LinkageProject`/repository/service, y endpoint `/health`
   (`"linkage-service is running"`). Mismo nivel que `internship-service`.
-- `hours-service` (8085): **Etapas 1, 2, 3, 4 y 5 completamente implementadas y validadas con tests.**
-  - **Etapa 1**: Persistencia en PostgreSQL (`RegistroHoras`), operaciones `POST /api/hours` y `PATCH /api/hours/{id}/validar`.
-  - **Etapa 2**: Productor Kafka que emite el evento `horas.registradas` con clave `estudianteId` y payload JSON formateado en camelCase con serialización manual.
-  - **Etapa 3**: Consumidor Kafka (`@KafkaListener`), proyección de lectura en MongoDB (`horas_resumen`), recalculo de totales y endpoint de consulta `GET /api/hours/student/{estudianteId}`.
-  - **Etapa 4**: Cliente gRPC (`UserServiceClient`) conectado a `user-service` para enriquecer la proyección de lectura con el `nombre` y `carrera` del estudiante de manera resiliente/best-effort.
-  - **Etapa 5**: Pruebas de integración end-to-end con Testcontainers (PostgreSQL, Kafka, MongoDB), integración de Swagger/OpenAPI y documentación completa en README.md.
 - `user-service` (8083): scaffolding + lógica básica + `/health` (`"user-service is
-  running"`). Falta: servidor gRPC (implementado en rama `feature/user-service-grpc-server`, pendiente de mergear).
+  running"`). Falta: servidor gRPC (requisito #15).
 - Monorepo gestionado con **Turbo** (`.turbo/`, `package.json` por servicio con scripts
   que envuelven `./mvnw build/test`). Esto es correcto y no debe "limpiarse".
 - `user.db` / `auth.db` / `linkage.db` son los fallbacks SQLite locales documentados
@@ -68,7 +62,22 @@ compañero): guardarlo como GitHub Secret y pasarlo como extra-var de Ansible
 (`-e "jwt_secret=${{ secrets.JWT_SECRET }}"`), con el playbook usando `{{ jwt_secret }}`
 en el `docker run`. Misma idea aplicaría a `DB_PASSWORD`. No bloqueante para hoy.
 
-## ✅ RESUELTO — EIP fija para el bastion de QA
+## ✅ RESUELTO — `qa_auth_jobs` con IP pública (Cloudflare/Excel, 15/jun)
+
+`qa_auth_jobs` movida de `private_1a` (10.0.3.0/24) a `public_1a` (10.0.1.0/24),
+con EIP fija **`18.232.199.190`** y puertos 80/8082 abiertos en `sg_private`.
+Nueva IP privada: `10.0.1.61` (era `10.0.3.95`). `QA_AUTH_JOBS_IP` actualizado en
+GitHub Secrets. Deploy vía Ansible re-ejecutado, pipeline verde. Verificado:
+- `http://18.232.199.190` → `200 OK`, frontend React cargando.
+- `http://18.232.199.190:8082/api/linkage/health` → `200 OK`, `linkage-service is running`.
+
+Excel de Cloudflare llenado:
+- **QA IP1** → `18.232.199.190`
+- **PRODUCCION IP** → `pasantias-prod-elb-115885246.us-east-1.elb.amazonaws.com`
+
+Cuando la cátedra asigne los subdominios `*.distribuidauce.org`, actualizar
+`01-REQUERIMIENTOS-MAESTROS.md` requisito #5 a "✅" y documentar los dominios en
+el README principal y en la sección 6 del documento de entrega.
 
 El bastion de QA (`pasantias-qa-bastion`) ahora tiene una Elastic IP fija:
 **`3.225.171.116`** (igual que PROD). Se agregó `aws_eip.bastion_eip` a
@@ -215,33 +224,130 @@ suposición anterior estaba equivocada en ese punto.)
 
 - Ninguna decisión estructural pendiente por ahora.
 
-## 🎯 Próxima tarea concreta (siguiente sesión) — ACTUALIZADO
+## ✅ COMPLETADO — `hours-service` (Semana 1, CQRS + Kafka + Mongo + gRPC)
 
-**Fase 1 + rate limiting completos.** Único pendiente antes de continuar: hacer
-`push`/deploy a `QA` y confirmar visualmente (`docker ps` en el EC2, o logs) que los 7
-contenedores (`postgres-db`, `redis`, 4 microservicios, `gateway-service`,
-`frontend-web`) están `Up` y que el gateway responde `429` al superar
-`burstCapacity: 20` en una ráfaga de pruebas (ej. con `curl` en loop o `ab`/`hey`).
+Implementado en 5 etapas sobre la rama `feature/hours-service-postgres` (PR abierto
+hacia `QA`, **sin mergear** — ver nota abajo), siguiendo
+`.agent/context/10-DISENO-HOURS-SERVICE.md`:
 
-**Siguiente gran hito: `hours-service` (8085)** — primer servicio con **CQRS + Kafka**
-(Fase 2). Antes de pedirle código a Antigravity, conviene definir el diseño en
-`.agent/context/` (modelo de comandos, eventos, modelo de lectura) para que la
-implementación sea consistente con el resto del proyecto.
+1. Esqueleto PostgreSQL (`hours_db`, entidad `RegistroHoras`, comandos REST con
+   400/404 igual estilo que `linkage-service`).
+2. Productor Kafka — publica `horas.registradas` tras cada `save()`.
+3. Consumidor Kafka + proyección MongoDB `horas_resumen` + `GET /api/hours/student/{id}`.
+4. Cliente gRPC hacia `user-service` (puerto 9083) para enriquecer
+   `nombre`/`carrera` — "best effort" (`Optional.empty()` si falla, nunca bloquea).
+5. Swagger (`springdoc`), README completo, y **prueba de integración end-to-end con
+   Testcontainers** (Postgres + Kafka + MongoDB reales) que valida el pipeline
+   completo: `POST /api/hours` → evento Kafka → proyección Mongo actualizada →
+   `GET /api/hours/student/{id}` → `PATCH .../validar` → totales recalculados.
 
-> Recordatorio (sin acción aún): cuando se llegue a Fase 3 (ASG+RDS), evaluar migrar
-> Redis a **ElastiCache** en PROD para que no se destruya junto con la EC2 — ver
-> conversación sobre Redis/ElastiCache (pendiente de documentar en
-> `02-ARQUITECTURA-TECNICA.md` cuando se aborde Fase 3).
+**17/17 tests pasando**, incluyendo la integración end-to-end. `hours-service` queda
+funcionalmente completo y validado localmente.
 
-## 🎯 Próxima tarea concreta (siguiente sesión)
+### 🔧 Lección para futuros servicios con MongoDB (`document-service`, `report-service`)
+**Spring Boot 4.x renombró el prefijo de propiedad de MongoDB**: usar
+`spring.mongodb.uri` (NO `spring.data.mongodb.uri`, que es el nombre de Spring Boot
+3.x y versiones anteriores — verificado independientemente, es un cambio real y
+documentado de `spring-boot-starter-data-mongodb` 4.x). Aplicar desde el inicio en
+Semana 3.
 
-1. Pedir a Antigravity el árbol completo + contenido de los controladores principales de
-  `apps/gateway-service/` y `apps/linkage-service/` (ya tienen `pom.xml`, hay que saber
-  cuánto está hecho).
-2. Pedir el contenido de `infra/qa/main.tf` y de `infra/ansible/deploy-qa.yml` /
-  `deploy-prod.yml`.
-3. Decidir el punto 4 de "Decisiones pendientes" (frontend directo vs. gateway) antes de
-  seguir tocando `build-args`.
-4. Continuar el desarrollo de microservicios pendientes (priorizar terminar
-  `gateway-service` y `linkage-service` ya que están scaffoldeados, antes de empezar
-  `hours-service` desde cero).
+### ✅ MongoDB Atlas configurado (13/jun)
+Cuenta gratuita (M0) creada, cluster `Cluster0` en AWS us-east-1, usuario de BD con
+permisos read/write, Network Access `0.0.0.0/0` (correcto para free tier — la
+protección real es usuario/contraseña, no IP allowlist). Connection string obtenido
+y **NO almacenado en ningún archivo del repo ni de `.agent/`** — se agregará como
+GitHub Secret `MONGO_URI` en Semana 4 (mismo patrón que `JWT_SECRET`/`DB_PASSWORD`),
+con el path `?...&` + nombre de BD ajustado por servicio (`hours_read_db`,
+`documents_db`, `reports_db`). Recordatorio: usar `spring.mongodb.uri` (ver lección
+arriba), no `spring.data.mongodb.uri`.
+
+## ✅ COMPLETADO — `evaluation-service` (Semana 2, parcial)
+
+`apps/evaluation-service` (8086, Layered + PostgreSQL `evaluation_db` + gRPC client
+hacia `user-service`). Reutilizó `linkage-service` como plantilla y **copió el
+cliente gRPC completo de `hours-service`** (`user.proto`, `UserServiceClient`,
+`UserServiceClientImpl`, `StudentInfo`) — sin "descubrimientos" nuevos de Spring Boot
+4, mucho más rápido que `hours-service`. Endpoints: `POST /api/evaluations` (valida
+`estudianteId`/`tutorId`/`calificacion`, incluyendo rango 0-10 → 400),
+`GET /api/evaluations/{id}` (404 si no existe), `GET /api/evaluations/student/{id}`
+(enriquecido con nombre/carrera vía gRPC, best-effort). **12/12 tests, BUILD
+SUCCESS**. Rama `feature/evaluation-service`, PR hacia `QA` — confirmar que se abrió
+(último paso pedido a Antigravity, sin confirmación de link todavía).
+
+`notification-service` (8087, Event-Driven + Kafka consumer + MQTT) queda **completado localmente** (verificación de tests unitarios e integración con Testcontainers exitosa). Consume eventos de `horas.registradas` con estado `VALIDADO` o `RECHAZADO`, los guarda en PostgreSQL (`notification_db`) y publica un JSON a MQTT en el topic dinámico `notificaciones/{estudianteId}` usando cifrado TLS hacia HiveMQ Cloud. El backend de pruebas pasa al 100%.
+
+`document-service` (8088, Event-Driven + PDF Generation + REST + S3 + Webhooks) queda **completado localmente** (verificación de 8 tests unitarios exitosa). Consume eventos de `horas.registradas` con estado `VALIDADO`, genera un archivo PDF en memoria utilizando OpenPDF (iText 2.1.7), lo sube a Amazon S3 (`pasantias-documents-qa` con tokens temporales de AWS Academy), guarda la metadata en PostgreSQL (`document_db`), realiza un upsert en MongoDB (`documentos_resumen`) y dispara un webhook de forma asíncrona ("best effort") a n8n.
+
+### Estado de PRs (NO mergear todavía — plan para mañana abajo)
+- `feature/user-service-grpc-server` → `QA`: agrega servidor gRPC
+  `GetStudentInfo` (puerto 9083) + columna `carrera` (ddl-auto=update, sin
+  migración manual necesaria).
+- `feature/hours-service-postgres` → `QA`: las 5 etapas de `hours-service`.
+- `feature/evaluation-service` → `QA`: `evaluation-service` completo.
+- `feature/document-service` → `QA` (o rama local `feature/document-service` pendiente de push): `document-service` completo y verificado localmente.
+
+## 🚨 URGENTE (prioridad #1, antes que lo demás) — Dominio Cloudflare
+
+El docente exigió (WhatsApp, 14/jun, con amenaza explícita de bajar nota) implementar
+el **dominio Cloudflare delante del ALB de PROD** — requisito #5 de
+`01-REQUERIMIENTOS-MAESTROS.md`, marcado "🔲 Pendiente", **nunca implementado**.
+Gestionado por la cátedra (dominio `distribuidauce.org`) vía un Excel donde cada
+estudiante aporta 2 "orígenes" (PROD y QA) y la cátedra asigna 2 subdominios de
+vuelta (ej. visto en la fila de un compañero:
+`uce-prod-elb-....amazonaws.com` → `<alumno>pro1.distribuidauce.org`,
+`<IP pública QA>` → `<alumno>pro2.distribuidauce.org`).
+
+### PROD — listo para llenar YA (sin trabajo nuevo)
+Origen PROD = `pasantias-prod-elb-115885246.us-east-1.elb.amazonaws.com`.
+
+### QA — requiere una EIP nueva en `qa_auth_jobs` (próxima sesión, ~mismo esfuerzo
+que la EIP del bastion de ayer)
+`qa_auth_jobs` (10.0.3.95) es privada hoy. Plan:
+1. Agregar `aws_eip` a `qa_auth_jobs` (no al bastion — ya tiene la suya).
+2. En `sg_private`, agregar ingress **solo puertos 80 (frontend) y 8082 (gateway)**
+   desde `0.0.0.0/0`. **NO tocar la regla de SSH (22)** — sigue restringida al
+   bastion (`sg_bastion`), eso se mantiene como fortaleza documentada.
+3. `terraform apply` en cuenta QA (#2) — requiere "Start Lab".
+4. Verificar desde fuera (sin túnel): `http://<nueva_EIP_qa>` (frontend) y
+   `http://<nueva_EIP_qa>:8082/api/linkage/health` (gateway).
+5. Esa IP es el "origen QA" del Excel.
+
+### Después de llenar el Excel
+Cuando la cátedra asigne los subdominios `*.distribuidauce.org`: actualizar
+`01-REQUERIMIENTOS-MAESTROS.md` (#5) a "✅", y agregar ambos dominios a la sección 6
+del documento de entrega de `linkage-service` (probar también vía el dominio nuevo,
+no solo el DNS crudo del ALB).
+
+### Acción adicional rápida (5 min, SIN AWS — se puede hacer en cualquier momento)
+Editar la descripción del PR #25 (`QA → master`, ya mergeado) en GitHub para
+referenciar explícitamente el PR #20 (`feature → QA`) y los runs de Actions #37/#38
+como evidencia de que se probó en QA antes de ir a `master` — el docente señaló que
+"nadie adjuntó la evidencia para ir a prod".
+
+## 🎯 Próxima tarea concreta (siguiente sesión) — Plan de merge a QA
+
+**Objetivo de la sesión**: mergear los 3 PRs pendientes a `QA` y validar con GitHub
+Actions, en este orden (NO mergear los 3 a la vez):
+
+1. **"Start Lab"** en la cuenta QA (#2), esperar a que las instancias estén
+   `running`. La EIP del bastion (`3.225.171.116`) y la IP privada de `qa_auth_jobs`
+   (`10.0.3.95`) no deberían cambiar (stop/start preserva IPs, a diferencia de
+   terminar/recrear) — no debería requerir actualizar secrets de GitHub.
+2. **Mergear PRIMERO solo `feature/user-service-grpc-server` → QA**, sola. Es el
+   único de los 3 que afecta el deploy actual (`user-service` está en la lista de
+   build/Ansible de `deploy-qa.yml`; los otros dos no están referenciados todavía).
+   Esto dispara `deploy-qa.yml`: rebuild + redeploy de `user-service` con el gRPC
+   server nuevo + columna `carrera`.
+3. **Verificar**: run de Actions en verde; `docker ps` muestra `user-service` con
+   imagen nueva (`Up` reciente); `docker logs user-service` muestra el gRPC server
+   arrancando en el puerto 9083; (opcional) confirmar columna `carrera` en la tabla
+   vía `docker exec postgres-db psql ...`.
+4. **Solo si 2-3 salen bien**: mergear `feature/hours-service-postgres` y
+   `feature/evaluation-service` → QA (deberían ser inertes para el deploy actual —
+   sirve para confirmar que no rompen el pipeline existente antes de Semana 4).
+
+Si algo falla en el paso 2-3, queda aislado — se sabe exactamente qué lo causó, sin
+ruido de las otras dos PRs.
+
+Después de esto (si hay tiempo): continuar con `notification-service` (Semana 2,
+diseño por etapas).
