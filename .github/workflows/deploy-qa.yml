@@ -219,15 +219,19 @@ jobs:
       - name: Create Ansible inventory
         run: |
           echo "[qa_ec2]" > /tmp/qa_inventory.ini
-          echo "${{ secrets.QA_AUTH_JOBS_IP }} ansible_user=ubuntu ansible_ssh_private_key_file=~/.ssh/QA.pem ansible_ssh_common_args='-o StrictHostKeyChecking=no -o ProxyCommand=\"ssh -W %h:%p -i ~/.ssh/QA.pem -o StrictHostKeyChecking=no ubuntu@${{ secrets.QA_BASTION_IP }}\"'" >> /tmp/qa_inventory.ini
-          echo "---Inventory content---"
+          echo "${{ secrets.QA_AUTH_JOBS_IP }}" >> /tmp/qa_inventory.ini
           cat /tmp/qa_inventory.ini
-          echo "---End inventory---"
+
+      - name: Configure Ansible SSH
+        run: |
+          printf '[defaults]\nremote_user = ubuntu\nprivate_key_file = ~/.ssh/QA.pem\nhost_key_checking = False\n\n[ssh_connection]\nssh_args = -o StrictHostKeyChecking=no -o ProxyCommand="ssh -W %%h:%%p -i ~/.ssh/QA.pem -o StrictHostKeyChecking=no ubuntu@%s"\n' \
+            "${{ secrets.QA_BASTION_IP }}" > /tmp/ansible.cfg
+          cat /tmp/ansible.cfg
 
       - name: Deploy via Ansible
         run: |
           pip install ansible
-          ansible-playbook infra/ansible/deploy-qa.yml \
+          ANSIBLE_CONFIG=/tmp/ansible.cfg ansible-playbook infra/ansible/deploy-qa.yml \
             -i /tmp/qa_inventory.ini \
             -e "aws_access_key_id=${{ secrets.AWS_ACCESS_KEY_ID }}" \
             -e "aws_secret_access_key=${{ secrets.AWS_SECRET_ACCESS_KEY }}" \
