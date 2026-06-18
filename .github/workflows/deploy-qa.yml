@@ -219,13 +219,12 @@ jobs:
       - name: Create Ansible inventory
         run: |
           echo "[qa_ec2]" > /tmp/qa_inventory.ini
-          echo "${{ secrets.QA_AUTH_JOBS_IP }}" >> /tmp/qa_inventory.ini
+          echo "10.0.1.61" >> /tmp/qa_inventory.ini
           cat /tmp/qa_inventory.ini
 
       - name: Configure Ansible SSH
         run: |
-          printf '[defaults]\nremote_user = ubuntu\nprivate_key_file = ~/.ssh/QA.pem\nhost_key_checking = False\n\n[ssh_connection]\nssh_args = -o StrictHostKeyChecking=no -o ProxyCommand="ssh -W %%h:%%p -i ~/.ssh/QA.pem -o StrictHostKeyChecking=no ubuntu@%s"\n' \
-            "${{ secrets.QA_BASTION_IP }}" > /tmp/ansible.cfg
+          printf '[defaults]\nremote_user = ubuntu\nprivate_key_file = ~/.ssh/QA.pem\nhost_key_checking = False\n\n[ssh_connection]\nssh_args = -o StrictHostKeyChecking=no -o ProxyCommand="ssh -W %%h:%%p -i ~/.ssh/QA.pem -o StrictHostKeyChecking=no ubuntu@3.225.171.116"\n' > /tmp/ansible.cfg
           cat /tmp/ansible.cfg
 
       - name: Deploy via Ansible
