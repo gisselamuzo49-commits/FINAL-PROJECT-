@@ -207,9 +207,14 @@ jobs:
           printf '%s' "${{ secrets.QA_SSH_KEY }}" > ~/.ssh/QA.pem
           chmod 400 ~/.ssh/QA.pem
           ssh-keyscan -H ${{ secrets.QA_BASTION_IP }} >> ~/.ssh/known_hosts
-          ssh -i ~/.ssh/QA.pem -o StrictHostKeyChecking=no -o ConnectTimeout=10 \
+          ssh -i ~/.ssh/QA.pem \
+            -o StrictHostKeyChecking=no \
+            -o ConnectTimeout=10 \
+            -v \
             ubuntu@${{ secrets.QA_BASTION_IP }} \
-            "ssh-keyscan -H ${{ secrets.QA_AUTH_JOBS_IP }}" >> ~/.ssh/known_hosts
+            "ssh-keyscan -H ${{ secrets.QA_AUTH_JOBS_IP }}" 2>&1 | tee /tmp/ssh_debug.txt
+          cat /tmp/ssh_debug.txt >> ~/.ssh/known_hosts || true
+          echo "SSH exit code: $?"
 
       - name: Create Ansible inventory
         run: |
