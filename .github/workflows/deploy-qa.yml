@@ -231,9 +231,23 @@ jobs:
       - name: Deploy via Ansible
         run: |
           pip install ansible
+          echo "=== ANSIBLE_CONFIG ==="
+          echo $ANSIBLE_CONFIG
+          echo "=== ansible.cfg content ==="
+          cat /tmp/ansible.cfg
+          echo "=== inventory content ==="
+          cat /tmp/qa_inventory.ini
+          echo "=== testing ansible connection ==="
+          ANSIBLE_CONFIG=/tmp/ansible.cfg ansible \
+            -i /tmp/qa_inventory.ini \
+            all -m ping \
+            -vvv 2>&1 | head -50
+          echo "=== running playbook ==="
           ANSIBLE_CONFIG=/tmp/ansible.cfg ansible-playbook infra/ansible/deploy-qa.yml \
             -i /tmp/qa_inventory.ini \
             -e "aws_access_key_id=${{ secrets.AWS_ACCESS_KEY_ID }}" \
             -e "aws_secret_access_key=${{ secrets.AWS_SECRET_ACCESS_KEY }}" \
             -e "aws_session_token=${{ secrets.AWS_SESSION_TOKEN }}"
+        env:
+          ANSIBLE_CONFIG: /tmp/ansible.cfg
 
