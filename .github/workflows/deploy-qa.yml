@@ -218,10 +218,10 @@ jobs:
 
       - name: Create Ansible inventory
         run: |
-          cat > /tmp/qa_inventory.ini << EOF
-          [qa_ec2]
-          ${{ secrets.QA_AUTH_JOBS_IP }} ansible_user=ubuntu ansible_ssh_private_key_file=~/.ssh/QA.pem ansible_ssh_common_args='-o StrictHostKeyChecking=no -o ProxyCommand="ssh -W %h:%p -i ~/.ssh/QA.pem -o StrictHostKeyChecking=no ubuntu@${{ secrets.QA_BASTION_IP }}"'
-          EOF
+          printf '[qa_ec2]\n%s ansible_user=ubuntu ansible_ssh_private_key_file=~/.ssh/QA.pem ansible_ssh_common_args='"'"'-o StrictHostKeyChecking=no -o ProxyCommand="ssh -W %%h:%%p -i ~/.ssh/QA.pem -o StrictHostKeyChecking=no ubuntu@%s"'"'"'\n' \
+            "${{ secrets.QA_AUTH_JOBS_IP }}" \
+            "${{ secrets.QA_BASTION_IP }}" > /tmp/qa_inventory.ini
+          cat /tmp/qa_inventory.ini
 
       - name: Deploy via Ansible
         run: |
