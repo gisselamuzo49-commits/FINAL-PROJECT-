@@ -276,7 +276,7 @@ cliente gRPC completo de `hours-service`** (`user.proto`, `UserServiceClient`,
 SUCCESS**. Rama `feature/evaluation-service`, PR hacia `QA` — confirmar que se abrió
 (último paso pedido a Antigravity, sin confirmación de link todavía).
 
-`notification-service` (8087, Event-Driven + Kafka consumer + MQTT) queda **completado localmente** (verificación de tests unitarios e integración con Testcontainers exitosa). Consume eventos de `horas.registradas` con estado `VALIDADO` o `RECHAZADO`, los guarda en PostgreSQL (`notification_db`) y publica un JSON a MQTT en el topic dinámico `notificaciones/{estudianteId}` usando cifrado TLS hacia HiveMQ Cloud. El backend de pruebas pasa al 100%.
+`notification-service` (8087, Event-Driven + Kafka consumer + MQTT) queda **completado localmente** (verificación de tests unitarios e integración con Testcontainers exitosa). Consume eventos de `horas.registradas` con estado `VALIDADO` o `RECHAZADO`, los guarda en PostgreSQL (`notification_db`) y publica un JSON a MQTT en el topic dinámico `notificaciones/{estudianteId}` usando una conexión TCP (puerto 1883) con autenticación básica hacia un broker Mosquitto self-hosted local/QA/PROD. El backend de pruebas pasa al 100%.
 
 `document-service` (8088, Event-Driven + PDF Generation + REST + S3 + Webhooks) queda **completado localmente** (verificación de 8 tests unitarios exitosa). Consume eventos de `horas.registradas` con estado `VALIDADO`, genera un archivo PDF en memoria utilizando OpenPDF (iText 2.1.7), lo sube a Amazon S3 (`pasantias-documents-qa` con tokens temporales de AWS Academy), guarda la metadata en PostgreSQL (`document_db`), realiza un upsert en MongoDB (`documentos_resumen`) y dispara un webhook de forma asíncrona ("best effort") a n8n.
 
