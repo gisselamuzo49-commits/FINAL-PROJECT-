@@ -263,18 +263,15 @@ con el path `?...&` + nombre de BD ajustado por servicio (`hours_read_db`,
 `documents_db`, `reports_db`). Recordatorio: usar `spring.mongodb.uri` (ver lección
 arriba), no `spring.data.mongodb.uri`.
 
-## ✅ COMPLETADO — `evaluation-service` (Semana 2, parcial)
+## ✅ COMPLETADO — `evaluation-service` (Semana 2, completo)
 
 `apps/evaluation-service` (8086, Layered + PostgreSQL `evaluation_db` + gRPC client
-hacia `user-service`). Reutilizó `linkage-service` como plantilla y **copió el
-cliente gRPC completo de `hours-service`** (`user.proto`, `UserServiceClient`,
-`UserServiceClientImpl`, `StudentInfo`) — sin "descubrimientos" nuevos de Spring Boot
-4, mucho más rápido que `hours-service`. Endpoints: `POST /api/evaluations` (valida
+hacia `user-service`). Reutilizó `linkage-service` como plantilla y tiene el
+cliente gRPC completo hacia `user-service` con Circuit Breaker programático de Resilience4j (igual que `hours-service` para solucionar la incompatibilidad de `resilience4j-spring-boot3` con Spring Boot 4.0.6, el cual gestiona de forma programática las transiciones de estado, expone su estado en `/health` y fue testeado eficientemente sin causar demoras). Endpoints: `POST /api/evaluations` (valida
 `estudianteId`/`tutorId`/`calificacion`, incluyendo rango 0-10 → 400),
 `GET /api/evaluations/{id}` (404 si no existe), `GET /api/evaluations/student/{id}`
-(enriquecido con nombre/carrera vía gRPC, best-effort). **12/12 tests, BUILD
-SUCCESS**. Rama `feature/evaluation-service`, PR hacia `QA` — confirmar que se abrió
-(último paso pedido a Antigravity, sin confirmación de link todavía).
+(enriquecido con nombre/carrera vía gRPC, best-effort). **14/14 tests, BUILD
+SUCCESS** en la rama `feature/mosquitto-migration`.
 
 `notification-service` (8087, Event-Driven + Kafka consumer + MQTT) queda **completado localmente** (verificación de tests unitarios e integración con Testcontainers exitosa). Consume eventos de `horas.registradas` con estado `VALIDADO` o `RECHAZADO`, los guarda en PostgreSQL (`notification_db`) y publica un JSON a MQTT en el topic dinámico `notificaciones/{estudianteId}` usando una conexión TCP (puerto 1883) con autenticación básica hacia un broker Mosquitto self-hosted local/QA/PROD. El backend de pruebas pasa al 100%.
 

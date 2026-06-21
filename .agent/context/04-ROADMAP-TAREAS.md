@@ -58,8 +58,8 @@ que reemplaza la planificación genérica original.
   `notification_db`. Conexión TLS real verificada manualmente. 10/10 tests.
   PR abierto hacia QA, sin mergear — espera Semana 4.
 - [x] `evaluation-service` (8086): Layered + PostgreSQL `evaluation_db` + cliente gRPC
-  hacia `user-service` (puerto 9083, best-effort). Validación calificación 0-10.
-  12/12 tests. PR abierto hacia QA, sin mergear — espera Semana 4.
+  hacia `user-service` (puerto 9083, best-effort) con Circuit Breaker programático de Resilience4j.
+  Validación calificación 0-10. 14/14 tests. PR abierto hacia QA, sin mergear — espera Semana 4.
 
 ### Semana 3 — Servicios periféricos restantes
 - [x] `document-service` (8088): consumidor Kafka + Webhook hacia n8n + Mongo/S3 (Completado y verificado con 8 tests passing).
