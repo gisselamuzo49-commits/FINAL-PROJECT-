@@ -54,9 +54,9 @@ que reemplaza la planificación genérica original.
 
 ### Semana 2 — Consumidores de eventos
 - [x] `notification-service` (8087): consumidor Kafka `horas.registradas` → MQTT
-  HiveMQ Cloud (TLS, topic `notificaciones/{estudianteId}`) + PostgreSQL
-  `notification_db`. Conexión TLS real verificada manualmente. 10/10 tests.
-  PR abierto hacia QA, sin mergear — espera Semana 4.
+  Mosquitto (topic `notificaciones/{estudianteId}`) + PostgreSQL `notification_db`.
+  Publicación MQTT protegida con Circuit Breaker programático de Resilience4j.
+  12/12 tests. PR abierto hacia QA, sin mergear — espera Semana 4.
 - [x] `evaluation-service` (8086): Layered + PostgreSQL `evaluation_db` + cliente gRPC
   hacia `user-service` (puerto 9083, best-effort) con Circuit Breaker programático de Resilience4j.
   Validación calificación 0-10. 14/14 tests. PR abierto hacia QA, sin mergear — espera Semana 4.
