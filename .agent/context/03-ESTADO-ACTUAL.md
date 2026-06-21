@@ -221,6 +221,7 @@ suposición anterior estaba equivocada en ese punto.)
   Fase 3 (semanas 9-12). Se implementarán en Terraform de forma que puedan
   `apply`/`destroy` cerca de los checkpoints, sin correr 24/7 durante el desarrollo
   diario (ver `05-AWS-ACADEMY-ESTRATEGIA.md`).
+6. **Seguridad no-root en contenedores**: Todos los Dockerfiles de los 11 microservicios (Java y Python) se han configurado para ejecutarse bajo un usuario no-root (`appuser` / `appgroup`) por razones de conformidad y seguridad.
 
 ## 🔴 Decisiones aún pendientes
 
