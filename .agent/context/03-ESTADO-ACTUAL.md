@@ -281,6 +281,7 @@ SUCCESS**. Rama `feature/evaluation-service`, PR hacia `QA` — confirmar que se
 `document-service` (8088, Event-Driven + PDF Generation + REST + S3 + Webhooks) queda **completado localmente** (verificación de 8 tests unitarios exitosa). Consume eventos de `horas.registradas` con estado `VALIDADO`, genera un archivo PDF en memoria utilizando OpenPDF (iText 2.1.7), lo sube a Amazon S3 (`pasantias-documents-qa` con tokens temporales de AWS Academy), guarda la metadata en PostgreSQL (`document_db`), realiza un upsert en MongoDB (`documentos_resumen`) y dispara un webhook de forma asíncrona ("best effort") a n8n.
 
 ### Estado de PRs (NO mergear todavía — plan para mañana abajo)
+- `feature/user-service-get-by-email` → `QA`: agrega endpoint `/email/{email}` en `user-service` + tests MockMvc (200/404).
 - `feature/user-service-grpc-server` → `QA`: agrega servidor gRPC
   `GetStudentInfo` (puerto 9083) + columna `carrera` (ddl-auto=update, sin
   migración manual necesaria).
