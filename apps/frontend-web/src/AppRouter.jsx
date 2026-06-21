@@ -8,6 +8,7 @@ import ProtectedRoute from './components/auth/ProtectedRoute';
 import Internships from './pages/Internships';
 import Linkage from './pages/Linkage';
 import Users from './pages/Users';
+import Hours from './pages/Hours';
 
 const router = createBrowserRouter([
   {
@@ -45,6 +46,10 @@ const router = createBrowserRouter([
       {
         path: 'users',
         element: <Users />
+      },
+      {
+        path: 'hours',
+        element: <Hours />
       }
     ]
   },

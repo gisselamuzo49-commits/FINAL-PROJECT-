@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import Header from './Header';
@@ -6,13 +6,6 @@ import Header from './Header';
 function DashboardLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const navigate = useNavigate();
-
-  // Temporary mock user data
-  const user = {
-    nombre: localStorage.getItem("userEmail") || "Estudiante UCE",
-    rol: "Estudiante Académico",
-    avatarUrl: null
-  };
 
   const API_URL = `http://${window.location.hostname}`;
   const GATEWAY_PORT = import.meta.env.VITE_GATEWAY_PORT || "8082";
@@ -24,6 +17,25 @@ function DashboardLayout() {
       headers["Authorization"] = `Bearer ${token}`;
     }
     return headers;
+  };
+
+  const [userProfile, setUserProfile] = useState(null);
+  const userEmail = localStorage.getItem("userEmail");
+
+  useEffect(() => {
+    if (!userEmail) return;
+    fetch(`${API_URL}:${GATEWAY_PORT}/api/users/email/${userEmail}`, { headers: getHeaders() })
+      .then(res => res.ok ? res.json() : null)
+      .then(data => setUserProfile(data))
+      .catch(() => setUserProfile(null));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userEmail]);
+
+  const user = {
+    nombre: userProfile ? `${userProfile.firstName} ${userProfile.lastName}` : (localStorage.getItem("userEmail") || "Estudiante UCE"),
+    rol: userProfile?.role || "Estudiante Académico",
+    avatarUrl: null,
+    userProfile
   };
 
   const handleLogout = () => {
@@ -55,7 +67,7 @@ function DashboardLayout() {
         <main className="flex-1 overflow-y-auto p-6 flex flex-col">
           {/* Main content page injected here */}
           <div className="flex-grow">
-            <Outlet context={{ API_URL, GATEWAY_PORT, getHeaders, logout: handleLogout }} />
+            <Outlet context={{ API_URL, GATEWAY_PORT, getHeaders, logout: handleLogout, userProfile, estudianteId: userProfile?.id }} />
           </div>
 
           {/* Footer */}
