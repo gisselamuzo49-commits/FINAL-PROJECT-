@@ -219,6 +219,8 @@ suposición anterior estaba equivocada en ese punto.)
   `apply`/`destroy` cerca de los checkpoints, sin correr 24/7 durante el desarrollo
   diario (ver `05-AWS-ACADEMY-ESTRATEGIA.md`).
 6. **Seguridad no-root en contenedores**: Todos los Dockerfiles de los 11 microservicios (Java y Python) se han configurado para ejecutarse bajo un usuario no-root (`appuser` / `appgroup`) por razones de conformidad y seguridad.
+7. **Soporte Neo4j en Ansible**: Se agregó la infraestructura y configuración del contenedor `neo4j:5-community` en `deploy-qa.yml` y `deploy-prod.yml`, incluyendo la inyección de credenciales (`NEO4J_URI`, `NEO4J_USER`, `NEO4J_PASSWORD`) a `internship-service` en su despliegue.
+8. **SPA Fallback en Nginx**: Se creó una configuración de Nginx personalizada en `apps/frontend-web/nginx.conf` utilizando `try_files` para redirigir correctamente las rutas del SPA a `index.html` en accesos directos, y se integró en el `Dockerfile` de `frontend-web`.
 
 ## 🔴 Decisiones aún pendientes
 
