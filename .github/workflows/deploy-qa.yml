@@ -10,7 +10,44 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      auth: ${{ steps.filter.outputs.auth }}
+      internship: ${{ steps.filter.outputs.internship }}
+      user: ${{ steps.filter.outputs.user }}
+      linkage: ${{ steps.filter.outputs.linkage }}
+      gateway: ${{ steps.filter.outputs.gateway }}
+      frontend: ${{ steps.filter.outputs.frontend }}
+      hours: ${{ steps.filter.outputs.hours }}
+      evaluation: ${{ steps.filter.outputs.evaluation }}
+      notification: ${{ steps.filter.outputs.notification }}
+      document: ${{ steps.filter.outputs.document }}
+      report: ${{ steps.filter.outputs.report }}
+      ai: ${{ steps.filter.outputs.ai }}
+      infra: ${{ steps.filter.outputs.infra }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            auth: 'apps/auth-service/**'
+            internship: 'apps/internship-service/**'
+            user: 'apps/user-service/**'
+            linkage: 'apps/linkage-service/**'
+            gateway: 'apps/gateway-service/**'
+            frontend: 'apps/frontend-web/**'
+            hours: 'apps/hours-service/**'
+            evaluation: 'apps/evaluation-service/**'
+            notification: 'apps/notification-service/**'
+            document: 'apps/document-service/**'
+            report: 'apps/report-service/**'
+            ai: 'apps/ai-service/**'
+            infra: 'infra/**'
+
   deploy:
+    needs: detect-changes
     runs-on: ubuntu-latest
 
     services:
@@ -48,65 +85,81 @@ jobs:
           cache: 'maven'
 
       - name: Run tests - auth-service
+        if: needs.detect-changes.outputs.auth == 'true'
         run: |
           cd apps/auth-service
           chmod +x mvnw
           ./mvnw test
 
       - name: Run tests - internship-service
+        if: needs.detect-changes.outputs.internship == 'true'
         run: |
           cd apps/internship-service
           chmod +x mvnw
           ./mvnw test
 
       - name: Run tests - user-service
+        if: needs.detect-changes.outputs.user == 'true'
         run: |
           cd apps/user-service
           chmod +x mvnw
           ./mvnw test
 
       - name: Run tests - linkage-service
+        if: needs.detect-changes.outputs.linkage == 'true'
         run: |
           cd apps/linkage-service
           chmod +x mvnw
           ./mvnw test
 
       - name: Run tests - gateway-service
+        if: needs.detect-changes.outputs.gateway == 'true'
         run: |
           cd apps/gateway-service
           chmod +x mvnw
           ./mvnw test
 
       - name: Run tests - hours-service
+        if: needs.detect-changes.outputs.hours == 'true'
         run: |
           cd apps/hours-service
           chmod +x mvnw
           ./mvnw test
 
       - name: Run tests - evaluation-service
+        if: needs.detect-changes.outputs.evaluation == 'true'
         run: |
           cd apps/evaluation-service
           chmod +x mvnw
           ./mvnw test
 
       - name: Run tests - notification-service
+        if: needs.detect-changes.outputs.notification == 'true'
         run: |
           cd apps/notification-service
           chmod +x mvnw
           ./mvnw test
 
       - name: Run tests - document-service
+        if: needs.detect-changes.outputs.document == 'true'
         run: |
           cd apps/document-service
           chmod +x mvnw
           ./mvnw test
 
       - name: Run tests - report-service
+        if: needs.detect-changes.outputs.report == 'true'
         run: |
           cd apps/report-service
           chmod +x mvnw
           ./mvnw test
 
+      - name: Run tests - ai-service
+        if: needs.detect-changes.outputs.ai == 'true'
+        run: |
+          cd apps/ai-service
+          pip install -r requirements.txt --user
+          python -m pytest test_main.py -v
 
       - name: Login to Docker Hub
         uses: docker/login-action@v3
@@ -115,6 +168,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build and push auth-service
+        if: needs.detect-changes.outputs.auth == 'true'
         uses: docker/build-push-action@v5
         with:
           context: ./apps/auth-service
@@ -122,6 +176,7 @@ jobs:
           tags: gdmuzo/auth-service:qa
 
       - name: Build and push internship-service
+        if: needs.detect-changes.outputs.internship == 'true'
         uses: docker/build-push-action@v5
         with:
           context: ./apps/internship-service
@@ -129,6 +184,7 @@ jobs:
           tags: gdmuzo/internship-service:qa
 
       - name: Build and push user-service
+        if: needs.detect-changes.outputs.user == 'true'
         uses: docker/build-push-action@v5
         with:
           context: ./apps/user-service
@@ -136,6 +192,7 @@ jobs:
           tags: gdmuzo/user-service:qa
 
       - name: Build and push linkage-service
+        if: needs.detect-changes.outputs.linkage == 'true'
         uses: docker/build-push-action@v5
         with:
           context: ./apps/linkage-service
@@ -143,6 +200,7 @@ jobs:
           tags: gdmuzo/linkage-service:qa
 
       - name: Build and push gateway-service
+        if: needs.detect-changes.outputs.gateway == 'true'
         uses: docker/build-push-action@v5
         with:
           context: ./apps/gateway-service
@@ -150,6 +208,7 @@ jobs:
           tags: gdmuzo/gateway-service:qa
 
       - name: Build and push frontend-web
+        if: needs.detect-changes.outputs.frontend == 'true'
         uses: docker/build-push-action@v5
         with:
           context: ./apps/frontend-web
@@ -159,6 +218,7 @@ jobs:
             VITE_GATEWAY_PORT=8082
 
       - name: Build and push hours-service
+        if: needs.detect-changes.outputs.hours == 'true'
         uses: docker/build-push-action@v5
         with:
           context: ./apps/hours-service
@@ -166,6 +226,7 @@ jobs:
           tags: gdmuzo/hours-service:latest
 
       - name: Build and push evaluation-service
+        if: needs.detect-changes.outputs.evaluation == 'true'
         uses: docker/build-push-action@v5
         with:
           context: ./apps/evaluation-service
@@ -173,6 +234,7 @@ jobs:
           tags: gdmuzo/evaluation-service:latest
 
       - name: Build and push notification-service
+        if: needs.detect-changes.outputs.notification == 'true'
         uses: docker/build-push-action@v5
         with:
           context: ./apps/notification-service
@@ -180,6 +242,7 @@ jobs:
           tags: gdmuzo/notification-service:latest
 
       - name: Build and push document-service
+        if: needs.detect-changes.outputs.document == 'true'
         uses: docker/build-push-action@v5
         with:
           context: ./apps/document-service
@@ -187,6 +250,7 @@ jobs:
           tags: gdmuzo/document-service:latest
 
       - name: Build and push report-service
+        if: needs.detect-changes.outputs.report == 'true'
         uses: docker/build-push-action@v5
         with:
           context: ./apps/report-service
@@ -194,12 +258,12 @@ jobs:
           tags: gdmuzo/report-service:latest
 
       - name: Build and push ai-service
+        if: needs.detect-changes.outputs.ai == 'true'
         uses: docker/build-push-action@v5
         with:
           context: ./apps/ai-service
           push: true
           tags: gdmuzo/ai-service:latest
-
 
       - name: Setup SSH key
         run: |
@@ -249,4 +313,3 @@ jobs:
             -e "aws_session_token=${{ secrets.AWS_SESSION_TOKEN }}"
         env:
           ANSIBLE_CONFIG: /tmp/ansible.cfg
-
