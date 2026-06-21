@@ -10,7 +10,7 @@ que reemplaza la planificación genérica original.
 
 - [x] `auth-service` (8080) — JWT, RBAC, hashing.
 - [x] `internship-service` (8081) — CRUD de ofertas.
-- [x] `user-service` (8083) — perfiles básicos implementados. Falta servidor gRPC.
+- [x] `user-service` (8083) — perfiles básicos e implementado endpoint de búsqueda por email (`/email/{email}`). Falta servidor gRPC.
 - [x] `linkage-service` (8084) — CRUD básico + `/health` implementados.
 - [x] `gateway-service` (8082) — rutas + JWT funcionando para los 4 servicios. Falta:
   rate limiting, WebSocket, rutas de servicios futuros.
