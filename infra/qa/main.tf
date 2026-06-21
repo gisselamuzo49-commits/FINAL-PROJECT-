@@ -221,7 +221,7 @@ resource "aws_eip" "bastion_eip" {
 # ─────────────────────────────────────────
 resource "aws_instance" "qa_auth_jobs" {
   ami                    = data.aws_ami.ubuntu.id
-  instance_type          = "t3.medium"
+  instance_type          = "t3.large"
   subnet_id              = aws_subnet.public_1a.id
   key_name               = data.aws_key_pair.qa_key.key_name
   vpc_security_group_ids = [aws_security_group.sg_private.id]

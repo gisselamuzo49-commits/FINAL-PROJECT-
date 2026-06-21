@@ -67,9 +67,12 @@ en el `docker run`. Misma idea aplicaría a `DB_PASSWORD`. No bloqueante para ho
 `qa_auth_jobs` movida de `private_1a` (10.0.3.0/24) a `public_1a` (10.0.1.0/24),
 con EIP fija **`18.232.199.190`** y puertos 80/8082 abiertos en `sg_private`.
 Nueva IP privada: `10.0.1.61` (era `10.0.3.95`). `QA_AUTH_JOBS_IP` actualizado en
-GitHub Secrets. Deploy vía Ansible re-ejecutado, pipeline verde. Verificado:
-- `http://18.232.199.190` → `200 OK`, frontend React cargando.
-- `http://18.232.199.190:8082/api/linkage/health` → `200 OK`, `linkage-service is running`.
+GitHub Secrets.- Deploy vía Ansible re-ejecutado, pipeline verde. Verificado en `t3.large` con swap de 4GB (21/jun):
+  - `http://18.232.199.190` (Frontend) → `200 OK`, frontend React cargando.
+  - `http://18.232.199.190:8082/api/linkage/health` (Linkage via GW) → `200 OK`, `"linkage-service is running"`.
+  - `http://18.232.199.190:8082/api/evaluation/health` (Evaluation via GW) → `200 OK`, `"evaluation-service is running"`.
+  - `http://18.232.199.190:8082/api/hours/health` (Hours via GW) → Retornaba `404` por conflicto de orden de rutas en `gateway-service` (la ruta comodín `/api/hours/**` consumía `/api/hours/health`). Se corrigió el orden de rutas en `application.yml` localmente y se commiteó para el próximo despliegue. Internamente en puerto 8085 retorna `200 OK` `"hours-service is running"`.
+  - Servicios internos (`notification-service` en 8087, `document-service` en 8088, `report-service` en 8089, `ai-service` en 8090) confirmados y respondiendo `200 OK` internamente (bloqueados externamente por Security Group como debe ser).
 
 Excel de Cloudflare llenado:
 - **QA IP1** → `18.232.199.190`
@@ -79,7 +82,7 @@ Cuando la cátedra asigne los subdominios `*.distribuidauce.org`, actualizar
 `01-REQUERIMIENTOS-MAESTROS.md` requisito #5 a "✅" y documentar los dominios en
 el README principal y en la sección 6 del documento de entrega.
 
-El bastion de QA (`pasantias-qa-bastion`) ahora tiene una Elastic IP fija:
+The bastion de QA (`pasantias-qa-bastion`) ahora tiene una Elastic IP fija:
 **`3.225.171.116`** (igual que PROD). Se agregó `aws_eip.bastion_eip` a
 `infra/qa/main.tf` (mismo patrón que PROD) + `lifecycle { ignore_changes = [ami] }` en
 `aws_instance.bastion` de **ambos** `infra/qa/main.tf` e `infra/prod/main.tf` (bug
@@ -91,9 +94,10 @@ cambiar entre sesiones de AWS Academy**.
 
 1. ~~Verificar `QA_BASTION_IP` en GitHub Secrets~~ ✅ RESUELTO PERMANENTEMENTE (ver
   arriba) — ya no es necesario revisar esto antes de cada push.
-2. **Riesgo de memoria en `qa_auth_jobs` (RESUELTO)**: Debido a que la instancia corre 18 contenedores en paralelo (con 10 JVMs de Java, Postgres, Mongo, Kafka, RabbitMQ, etc.), la RAM de 2GiB de la `t3.small` causaba congelamiento de red (timeouts en SSH y HTTP).
-  - **Solución 1:** Se actualizó `infra/qa/main.tf` para subir el tipo de instancia a **`t3.medium` (4 GiB RAM)** y se aplicó con éxito.
+2.- **Riesgo de memoria en `qa_auth_jobs` (RESUELTO)**: Debido a que la instancia corre 18 contenedores en paralelo (con 10 JVMs de Java, Postgres, Mongo, Kafka, RabbitMQ, etc.), la RAM de 2GiB de la `t3.small` causaba congelamiento de red (timeouts en SSH y HTTP).
+  - **Solución 1:** Se actualizó `infra/qa/main.tf` para subir la instancia a **`t3.large` (8 GiB RAM, 2 vCPUs)** para dar mayor holgura.
   - **Solución 2:** Se configuraron límites de memoria JVM en `infra/ansible/deploy-qa.yml` para los 10 servicios Java agregando `-e JAVA_TOOL_OPTIONS="-Xmx256m -Xms128m"`.
+  - **Solución 3 (Swap):** Se creó un archivo Swap de **4GB** (`/swapfile`) persistente en el volumen EBS (`/etc/fstab`), garantizando estabilidad de memoria.
   - **Sincronización:** Se corrigió el desfase entre el código y la infraestructura real agregando la subred pública `public_1a`, las reglas de ingreso públicas de puertos 80/8082 para `sg_private` y el recurso `aws_eip.qa_auth_jobs_eip` al código de Terraform y Git.
 
 

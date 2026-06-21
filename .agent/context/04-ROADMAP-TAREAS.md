@@ -79,9 +79,7 @@ que reemplaza la planificación genérica original.
   de riesgo de deserción, cola RabbitMQ (contenedor con healthcheck — ver
   09-ADOPCIONES #4).
 - [ ] `gateway-service`: rutas para los 6 servicios nuevos + soporte WebSocket.
-- [ ] Deploy completo a QA (11 microservicios + Kafka + RabbitMQ + MongoDB + Redis +
-  Postgres). Instancia configurada como `t3.medium` + límites de JVM establecidos — ver
-  riesgo de memoria en `03-ESTADO-ACTUAL.md`.
+- [x] Deploy completo a QA (18 contenedores: microservicios + Kafka + RabbitMQ + MongoDB + Redis + Postgres). Instancia configurada como `t3.large` (8 GiB RAM) + Swap de 4GB + límites de JVM establecidos. ✅
 
 
 ### Semana 5 — Sesión de diseño + Terraform modular + infraestructura PROD

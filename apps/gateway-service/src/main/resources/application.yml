@@ -69,11 +69,6 @@ spring:
               filters:
                 - name: JwtAuthenticationFilter
 
-            - id: hours-service
-              uri: ${HOURS_SERVICE_URL:http://hours-service:8085}
-              predicates:
-                - Path=/api/hours/**
-
             - id: hours-health
               uri: ${HOURS_SERVICE_URL:http://hours-service:8085}
               predicates:
@@ -81,10 +76,10 @@ spring:
               filters:
                 - RewritePath=/api/hours/health, /health
 
-            - id: evaluation-service
-              uri: ${EVALUATION_SERVICE_URL:http://evaluation-service:8086}
+            - id: hours-service
+              uri: ${HOURS_SERVICE_URL:http://hours-service:8085}
               predicates:
-                - Path=/api/evaluations/**
+                - Path=/api/hours/**
 
             - id: evaluation-health
               uri: ${EVALUATION_SERVICE_URL:http://evaluation-service:8086}
@@ -92,6 +87,11 @@ spring:
                 - Path=/api/evaluation/health
               filters:
                 - RewritePath=/api/evaluation/health, /health
+
+            - id: evaluation-service
+              uri: ${EVALUATION_SERVICE_URL:http://evaluation-service:8086}
+              predicates:
+                - Path=/api/evaluations/**
 
             - id: notification-service
               uri: ${NOTIFICATION_SERVICE_URL:http://notification-service:8087}
