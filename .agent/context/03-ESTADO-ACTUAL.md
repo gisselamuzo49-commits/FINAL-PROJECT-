@@ -237,13 +237,13 @@ hacia `QA`, **sin mergear** — ver nota abajo), siguiendo
 2. Productor Kafka — publica `horas.registradas` tras cada `save()`.
 3. Consumidor Kafka + proyección MongoDB `horas_resumen` + `GET /api/hours/student/{id}`.
 4. Cliente gRPC hacia `user-service` (puerto 9083) para enriquecer
-   `nombre`/`carrera` — "best effort" (`Optional.empty()` si falla, nunca bloquea).
+   `nombre`/`carrera` — "best effort" con Circuit Breaker programático de Resilience4j (para solucionar la incompatibilidad de `resilience4j-spring-boot3` con Spring Boot 4.0.6, el cual gestiona de forma programática las transiciones de estado, expone su estado en `/health` y fue testeado eficientemente sin causar demoras).
 5. Swagger (`springdoc`), README completo, y **prueba de integración end-to-end con
    Testcontainers** (Postgres + Kafka + MongoDB reales) que valida el pipeline
    completo: `POST /api/hours` → evento Kafka → proyección Mongo actualizada →
    `GET /api/hours/student/{id}` → `PATCH .../validar` → totales recalculados.
 
-**17/17 tests pasando**, incluyendo la integración end-to-end. `hours-service` queda
+**19/19 tests pasando**, incluyendo la integración end-to-end. `hours-service` queda
 funcionalmente completo y validado localmente.
 
 ### 🔧 Lección para futuros servicios con MongoDB (`document-service`, `report-service`)

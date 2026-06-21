@@ -39,7 +39,7 @@ que reemplaza la planificación genérica original.
   Semana 4.
 - [x] `hours-service` (8085): CQRS — comandos REST escriben en `hours_db` (PostgreSQL),
   evento `horas.registradas` a Kafka, proyección de lectura en MongoDB. ✅ Completo
-  (5 etapas, 17/17 tests incl. integración end-to-end con Testcontainers). PR abierto
+  (5 etapas + Circuit Breaker de Resilience4j programático en cliente gRPC, 19/19 tests incl. integración end-to-end con Testcontainers). PR abierto
   hacia `QA`, sin mergear — ver `03-ESTADO-ACTUAL.md`.
 - [ ] Quick wins en paralelo (bajo costo, alto impacto en backlog docente):
   - [ ] Logging estructurado (niveles INFO/DEBUG/WARN/ERROR) en los 5 servicios ya
