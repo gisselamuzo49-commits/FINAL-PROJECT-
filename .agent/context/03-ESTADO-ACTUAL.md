@@ -91,13 +91,11 @@ cambiar entre sesiones de AWS Academy**.
 
 1. ~~Verificar `QA_BASTION_IP` en GitHub Secrets~~ ✅ RESUELTO PERMANENTEMENTE (ver
   arriba) — ya no es necesario revisar esto antes de cada push.
-2. **Riesgo de memoria en `qa_auth_jobs` (`t3.small`, 2GiB RAM)**: ahora corre 8
-  contenedores (postgres-db, redis, 4 microservicios Java, gateway-service,
-  frontend-web), 5 de ellos JVMs. Es plausible que se acerque al límite de RAM. Tras el
-  próximo deploy, revisar con `docker stats` y `free -h` en el EC2. Si hay
-  OOM-kills/swap, opciones: (a) subir temporalmente a `t3.medium` solo durante sesiones
-  de prueba, o (b) ajustar `-Xmx` de las JVMs vía `JAVA_OPTS`/`JAVA_TOOL_OPTIONS` en los
-  `docker run` de Ansible (ej. `-Xmx256m` por servicio) para acotar el consumo total.
+2. **Riesgo de memoria en `qa_auth_jobs` (RESUELTO)**: Debido a que la instancia corre 18 contenedores en paralelo (con 10 JVMs de Java, Postgres, Mongo, Kafka, RabbitMQ, etc.), la RAM de 2GiB de la `t3.small` causaba congelamiento de red (timeouts en SSH y HTTP).
+  - **Solución 1:** Se actualizó `infra/qa/main.tf` para subir el tipo de instancia a **`t3.medium` (4 GiB RAM)** y se aplicó con éxito.
+  - **Solución 2:** Se configuraron límites de memoria JVM en `infra/ansible/deploy-qa.yml` para los 10 servicios Java agregando `-e JAVA_TOOL_OPTIONS="-Xmx256m -Xms128m"`.
+  - **Sincronización:** Se corrigió el desfase entre el código y la infraestructura real agregando la subred pública `public_1a`, las reglas de ingreso públicas de puertos 80/8082 para `sg_private` y el recurso `aws_eip.qa_auth_jobs_eip` al código de Terraform y Git.
+
 
 - `RequestRateLimiter` + `KeyResolver` híbrido (JWT o IP) en rutas de
   `internship-service`, `user-service`, `linkage-service`. ✅

@@ -80,8 +80,9 @@ que reemplaza la planificación genérica original.
   09-ADOPCIONES #4).
 - [ ] `gateway-service`: rutas para los 6 servicios nuevos + soporte WebSocket.
 - [ ] Deploy completo a QA (11 microservicios + Kafka + RabbitMQ + MongoDB + Redis +
-  Postgres). Posible necesidad temporal de `t3.medium` para esta validación — ver
+  Postgres). Instancia configurada como `t3.medium` + límites de JVM establecidos — ver
   riesgo de memoria en `03-ESTADO-ACTUAL.md`.
+
 
 ### Semana 5 — Sesión de diseño + Terraform modular + infraestructura PROD
 Sesión de diseño dedicada **antes** de tocar Terraform de PROD — ver decisiones
