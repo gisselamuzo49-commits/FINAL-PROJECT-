@@ -71,27 +71,41 @@
     # ── Pull de imágenes ─────────────────
     - name: Pull postgres image
       shell: docker pull {{ postgres_image }}
+      async: 60
+      poll: 10
 
     - name: Pull redis image
       shell: docker pull {{ redis_image }}
 
     - name: Pull auth-service image
       shell: docker pull {{ docker_image_auth }}
+      async: 60
+      poll: 10
 
     - name: Pull internship-service image
       shell: docker pull {{ docker_image_internship }}
+      async: 60
+      poll: 10
 
     - name: Pull user-service image
       shell: docker pull {{ docker_image_user }}
+      async: 60
+      poll: 10
 
     - name: Pull linkage-service image
       shell: docker pull {{ docker_image_linkage }}
+      async: 60
+      poll: 10
 
     - name: Pull gateway-service image
       shell: docker pull {{ docker_image_gateway }}
+      async: 60
+      poll: 10
 
     - name: Pull frontend-web image
       shell: docker pull {{ docker_image_frontend }}
+      async: 60
+      poll: 10
 
     # ── Detener y remover contenedores viejos ──
     - name: Detener y remover contenedores existentes
