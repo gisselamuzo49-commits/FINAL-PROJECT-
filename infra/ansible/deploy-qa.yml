@@ -16,6 +16,7 @@
     docker_image_frontend:    "gdmuzo/frontend-web:qa"
     postgres_image:           "postgres:15-alpine"
     redis_image:              "redis:7-alpine"
+    neo4j_password:           "password123"
 
   tasks:
 
@@ -157,11 +158,16 @@
       async: 60
       poll: 10
 
+    - name: Pull neo4j image
+      shell: docker pull neo4j:5-community
+      async: 60
+      poll: 10
+
     # ── Detener y remover contenedores viejos ──
     - name: Detener y remover contenedores existentes
       shell: |
-        docker stop auth-service internship-service user-service linkage-service gateway-service frontend-web postgres-db redis zookeeper kafka mongodb rabbitmq hours-service evaluation-service notification-service document-service report-service ai-service 2>/dev/null || true
-        docker rm   auth-service internship-service user-service linkage-service gateway-service frontend-web postgres-db redis zookeeper kafka mongodb rabbitmq hours-service evaluation-service notification-service document-service report-service ai-service 2>/dev/null || true
+        docker stop auth-service internship-service user-service linkage-service gateway-service frontend-web postgres-db redis zookeeper kafka mongodb rabbitmq hours-service evaluation-service notification-service document-service report-service ai-service neo4j 2>/dev/null || true
+        docker rm   auth-service internship-service user-service linkage-service gateway-service frontend-web postgres-db redis zookeeper kafka mongodb rabbitmq hours-service evaluation-service notification-service document-service report-service ai-service neo4j 2>/dev/null || true
 
 
     # ── Levantar contenedores ────────────
@@ -212,6 +218,9 @@
           -e DB_NAME=internship_db \
           -e DB_USER=postgres \
           -e DB_PASSWORD=postgres \
+          -e NEO4J_URI=bolt://neo4j:7687 \
+          -e NEO4J_USER=neo4j \
+          -e NEO4J_PASSWORD={{ neo4j_password }} \
           -e JAVA_TOOL_OPTIONS="-Xmx256m -Xms128m" \
           {{ docker_image_internship }}
 
@@ -296,6 +305,16 @@
         -e RABBITMQ_DEFAULT_USER=guest
         -e RABBITMQ_DEFAULT_PASS=guest
         rabbitmq:3-management-alpine
+
+    - name: Levantar neo4j
+      shell: >
+        docker run -d --name neo4j
+        --network pasantias-net
+        --restart always
+        -p 7474:7474
+        -p 7687:7687
+        -e NEO4J_AUTH=neo4j/{{ neo4j_password }}
+        neo4j:5-community
 
     - name: Levantar hours-service
       shell: >
