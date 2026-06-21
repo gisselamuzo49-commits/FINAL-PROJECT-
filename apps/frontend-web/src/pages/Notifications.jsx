@@ -140,7 +140,7 @@ function Notifications() {
                   {getNotifIcon(notif.tipo)}
                 </div>
                 <div className="min-w-0">
-                  <p className={`text-sm text-gray-850 leading-relaxed ${!notif.leida ? 'font-medium' : ''}`}>
+                  <p className={`text-sm text-gray-800 leading-relaxed ${!notif.leida ? 'font-medium' : ''}`}>
                     {notif.mensaje}
                   </p>
                   <p className="text-[10px] text-gray-400 mt-1">
