@@ -22,7 +22,7 @@ public class MqttClientManager {
     @Value("${mqtt.broker.host}")
     private String host;
 
-    @Value("${mqtt.broker.port:8883}")
+    @Value("${mqtt.broker.port:1883}")
     private int port;
 
     @Value("${mqtt.broker.username:}")
