@@ -66,7 +66,7 @@ que reemplaza la planificación genérica original.
 - [x] S3 configurado para CVs y documentos generados (usado por `document-service`) — Bucket `pasantias-documents-qa` en us-east-1 creado y versionado activado.
 - [ ] Configurar n8n (self-hosted en cuenta DEV/Sandbox #1 o local) y conectar al menos
   un flujo real (ej. notificación por correo cuando se aprueba una práctica).
-- [ ] `report-service` (8089): consumidor Kafka + endpoint SOAP + Mongo.
+- [x] `report-service` (8089): consumidor Kafka + endpoint SOAP + Mongo (Completado y protegido con Circuit Breaker programático de Resilience4j para llamadas REST a `document-service`, 13/13 tests passing).
 - [ ] Swagger/OpenAPI (`springdoc-openapi-starter-webmvc-ui`) en los 6 microservicios
   nuevos de esta fase (Listo en `hours-service`, `evaluation-service`, `notification-service` y `document-service`) — backlog docente #2.
 - [ ] PAAS secundario **Supabase** — módulo "Encuestas de satisfacción / feedback

@@ -277,6 +277,8 @@ SUCCESS** en la rama `feature/mosquitto-migration`.
 
 `document-service` (8088, Event-Driven + PDF Generation + REST + S3 + Webhooks) queda **completado localmente** (verificación de 10 tests unitarios exitosa). Consume eventos de `horas.registradas` con estado `VALIDADO`, genera un archivo PDF en memoria utilizando OpenPDF (iText 2.1.7), lo sube a Amazon S3 (`pasantias-documents-qa` con tokens temporales de AWS Academy) bajo la protección de un Circuit Breaker programático de Resilience4j (expuesto en `/health`), guarda la metadata en PostgreSQL (`document_db`), realiza un upsert en MongoDB (`documentos_resumen`) y dispara un webhook de forma asíncrona ("best effort") a n8n.
 
+`report-service` (8089, Kafka consumer + SOAP + MongoDB + PostgreSQL) queda **completado localmente** (verificación de 13 tests unitarios exitosa). Consume eventos de `horas.registradas` en Kafka, realiza la consolidación de reportes, consulta de forma best-effort el total de documentos en `document-service` vía REST (protegido con un Circuit Breaker programático de Resilience4j, expuesto en `/health`), guarda los reportes en PostgreSQL (`report_db`) y actualiza el reporte global en MongoDB.
+
 ### Estado de PRs (NO mergear todavía — plan para mañana abajo)
 - `feature/user-service-get-by-email` → `QA`: agrega endpoint `/email/{email}` en `user-service` + tests MockMvc (200/404).
 - `feature/user-service-grpc-server` → `QA`: agrega servidor gRPC
