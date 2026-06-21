@@ -85,6 +85,8 @@ spring:
               uri: ${HOURS_SERVICE_URL:http://hours-service:8085}
               predicates:
                 - Path=/api/hours/**
+              filters:
+                - name: JwtAuthenticationFilter
 
             - id: evaluation-health
               uri: ${EVALUATION_SERVICE_URL:http://evaluation-service:8086}
@@ -97,26 +99,36 @@ spring:
               uri: ${EVALUATION_SERVICE_URL:http://evaluation-service:8086}
               predicates:
                 - Path=/api/evaluations/**
+              filters:
+                - name: JwtAuthenticationFilter
 
             - id: notification-service
               uri: ${NOTIFICATION_SERVICE_URL:http://notification-service:8087}
               predicates:
                 - Path=/api/notifications/**
+              filters:
+                - name: JwtAuthenticationFilter
 
             - id: document-service
               uri: ${DOCUMENT_SERVICE_URL:http://document-service:8088}
               predicates:
                 - Path=/api/documents/**
+              filters:
+                - name: JwtAuthenticationFilter
 
             - id: report-service
               uri: ${REPORT_SERVICE_URL:http://report-service:8089}
               predicates:
                 - Path=/api/reports/**
+              filters:
+                - name: JwtAuthenticationFilter
 
             - id: ai-service
               uri: ${AI_SERVICE_URL:http://ai-service:8090}
               predicates:
                 - Path=/api/ai/**
+              filters:
+                - name: JwtAuthenticationFilter
 
 
 # Configuración de seguridad JWT compartida
