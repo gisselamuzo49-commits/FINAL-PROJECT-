@@ -10,7 +10,44 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      auth: ${{ steps.filter.outputs.auth }}
+      internship: ${{ steps.filter.outputs.internship }}
+      user: ${{ steps.filter.outputs.user }}
+      linkage: ${{ steps.filter.outputs.linkage }}
+      gateway: ${{ steps.filter.outputs.gateway }}
+      frontend: ${{ steps.filter.outputs.frontend }}
+      hours: ${{ steps.filter.outputs.hours }}
+      evaluation: ${{ steps.filter.outputs.evaluation }}
+      notification: ${{ steps.filter.outputs.notification }}
+      document: ${{ steps.filter.outputs.document }}
+      report: ${{ steps.filter.outputs.report }}
+      ai: ${{ steps.filter.outputs.ai }}
+      infra: ${{ steps.filter.outputs.infra }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            auth: 'apps/auth-service/**'
+            internship: 'apps/internship-service/**'
+            user: 'apps/user-service/**'
+            linkage: 'apps/linkage-service/**'
+            gateway: 'apps/gateway-service/**'
+            frontend: 'apps/frontend-web/**'
+            hours: 'apps/hours-service/**'
+            evaluation: 'apps/evaluation-service/**'
+            notification: 'apps/notification-service/**'
+            document: 'apps/document-service/**'
+            report: 'apps/report-service/**'
+            ai: 'apps/ai-service/**'
+            infra: 'infra/**'
+
   deploy:
+    needs: detect-changes
     runs-on: ubuntu-latest
 
     services:
@@ -48,30 +85,35 @@ jobs:
           cache: 'maven'
 
       - name: Run tests - auth-service
+        if: needs.detect-changes.outputs.auth == 'true'
         run: |
           cd apps/auth-service
           chmod +x mvnw
           ./mvnw test
 
       - name: Run tests - internship-service
+        if: needs.detect-changes.outputs.internship == 'true'
         run: |
           cd apps/internship-service
           chmod +x mvnw
           ./mvnw test
 
       - name: Run tests - user-service
+        if: needs.detect-changes.outputs.user == 'true'
         run: |
           cd apps/user-service
           chmod +x mvnw
           ./mvnw test
 
       - name: Run tests - linkage-service
+        if: needs.detect-changes.outputs.linkage == 'true'
         run: |
           cd apps/linkage-service
           chmod +x mvnw
           ./mvnw test
 
       - name: Run tests - gateway-service
+        if: needs.detect-changes.outputs.gateway == 'true'
         run: |
           cd apps/gateway-service
           chmod +x mvnw
@@ -84,6 +126,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build and push auth-service
+        if: needs.detect-changes.outputs.auth == 'true'
         uses: docker/build-push-action@v5
         with:
           context: ./apps/auth-service
@@ -91,6 +134,7 @@ jobs:
           tags: gdmuzo/auth-service:latest
 
       - name: Build and push internship-service
+        if: needs.detect-changes.outputs.internship == 'true'
         uses: docker/build-push-action@v5
         with:
           context: ./apps/internship-service
@@ -98,6 +142,7 @@ jobs:
           tags: gdmuzo/internship-service:latest
 
       - name: Build and push user-service
+        if: needs.detect-changes.outputs.user == 'true'
         uses: docker/build-push-action@v5
         with:
           context: ./apps/user-service
@@ -105,6 +150,7 @@ jobs:
           tags: gdmuzo/user-service:latest
 
       - name: Build and push linkage-service
+        if: needs.detect-changes.outputs.linkage == 'true'
         uses: docker/build-push-action@v5
         with:
           context: ./apps/linkage-service
@@ -112,6 +158,7 @@ jobs:
           tags: gdmuzo/linkage-service:latest
 
       - name: Build and push gateway-service
+        if: needs.detect-changes.outputs.gateway == 'true'
         uses: docker/build-push-action@v5
         with:
           context: ./apps/gateway-service
@@ -119,6 +166,7 @@ jobs:
           tags: gdmuzo/gateway-service:latest
 
       - name: Build and push frontend-web
+        if: needs.detect-changes.outputs.frontend == 'true'
         uses: docker/build-push-action@v5
         with:
           context: ./apps/frontend-web

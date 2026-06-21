@@ -7,17 +7,12 @@ _Última actualización: 2026-06-12 (verificación contra REPORTE-ESTADO.md gene
 
 ## ✅ Completado / Verificado
 
-- `gateway-service` (8082): **MUCHO más avanzado de lo esperado.** Ya tiene:
-  - `JwtAuthenticationFilter` funcional (valida JWT con `jjwt`, agrega header
-    `X-Auth-User`, deja pasar `OPTIONS` para CORS preflight).
-  - Rutas configuradas para `auth-service` (sin JWT, correcto para login/registro),
-    `internship-service`, `user-service` y `linkage-service` (con JWT).
-  - Rutas de health-check con `RewritePath` hacia `/health` de `user-service` y
-    `linkage-service`.
-  - CORS delegado a cada microservicio (con `DedupeResponseHeader` para evitar headers
-    duplicados).
-  - **Pendiente**: rate limiting (requisito #5), soporte WebSocket (requisito #15), y
-    agregar rutas a medida que se creen `hours-service`, `evaluation-service`, etc.
+- `gateway-service` (8082): **Completamente configurado y asegurado.** Ya tiene:
+  - `JwtAuthenticationFilter` funcional (valida JWT con `jjwt`, agrega header `X-Auth-User`, deja pasar `OPTIONS` para CORS preflight).
+  - CORS configurado de forma segura con `allowedOriginPatterns` parametrizados por variables de entorno (Local, QA y PROD) con `allowCredentials: true` y habilitando el método `PATCH`.
+  - Todas las rutas de negocio protegidas explícitamente con `JwtAuthenticationFilter` (se agregaron las 6 rutas vulnerables correspondientes a `hours-service`, `evaluation-service`, `notification-service`, `document-service`, `report-service` y `ai-service`).
+  - Rutas de health-check públicas (`/api/users/health`, `/api/linkage/health`, `/api/hours/health`, `/api/evaluation/health`) que redirigen correctamente a sus respectivos microservicios sin requerir JWT.
+  - **Pendiente**: rate limiting (requisito #5) y soporte WebSocket (requisito #15).
 
 - `linkage-service` (8084): **básico ya funcional** — `LinkageController` con
   create/getAll/getById, `LinkageProject`/repository/service, y endpoint `/health`
@@ -120,8 +115,9 @@ suposición anterior estaba equivocada en ese punto.)
 
 ### CI/CD (`.github/workflows/deploy-qa.yml` y `deploy-prod.yml`)
 
-- [x] **Tests antes de build de imágenes** — RESUELTO. Corre `./mvnw test` para los 5
-  servicios con `pom.xml` antes de `docker/build-push-action`.
+- [x] **Tests antes de build de imágenes** — RESUELTO. Corre `./mvnw test` para los servicios Java con `pom.xml` antes de `docker/build-push-action`.
+- [x] **Build y Tests Selectivos** — RESUELTO. Se integró `dorny/paths-filter@v3` en `deploy-qa.yml` y `deploy-prod.yml` para ejecutar únicamente las pruebas unitarias y la compilación/push de imágenes de los servicios que contienen cambios en su respectivo directorio `apps/`.
+- [x] **Tests de ai-service en CI/CD** — RESUELTO. Se agregó la ejecución de pruebas unitarias (`pytest`) para `ai-service` condicionada a cambios detectados en `apps/ai-service/**`.
 - [x] Login a Docker Hub + build/push con tags correctos (`:qa` / `:latest`) — RESUELTO.
 - [x] Deploy vía Ansible a través del bastion con inventario dinámico — RESUELTO.
   **Verificado en detalle**: los playbooks `deploy-qa.yml`/`deploy-prod.yml` levantan
@@ -193,6 +189,7 @@ suposición anterior estaba equivocada en ese punto.)
   `init-multiple-dbs.sh`), `auth-service`, `internship-service`, `user-service`,
   `linkage-service`, `gateway-service` (con las 4 URLs internas + `JWT_SECRET`
   inyectadas como env vars) y `frontend-web`. Red Docker compartida `pasantias-net`.
+- Se configuró `async: 60` y `poll: 10` en todas las tareas lentas de `docker pull` (Postgres, Redis, servicios, Kafka, Mongo, RabbitMQ, etc.) para evitar bloqueos y cuelgues de SSH/ProxyCommand sobre el Bastion host durante los despliegues.
 - **Conclusión**: el stack completo de Fase 1 (4 microservicios + gateway + frontend +
   Postgres con 4 DBs) ya se despliega end-to-end con un solo `git push` a `QA`/`main`,
   una vez la infraestructura (bastion + EC2) existe. Falta solo el fix de `/health` para
@@ -221,6 +218,7 @@ suposición anterior estaba equivocada en ese punto.)
   Fase 3 (semanas 9-12). Se implementarán en Terraform de forma que puedan
   `apply`/`destroy` cerca de los checkpoints, sin correr 24/7 durante el desarrollo
   diario (ver `05-AWS-ACADEMY-ESTRATEGIA.md`).
+6. **Seguridad no-root en contenedores**: Todos los Dockerfiles de los 11 microservicios (Java y Python) se han configurado para ejecutarse bajo un usuario no-root (`appuser` / `appgroup`) por razones de conformidad y seguridad.
 
 ## 🔴 Decisiones aún pendientes
 
@@ -276,7 +274,7 @@ cliente gRPC completo de `hours-service`** (`user.proto`, `UserServiceClient`,
 SUCCESS**. Rama `feature/evaluation-service`, PR hacia `QA` — confirmar que se abrió
 (último paso pedido a Antigravity, sin confirmación de link todavía).
 
-`notification-service` (8087, Event-Driven + Kafka consumer + MQTT) queda **completado localmente** (verificación de tests unitarios e integración con Testcontainers exitosa). Consume eventos de `horas.registradas` con estado `VALIDADO` o `RECHAZADO`, los guarda en PostgreSQL (`notification_db`) y publica un JSON a MQTT en el topic dinámico `notificaciones/{estudianteId}` usando cifrado TLS hacia HiveMQ Cloud. El backend de pruebas pasa al 100%.
+`notification-service` (8087, Event-Driven + Kafka consumer + MQTT) queda **completado localmente** (verificación de tests unitarios e integración con Testcontainers exitosa). Consume eventos de `horas.registradas` con estado `VALIDADO` o `RECHAZADO`, los guarda en PostgreSQL (`notification_db`) y publica un JSON a MQTT en el topic dinámico `notificaciones/{estudianteId}` usando una conexión TCP (puerto 1883) con autenticación básica hacia un broker Mosquitto self-hosted local/QA/PROD. El backend de pruebas pasa al 100%.
 
 `document-service` (8088, Event-Driven + PDF Generation + REST + S3 + Webhooks) queda **completado localmente** (verificación de 8 tests unitarios exitosa). Consume eventos de `horas.registradas` con estado `VALIDADO`, genera un archivo PDF en memoria utilizando OpenPDF (iText 2.1.7), lo sube a Amazon S3 (`pasantias-documents-qa` con tokens temporales de AWS Academy), guarda la metadata en PostgreSQL (`document_db`), realiza un upsert en MongoDB (`documentos_resumen`) y dispara un webhook de forma asíncrona ("best effort") a n8n.
 
