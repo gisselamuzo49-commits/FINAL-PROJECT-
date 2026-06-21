@@ -16,7 +16,7 @@ que reemplaza la planificación genérica original.
   rate limiting, WebSocket, rutas de servicios futuros.
 - [x] Configurar 4 bases PostgreSQL lógicas (`auth_db`, `internship_db`, `user_db`,
   `linkage_db`) — verificado en `infra/ansible/*.yml` vía `init-multiple-dbs.sh`.
-- [x] Frontend: flujos de login/registro + paneles para los 4 servicios — verificado
+- [x] Frontend: flujos de login/registro + paneles para los 4 servicios + páginas de Horas (`Hours.jsx`), Evaluaciones (`Evaluations.jsx`), Documentos (`Documents.jsx`), Notificaciones (`Notifications.jsx`) y Recomendaciones (`Recommendations.jsx`) — verificado
   (`LoginCard`, `InternshipsTab`, `ProfilesTab`, `LinkageTab`, todo vía gateway con JWT).
 - [ ] Swagger/OpenAPI habilitado y documentado en cada servicio (requisito #21).
 - [ ] Conventional commits + plantilla de PR aplicados desde ahora (requisito #21).
