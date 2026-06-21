@@ -12,6 +12,7 @@ import Hours from './pages/Hours';
 import Evaluations from './pages/Evaluations';
 import Documents from './pages/Documents';
 import Notifications from './pages/Notifications';
+import Recommendations from './pages/Recommendations';
 
 const router = createBrowserRouter([
   {
@@ -65,6 +66,10 @@ const router = createBrowserRouter([
       {
         path: 'notifications',
         element: <Notifications />
+      },
+      {
+        path: 'recommendations',
+        element: <Recommendations />
       }
     ]
   },

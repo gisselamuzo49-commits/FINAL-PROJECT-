@@ -128,6 +128,12 @@ function Sidebar({ user = {}, onLogout, isOpen, onClose }) {
           <span className="mr-3 text-base">🔔</span>
           <span>Notificaciones</span>
         </NavLink>
+
+        {/* Recomendaciones */}
+        <NavLink to="/recommendations" className={navLinkClass}>
+          <span className="mr-3 text-base">🎯</span>
+          <span>Recomendaciones</span>
+        </NavLink>
       </nav>
 
       {/* Footer Profile & Logout */}
