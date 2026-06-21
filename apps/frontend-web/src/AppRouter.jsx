@@ -11,6 +11,7 @@ import Users from './pages/Users';
 import Hours from './pages/Hours';
 import Evaluations from './pages/Evaluations';
 import Documents from './pages/Documents';
+import Notifications from './pages/Notifications';
 
 const router = createBrowserRouter([
   {
@@ -60,6 +61,10 @@ const router = createBrowserRouter([
       {
         path: 'documents',
         element: <Documents />
+      },
+      {
+        path: 'notifications',
+        element: <Notifications />
       }
     ]
   },
