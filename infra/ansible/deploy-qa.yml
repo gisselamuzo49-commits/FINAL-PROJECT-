@@ -163,6 +163,7 @@
           -e DB_USER=postgres \
           -e DB_PASSWORD=postgres \
           -e JWT_SECRET='v9y$B&E)H@McQfTjWmZq4t7w!z%C*F-JaNdRgUkXp2r5u8x/A?D(G+KbPeShVmYq' \
+          -e JAVA_TOOL_OPTIONS="-Xmx256m -Xms128m" \
           {{ docker_image_auth }}
 
     - name: Levantar internship-service
@@ -177,6 +178,7 @@
           -e DB_NAME=internship_db \
           -e DB_USER=postgres \
           -e DB_PASSWORD=postgres \
+          -e JAVA_TOOL_OPTIONS="-Xmx256m -Xms128m" \
           {{ docker_image_internship }}
 
     - name: Levantar user-service
@@ -191,6 +193,7 @@
           -e DB_NAME=user_db \
           -e DB_USER=postgres \
           -e DB_PASSWORD=postgres \
+          -e JAVA_TOOL_OPTIONS="-Xmx256m -Xms128m" \
           {{ docker_image_user }}
 
     - name: Levantar linkage-service
@@ -205,6 +208,7 @@
           -e DB_NAME=linkage_db \
           -e DB_USER=postgres \
           -e DB_PASSWORD=postgres \
+          -e JAVA_TOOL_OPTIONS="-Xmx256m -Xms128m" \
           {{ docker_image_linkage }}
 
     - name: Levantar redis
@@ -275,6 +279,7 @@
         -e MONGO_URI=mongodb://mongodb:27017/hours_read_db
         -e USER_SERVICE_GRPC_HOST=user-service
         -e USER_SERVICE_GRPC_PORT=9083
+        -e JAVA_TOOL_OPTIONS="-Xmx256m -Xms128m"
         gdmuzo/hours-service:latest
 
     - name: Levantar evaluation-service
@@ -291,6 +296,7 @@
         -e JWT_SECRET='v9y$B&E)H@McQfTjWmZq4t7w!z%C*F-JaNdRgUkXp2r5u8x/A?D(G+KbPeShVmYq'
         -e USER_SERVICE_GRPC_HOST=user-service
         -e USER_SERVICE_GRPC_PORT=9083
+        -e JAVA_TOOL_OPTIONS="-Xmx256m -Xms128m"
         gdmuzo/evaluation-service:latest
 
     - name: Levantar notification-service
@@ -309,6 +315,7 @@
         -e MQTT_PORT=8883
         -e MQTT_USER=mqttuser
         -e MQTT_PASSWORD=Mqtt2026@
+        -e JAVA_TOOL_OPTIONS="-Xmx256m -Xms128m"
         gdmuzo/notification-service:latest
 
     - name: Levantar document-service
@@ -328,6 +335,7 @@
         -e AWS_ACCESS_KEY_ID={{ aws_access_key_id }}
         -e AWS_SECRET_ACCESS_KEY={{ aws_secret_access_key }}
         -e AWS_SESSION_TOKEN={{ aws_session_token }}
+        -e JAVA_TOOL_OPTIONS="-Xmx256m -Xms128m"
         gdmuzo/document-service:latest
 
     - name: Levantar report-service
@@ -344,6 +352,7 @@
         -e KAFKA_BOOTSTRAP_SERVERS=kafka:9092
         -e MONGO_URI=mongodb://mongodb:27017/report_read_db
         -e DOCUMENT_SERVICE_URL=http://document-service:8088
+        -e JAVA_TOOL_OPTIONS="-Xmx256m -Xms128m"
         gdmuzo/report-service:latest
 
     - name: Levantar ai-service
@@ -373,6 +382,7 @@
           -e REDIS_HOST=redis \
           -e REDIS_PORT=6379 \
           -e JWT_SECRET='v9y$B&E)H@McQfTjWmZq4t7w!z%C*F-JaNdRgUkXp2r5u8x/A?D(G+KbPeShVmYq' \
+          -e JAVA_TOOL_OPTIONS="-Xmx256m -Xms128m" \
           {{ docker_image_gateway }}
 
     - name: Levantar frontend-web

@@ -145,6 +145,22 @@ resource "aws_security_group" "sg_private" {
     protocol        = "tcp"
     security_groups = [aws_security_group.sg_bastion.id]
   }
+  # Acceso HTTP público al frontend
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+    description = "Frontend web access"
+  }
+  # Acceso HTTP público al gateway
+  ingress {
+    from_port   = 8082
+    to_port     = 8082
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+    description = "Gateway API access"
+  }
   egress {
     from_port   = 0
     to_port     = 0
@@ -205,8 +221,8 @@ resource "aws_eip" "bastion_eip" {
 # ─────────────────────────────────────────
 resource "aws_instance" "qa_auth_jobs" {
   ami                    = data.aws_ami.ubuntu.id
-  instance_type          = "t3.small"
-  subnet_id              = aws_subnet.private_1a.id
+  instance_type          = "t3.medium"
+  subnet_id              = aws_subnet.public_1a.id
   key_name               = data.aws_key_pair.qa_key.key_name
   vpc_security_group_ids = [aws_security_group.sg_private.id]
 
@@ -240,6 +256,14 @@ resource "aws_instance" "qa_auth_jobs" {
   }
 }
 
+# Elastic IP fija para la instancia de servicios
+resource "aws_eip" "qa_auth_jobs_eip" {
+  instance   = aws_instance.qa_auth_jobs.id
+  domain     = "vpc"
+  depends_on = [aws_internet_gateway.igw]
+  tags       = { Name = "pasantias-qa-auth-jobs-eip" }
+}
+
 # ─────────────────────────────────────────
 # OUTPUTS
 # Comandos para obtener los valores:
@@ -255,3 +279,9 @@ output "qa_auth_jobs_private_ip" {
   description = "IP privada del EC2 de servicios (actualizar QA_AUTH_JOBS_IP en GitHub Secrets)"
   value       = aws_instance.qa_auth_jobs.private_ip
 }
+
+output "qa_auth_jobs_public_ip" {
+  description = "IP pública del EC2 de servicios (asociada a la EIP)"
+  value       = aws_eip.qa_auth_jobs_eip.public_ip
+}
+
