@@ -7,17 +7,12 @@ _Última actualización: 2026-06-12 (verificación contra REPORTE-ESTADO.md gene
 
 ## ✅ Completado / Verificado
 
-- `gateway-service` (8082): **MUCHO más avanzado de lo esperado.** Ya tiene:
-  - `JwtAuthenticationFilter` funcional (valida JWT con `jjwt`, agrega header
-    `X-Auth-User`, deja pasar `OPTIONS` para CORS preflight).
-  - Rutas configuradas para `auth-service` (sin JWT, correcto para login/registro),
-    `internship-service`, `user-service` y `linkage-service` (con JWT).
-  - Rutas de health-check con `RewritePath` hacia `/health` de `user-service` y
-    `linkage-service`.
-  - CORS delegado a cada microservicio (con `DedupeResponseHeader` para evitar headers
-    duplicados).
-  - **Pendiente**: rate limiting (requisito #5), soporte WebSocket (requisito #15), y
-    agregar rutas a medida que se creen `hours-service`, `evaluation-service`, etc.
+- `gateway-service` (8082): **Completamente configurado y asegurado.** Ya tiene:
+  - `JwtAuthenticationFilter` funcional (valida JWT con `jjwt`, agrega header `X-Auth-User`, deja pasar `OPTIONS` para CORS preflight).
+  - CORS configurado de forma segura con `allowedOriginPatterns` parametrizados por variables de entorno (Local, QA y PROD) con `allowCredentials: true` y habilitando el método `PATCH`.
+  - Todas las rutas de negocio protegidas explícitamente con `JwtAuthenticationFilter` (se agregaron las 6 rutas vulnerables correspondientes a `hours-service`, `evaluation-service`, `notification-service`, `document-service`, `report-service` y `ai-service`).
+  - Rutas de health-check públicas (`/api/users/health`, `/api/linkage/health`, `/api/hours/health`, `/api/evaluation/health`) que redirigen correctamente a sus respectivos microservicios sin requerir JWT.
+  - **Pendiente**: rate limiting (requisito #5) y soporte WebSocket (requisito #15).
 
 - `linkage-service` (8084): **básico ya funcional** — `LinkageController` con
   create/getAll/getById, `LinkageProject`/repository/service, y endpoint `/health`
@@ -193,6 +188,7 @@ suposición anterior estaba equivocada en ese punto.)
   `init-multiple-dbs.sh`), `auth-service`, `internship-service`, `user-service`,
   `linkage-service`, `gateway-service` (con las 4 URLs internas + `JWT_SECRET`
   inyectadas como env vars) y `frontend-web`. Red Docker compartida `pasantias-net`.
+- Se configuró `async: 60` y `poll: 10` en todas las tareas lentas de `docker pull` (Postgres, Redis, servicios, Kafka, Mongo, RabbitMQ, etc.) para evitar bloqueos y cuelgues de SSH/ProxyCommand sobre el Bastion host durante los despliegues.
 - **Conclusión**: el stack completo de Fase 1 (4 microservicios + gateway + frontend +
   Postgres con 4 DBs) ya se despliega end-to-end con un solo `git push` a `QA`/`main`,
   una vez la infraestructura (bastion + EC2) existe. Falta solo el fix de `/health` para
