@@ -9,6 +9,7 @@ import Internships from './pages/Internships';
 import Linkage from './pages/Linkage';
 import Users from './pages/Users';
 import Hours from './pages/Hours';
+import Evaluations from './pages/Evaluations';
 
 const router = createBrowserRouter([
   {
@@ -50,6 +51,10 @@ const router = createBrowserRouter([
       {
         path: 'hours',
         element: <Hours />
+      },
+      {
+        path: 'evaluations',
+        element: <Evaluations />
       }
     ]
   },
