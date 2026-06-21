@@ -115,8 +115,9 @@ suposición anterior estaba equivocada en ese punto.)
 
 ### CI/CD (`.github/workflows/deploy-qa.yml` y `deploy-prod.yml`)
 
-- [x] **Tests antes de build de imágenes** — RESUELTO. Corre `./mvnw test` para los 5
-  servicios con `pom.xml` antes de `docker/build-push-action`.
+- [x] **Tests antes de build de imágenes** — RESUELTO. Corre `./mvnw test` para los servicios Java con `pom.xml` antes de `docker/build-push-action`.
+- [x] **Build y Tests Selectivos** — RESUELTO. Se integró `dorny/paths-filter@v3` en `deploy-qa.yml` y `deploy-prod.yml` para ejecutar únicamente las pruebas unitarias y la compilación/push de imágenes de los servicios que contienen cambios en su respectivo directorio `apps/`.
+- [x] **Tests de ai-service en CI/CD** — RESUELTO. Se agregó la ejecución de pruebas unitarias (`pytest`) para `ai-service` condicionada a cambios detectados en `apps/ai-service/**`.
 - [x] Login a Docker Hub + build/push con tags correctos (`:qa` / `:latest`) — RESUELTO.
 - [x] Deploy vía Ansible a través del bastion con inventario dinámico — RESUELTO.
   **Verificado en detalle**: los playbooks `deploy-qa.yml`/`deploy-prod.yml` levantan
