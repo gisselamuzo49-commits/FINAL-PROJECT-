@@ -9,6 +9,9 @@ import com.uce.document_service.models.EstadoDocumento;
 import com.uce.document_service.models.TipoDocumento;
 import com.uce.document_service.repositories.DocumentoGeneradoRepository;
 import com.uce.document_service.repositories.DocumentoResumenRepository;
+import io.github.resilience4j.circuitbreaker.CircuitBreaker;
+import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig;
+import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +27,7 @@ import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 import java.io.ByteArrayOutputStream;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -51,6 +55,22 @@ public class DocumentService {
 
     private final RestTemplate restTemplate = new RestTemplate(new org.springframework.http.client.JdkClientHttpRequestFactory());
 
+    private final CircuitBreaker circuitBreaker;
+
+    public DocumentService() {
+        this(CircuitBreakerConfig.custom()
+                .failureRateThreshold(50) // 50% failure rate opens the circuit
+                .slidingWindowSize(10)
+                .waitDurationInOpenState(Duration.ofSeconds(15))
+                .permittedNumberOfCallsInHalfOpenState(3)
+                .build());
+    }
+
+    public DocumentService(CircuitBreakerConfig customConfig) {
+        CircuitBreakerRegistry registry = CircuitBreakerRegistry.of(customConfig);
+        this.circuitBreaker = registry.circuitBreaker("s3Client");
+    }
+
     @Transactional
     public DocumentoGenerado generateAndUploadDocument(String estudianteId, String proyectoId, Double horas, String fecha, Long horasId) {
         logger.info("Iniciando generación de documento para estudiante: {}, proyecto: {}", estudianteId, proyectoId);
@@ -69,20 +89,27 @@ public class DocumentService {
 
         if (s3Client.isPresent() && bucketName != null && !bucketName.trim().isEmpty()) {
             try {
-                logger.info("Subiendo PDF a S3 bucket: {}, key: {}", bucketName, s3Key);
-                PutObjectRequest putOb = PutObjectRequest.builder()
-                        .bucket(bucketName)
-                        .key(s3Key)
-                        .contentType("application/pdf")
-                        .build();
+                final byte[] finalPdfBytes = pdfBytes;
+                final String finalS3Url = "https://" + bucketName + ".s3.amazonaws.com/" + s3Key;
+                
+                s3Url = circuitBreaker.executeSupplier(() -> {
+                    logger.info("Subiendo PDF a S3 bucket: {}, key: {}", bucketName, s3Key);
+                    PutObjectRequest putOb = PutObjectRequest.builder()
+                            .bucket(bucketName)
+                            .key(s3Key)
+                            .contentType("application/pdf")
+                            .build();
 
-                s3Client.get().putObject(putOb, RequestBody.fromBytes(pdfBytes));
-                s3Url = "https://" + bucketName + ".s3.amazonaws.com/" + s3Key;
+                    s3Client.get().putObject(putOb, RequestBody.fromBytes(finalPdfBytes));
+                    return finalS3Url;
+                });
+                
                 estado = EstadoDocumento.GENERADO;
                 logger.info("PDF subido exitosamente. URL: {}", s3Url);
             } catch (Exception e) {
-                logger.error("Error al subir el archivo a S3 (flujo best-effort continuará con estado ERROR): {}", e.getMessage());
-                // No relanzamos la excepción
+                logger.error("Error al subir el archivo a S3 vía Circuit Breaker (flujo best-effort continuará con estado ERROR): {}", e.getMessage());
+                s3Url = null;
+                estado = EstadoDocumento.ERROR;
             }
         } else {
             logger.warn("S3Client no está configurado o S3_BUCKET_NAME está vacío. El documento se marcará con estado ERROR.");
@@ -177,12 +204,36 @@ public class DocumentService {
             payload.put("estudianteId", estudianteId);
             payload.put("s3Url", s3Url);
             payload.put("tipo", tipo);
-
             HttpEntity<Map<String, String>> request = new HttpEntity<>(payload, headers);
             restTemplate.postForLocation(n8nWebhookUrl, request);
             logger.info("Webhook enviado exitosamente a n8n.");
         } catch (Exception e) {
             logger.error("Error al enviar webhook a n8n (flujo best-effort continuará): {}", e.getMessage());
         }
+    }
+
+    public String getCircuitBreakerState() {
+        return circuitBreaker.getState().name();
+    }
+
+    public CircuitBreaker getCircuitBreaker() {
+        return circuitBreaker;
+    }
+
+    // Setters for test mock injection
+    void setPostgresRepository(DocumentoGeneradoRepository postgresRepository) {
+        this.postgresRepository = postgresRepository;
+    }
+
+    void setMongoRepository(DocumentoResumenRepository mongoRepository) {
+        this.mongoRepository = mongoRepository;
+    }
+
+    void setS3Client(S3Client s3Client) {
+        this.s3Client = Optional.ofNullable(s3Client);
+    }
+
+    void setBucketName(String bucketName) {
+        this.bucketName = bucketName;
     }
 }

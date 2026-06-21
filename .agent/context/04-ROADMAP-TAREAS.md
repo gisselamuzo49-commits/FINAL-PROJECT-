@@ -62,7 +62,7 @@ que reemplaza la planificación genérica original.
   Validación calificación 0-10. 14/14 tests. PR abierto hacia QA, sin mergear — espera Semana 4.
 
 ### Semana 3 — Servicios periféricos restantes
-- [x] `document-service` (8088): consumidor Kafka + Webhook hacia n8n + Mongo/S3 (Completado y verificado con 8 tests passing).
+- [x] `document-service` (8088): consumidor Kafka + Webhook hacia n8n + Mongo/S3 (Completado y protegido con Circuit Breaker programático de Resilience4j para subidas a S3, 10/10 tests passing).
 - [x] S3 configurado para CVs y documentos generados (usado por `document-service`) — Bucket `pasantias-documents-qa` en us-east-1 creado y versionado activado.
 - [ ] Configurar n8n (self-hosted en cuenta DEV/Sandbox #1 o local) y conectar al menos
   un flujo real (ej. notificación por correo cuando se aprueba una práctica).
