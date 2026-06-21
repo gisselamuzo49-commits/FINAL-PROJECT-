@@ -5,6 +5,7 @@ import com.uce.user_service.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import org.springframework.http.ResponseEntity;
 import java.util.List;
 
 @RestController
@@ -32,5 +33,12 @@ public class UserController {
     @GetMapping("/{id}")
     public UserProfile getProfileById(@PathVariable Long id) {
         return userService.getProfileById(id);
+    }
+
+    @GetMapping("/email/{email}")
+    public ResponseEntity<UserProfile> getProfileByEmail(@PathVariable String email) {
+        return userService.getProfileByEmail(email)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 }
