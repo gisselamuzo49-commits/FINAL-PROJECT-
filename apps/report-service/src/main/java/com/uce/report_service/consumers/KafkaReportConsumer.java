@@ -7,6 +7,9 @@ import com.uce.report_service.models.ReporteGlobal;
 import com.uce.report_service.repositories.RegistroHorasReporteRepository;
 import com.uce.report_service.repositories.ReporteEstudianteRepository;
 import com.uce.report_service.repositories.ReporteGlobalRepository;
+import io.github.resilience4j.circuitbreaker.CircuitBreaker;
+import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig;
+import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -44,6 +48,19 @@ public class KafkaReportConsumer {
 
     @Value("${document.service.url}")
     private String documentServiceUrl;
+
+    private CircuitBreaker circuitBreaker;
+
+    public KafkaReportConsumer() {
+        CircuitBreakerConfig config = CircuitBreakerConfig.custom()
+                .failureRateThreshold(50) // 50% failure rate opens the circuit
+                .slidingWindowSize(10)
+                .waitDurationInOpenState(Duration.ofSeconds(15))
+                .permittedNumberOfCallsInHalfOpenState(3)
+                .build();
+        CircuitBreakerRegistry registry = CircuitBreakerRegistry.of(config);
+        this.circuitBreaker = registry.circuitBreaker("documentService");
+    }
 
     @KafkaListener(topics = "horas.registradas", groupId = "report-service-group")
     public void consume(String message) {
@@ -85,14 +102,14 @@ public class KafkaReportConsumer {
             // 3. Fetch documents count from document-service (best effort)
             int totalDocumentos = 0;
             try {
-                String url = documentServiceUrl + "/api/documents/student/" + estudianteId;
+                final String url = documentServiceUrl + "/api/documents/student/" + estudianteId;
                 log.info("Querying document-service at: {}", url);
-                Map<?, ?> response = restTemplate.getForObject(url, Map.class);
+                Map<?, ?> response = circuitBreaker.executeSupplier(() -> restTemplate.getForObject(url, Map.class));
                 if (response != null && response.containsKey("totalDocumentos")) {
                     totalDocumentos = ((Number) response.get("totalDocumentos")).intValue();
                 }
             } catch (Exception e) {
-                log.warn("Could not retrieve documents count from document-service for student {}: {}", estudianteId, e.getMessage());
+                log.warn("Could not retrieve documents count from document-service via Circuit Breaker for student {}: {}", estudianteId, e.getMessage());
             }
 
             // 4. Save/Update ReporteEstudiante in PostgreSQL
@@ -136,5 +153,42 @@ public class KafkaReportConsumer {
         ReporteGlobal globalReport = new ReporteGlobal(totalEstudiantes, totalValidadas, totalPendientes, facultadMap, LocalDateTime.now());
         globalRepository.save(globalReport);
         log.info("Global report updated in MongoDB successfully.");
+    }
+
+    public String getCircuitBreakerState() {
+        return circuitBreaker.getState().name();
+    }
+
+    public CircuitBreaker getCircuitBreaker() {
+        return circuitBreaker;
+    }
+
+    // Setters for test mock injection
+    void setRegistroRepository(RegistroHorasReporteRepository registroRepository) {
+        this.registroRepository = registroRepository;
+    }
+
+    void setStudentRepository(ReporteEstudianteRepository studentRepository) {
+        this.studentRepository = studentRepository;
+    }
+
+    void setGlobalRepository(ReporteGlobalRepository globalRepository) {
+        this.globalRepository = globalRepository;
+    }
+
+    void setRestTemplate(RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
+    }
+
+    void setObjectMapper(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+    }
+
+    void setDocumentServiceUrl(String documentServiceUrl) {
+        this.documentServiceUrl = documentServiceUrl;
+    }
+
+    void setCircuitBreaker(CircuitBreaker circuitBreaker) {
+        this.circuitBreaker = circuitBreaker;
     }
 }

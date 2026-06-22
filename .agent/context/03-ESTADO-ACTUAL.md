@@ -237,13 +237,13 @@ hacia `QA`, **sin mergear** — ver nota abajo), siguiendo
 2. Productor Kafka — publica `horas.registradas` tras cada `save()`.
 3. Consumidor Kafka + proyección MongoDB `horas_resumen` + `GET /api/hours/student/{id}`.
 4. Cliente gRPC hacia `user-service` (puerto 9083) para enriquecer
-   `nombre`/`carrera` — "best effort" (`Optional.empty()` si falla, nunca bloquea).
+   `nombre`/`carrera` — "best effort" con Circuit Breaker programático de Resilience4j (para solucionar la incompatibilidad de `resilience4j-spring-boot3` con Spring Boot 4.0.6, el cual gestiona de forma programática las transiciones de estado, expone su estado en `/health` y fue testeado eficientemente sin causar demoras).
 5. Swagger (`springdoc`), README completo, y **prueba de integración end-to-end con
    Testcontainers** (Postgres + Kafka + MongoDB reales) que valida el pipeline
    completo: `POST /api/hours` → evento Kafka → proyección Mongo actualizada →
    `GET /api/hours/student/{id}` → `PATCH .../validar` → totales recalculados.
 
-**17/17 tests pasando**, incluyendo la integración end-to-end. `hours-service` queda
+**19/19 tests pasando**, incluyendo la integración end-to-end. `hours-service` queda
 funcionalmente completo y validado localmente.
 
 ### 🔧 Lección para futuros servicios con MongoDB (`document-service`, `report-service`)
@@ -263,22 +263,21 @@ con el path `?...&` + nombre de BD ajustado por servicio (`hours_read_db`,
 `documents_db`, `reports_db`). Recordatorio: usar `spring.mongodb.uri` (ver lección
 arriba), no `spring.data.mongodb.uri`.
 
-## ✅ COMPLETADO — `evaluation-service` (Semana 2, parcial)
+## ✅ COMPLETADO — `evaluation-service` (Semana 2, completo)
 
 `apps/evaluation-service` (8086, Layered + PostgreSQL `evaluation_db` + gRPC client
-hacia `user-service`). Reutilizó `linkage-service` como plantilla y **copió el
-cliente gRPC completo de `hours-service`** (`user.proto`, `UserServiceClient`,
-`UserServiceClientImpl`, `StudentInfo`) — sin "descubrimientos" nuevos de Spring Boot
-4, mucho más rápido que `hours-service`. Endpoints: `POST /api/evaluations` (valida
+hacia `user-service`). Reutilizó `linkage-service` como plantilla y tiene el
+cliente gRPC completo hacia `user-service` con Circuit Breaker programático de Resilience4j (igual que `hours-service` para solucionar la incompatibilidad de `resilience4j-spring-boot3` con Spring Boot 4.0.6, el cual gestiona de forma programática las transiciones de estado, expone su estado en `/health` y fue testeado eficientemente sin causar demoras). Endpoints: `POST /api/evaluations` (valida
 `estudianteId`/`tutorId`/`calificacion`, incluyendo rango 0-10 → 400),
 `GET /api/evaluations/{id}` (404 si no existe), `GET /api/evaluations/student/{id}`
-(enriquecido con nombre/carrera vía gRPC, best-effort). **12/12 tests, BUILD
-SUCCESS**. Rama `feature/evaluation-service`, PR hacia `QA` — confirmar que se abrió
-(último paso pedido a Antigravity, sin confirmación de link todavía).
+(enriquecido con nombre/carrera vía gRPC, best-effort). **14/14 tests, BUILD
+SUCCESS** en la rama `feature/mosquitto-migration`.
 
-`notification-service` (8087, Event-Driven + Kafka consumer + MQTT) queda **completado localmente** (verificación de tests unitarios e integración con Testcontainers exitosa). Consume eventos de `horas.registradas` con estado `VALIDADO` o `RECHAZADO`, los guarda en PostgreSQL (`notification_db`) y publica un JSON a MQTT en el topic dinámico `notificaciones/{estudianteId}` usando una conexión TCP (puerto 1883) con autenticación básica hacia un broker Mosquitto self-hosted local/QA/PROD. El backend de pruebas pasa al 100%.
+`notification-service` (8087, Event-Driven + Kafka consumer + MQTT) queda **completado localmente** (verificación de tests unitarios e integración con Testcontainers exitosa). Consume eventos de `horas.registradas` con estado `VALIDADO` o `RECHAZADO`, los guarda en PostgreSQL (`notification_db`) y publica un JSON a MQTT en el topic dinámico `notificaciones/{estudianteId}` usando una conexión TCP (puerto 1883) con autenticación básica hacia un broker Mosquitto self-hosted local/QA/PROD. El proceso de publicación a MQTT está protegido con un Circuit Breaker programático de Resilience4j, expuesto en `/health`, y el backend de pruebas pasa al 100% (12/12 tests).
 
-`document-service` (8088, Event-Driven + PDF Generation + REST + S3 + Webhooks) queda **completado localmente** (verificación de 8 tests unitarios exitosa). Consume eventos de `horas.registradas` con estado `VALIDADO`, genera un archivo PDF en memoria utilizando OpenPDF (iText 2.1.7), lo sube a Amazon S3 (`pasantias-documents-qa` con tokens temporales de AWS Academy), guarda la metadata en PostgreSQL (`document_db`), realiza un upsert en MongoDB (`documentos_resumen`) y dispara un webhook de forma asíncrona ("best effort") a n8n.
+`document-service` (8088, Event-Driven + PDF Generation + REST + S3 + Webhooks) queda **completado localmente** (verificación de 10 tests unitarios exitosa). Consume eventos de `horas.registradas` con estado `VALIDADO`, genera un archivo PDF en memoria utilizando OpenPDF (iText 2.1.7), lo sube a Amazon S3 (`pasantias-documents-qa` con tokens temporales de AWS Academy) bajo la protección de un Circuit Breaker programático de Resilience4j (expuesto en `/health`), guarda la metadata en PostgreSQL (`document_db`), realiza un upsert en MongoDB (`documentos_resumen`) y dispara un webhook de forma asíncrona ("best effort") a n8n.
+
+`report-service` (8089, Kafka consumer + SOAP + MongoDB + PostgreSQL) queda **completado localmente** (verificación de 13 tests unitarios exitosa). Consume eventos de `horas.registradas` en Kafka, realiza la consolidación de reportes, consulta de forma best-effort el total de documentos en `document-service` vía REST (protegido con un Circuit Breaker programático de Resilience4j, expuesto en `/health`), guarda los reportes en PostgreSQL (`report_db`) y actualiza el reporte global en MongoDB.
 
 ### Estado de PRs (NO mergear todavía — plan para mañana abajo)
 - `feature/user-service-get-by-email` → `QA`: agrega endpoint `/email/{email}` en `user-service` + tests MockMvc (200/404).

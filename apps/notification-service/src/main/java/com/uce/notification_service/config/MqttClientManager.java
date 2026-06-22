@@ -1,5 +1,8 @@
 package com.uce.notification_service.config;
 
+import io.github.resilience4j.circuitbreaker.CircuitBreaker;
+import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig;
+import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
 import org.eclipse.paho.client.mqttv3.IMqttToken;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
@@ -13,6 +16,7 @@ import org.springframework.stereotype.Component;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
+import java.time.Duration;
 
 @Component
 public class MqttClientManager {
@@ -36,6 +40,22 @@ public class MqttClientManager {
 
     private MqttClient mqttClient;
     private boolean connected = false;
+
+    private final CircuitBreaker circuitBreaker;
+
+    public MqttClientManager() {
+        this(CircuitBreakerConfig.custom()
+                .failureRateThreshold(50) // 50% failure rate opens the circuit
+                .slidingWindowSize(10)
+                .waitDurationInOpenState(Duration.ofSeconds(15))
+                .permittedNumberOfCallsInHalfOpenState(3)
+                .build());
+    }
+
+    public MqttClientManager(CircuitBreakerConfig customConfig) {
+        CircuitBreakerRegistry registry = CircuitBreakerRegistry.of(customConfig);
+        this.circuitBreaker = registry.circuitBreaker("mqttPublisher");
+    }
 
     @PostConstruct
     public void init() {
@@ -77,22 +97,28 @@ public class MqttClientManager {
     }
 
     public synchronized void publish(String topic, String payload) {
-        if (mqttClient == null || !mqttClient.isConnected()) {
-            logger.warn("El cliente MQTT no está conectado. Intentando reconectar antes de publicar...");
-            connect();
-        }
+        try {
+            circuitBreaker.executeRunnable(() -> {
+                if (mqttClient == null || !mqttClient.isConnected()) {
+                    logger.warn("El cliente MQTT no está conectado. Intentando reconectar antes de publicar...");
+                    connect();
+                }
 
-        if (mqttClient != null && mqttClient.isConnected()) {
-            try {
-                MqttMessage message = new MqttMessage(payload.getBytes());
-                message.setQos(1); // At least once delivery
-                mqttClient.publish(topic, message);
-                logger.info("Mensaje publicado en topic MQTT [{}]: {}", topic, payload);
-            } catch (MqttException e) {
-                logger.error("Error al publicar mensaje en el topic [{}]: {}", topic, e.getMessage());
-            }
-        } else {
-            logger.error("No se pudo publicar el mensaje porque el cliente MQTT no está conectado.");
+                if (mqttClient != null && mqttClient.isConnected()) {
+                    try {
+                        MqttMessage message = new MqttMessage(payload.getBytes());
+                        message.setQos(1); // At least once delivery
+                        mqttClient.publish(topic, message);
+                        logger.info("Mensaje publicado en topic MQTT [{}]: {}", topic, payload);
+                    } catch (MqttException e) {
+                        throw new RuntimeException("Error en publicación MQTT: " + e.getMessage(), e);
+                    }
+                } else {
+                    throw new RuntimeException("No se pudo publicar el mensaje porque el cliente MQTT no está conectado.");
+                }
+            });
+        } catch (Exception e) {
+            logger.error("Error al publicar mensaje en el topic [{}] vía Circuit Breaker: {}", topic, e.getMessage());
         }
     }
 
@@ -111,5 +137,18 @@ public class MqttClientManager {
 
     public boolean isConnected() {
         return mqttClient != null && mqttClient.isConnected();
+    }
+
+    public String getCircuitBreakerState() {
+        return circuitBreaker.getState().name();
+    }
+
+    public CircuitBreaker getCircuitBreaker() {
+        return circuitBreaker;
+    }
+
+    // Setter to allow mock injection during unit tests
+    void setMqttClient(MqttClient mqttClient) {
+        this.mqttClient = mqttClient;
     }
 }
