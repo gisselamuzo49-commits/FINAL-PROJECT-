@@ -74,6 +74,19 @@
               done
           fi
 
+    - name: Limpieza agresiva de disco antes de pulls
+      shell: |
+        docker system prune -af --volumes || true
+        journalctl --vacuum-size=50M || true
+        rm -rf /tmp/* || true
+        df -h
+      register: disk_space_after
+      changed_when: false
+
+    - name: Mostrar espacio en disco después de la limpieza
+      debug:
+        var: disk_space_after.stdout_lines
+
     # ── Pull de imágenes ─────────────────
     - name: Pull postgres image
       shell: docker pull {{ postgres_image }}
