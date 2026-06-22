@@ -280,13 +280,9 @@ SUCCESS**. Rama `feature/evaluation-service`, PR hacia `QA` — confirmar que se
 
 `document-service` (8088, Event-Driven + PDF Generation + REST + S3 + Webhooks) queda **completado localmente** (verificación de 8 tests unitarios exitosa). Consume eventos de `horas.registradas` con estado `VALIDADO`, genera un archivo PDF en memoria utilizando OpenPDF (iText 2.1.7), lo sube a Amazon S3 (`pasantias-documents-qa` con tokens temporales de AWS Academy), guarda la metadata en PostgreSQL (`document_db`), realiza un upsert en MongoDB (`documentos_resumen`) y dispara un webhook de forma asíncrona ("best effort") a n8n.
 
-### Estado de PRs (NO mergear todavía — plan para mañana abajo)
-- `feature/user-service-grpc-server` → `QA`: agrega servidor gRPC
-  `GetStudentInfo` (puerto 9083) + columna `carrera` (ddl-auto=update, sin
-  migración manual necesaria).
-- `feature/hours-service-postgres` → `QA`: las 5 etapas de `hours-service`.
-- `feature/evaluation-service` → `QA`: `evaluation-service` completo.
-- `feature/document-service` → `QA` (o rama local `feature/document-service` pendiente de push): `document-service` completo y verificado localmente.
+### Estado de PRs y Circuit Breakers
+- **Circuit Breakers**: Los 5 microservicios (`hours`, `evaluation`, `notification`, `document` y `report`) cuentan ahora con Circuit Breakers programáticos usando Resilience4j, integrados en `/health`, y con todas sus suites de pruebas exitosas (68/68 tests exitosos). La rama `feature/mosquitto-migration` que contiene estos cambios fue unificada en `QA` mediante el PR #53.
+- **Rediseño Frontend**: Se completó e integró la interfaz, y `apps/frontend-web/src/main.jsx` fue actualizado para usar `AppRouter` como punto de entrada de la aplicación en la rama `feature/frontend-redesign`.
 
 ## 🚨 URGENTE (prioridad #1, antes que lo demás) — Dominio Cloudflare
 
