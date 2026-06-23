@@ -387,7 +387,7 @@ jobs:
   # JOB 15: deploy (Ejecución en el Bastion self-hosted)
   # ═══════════════════════════════════════
   deploy:
-    runs-on: self-hosted
+    runs-on: [self-hosted, linux, qa]
     needs:
       - detect-changes
       - test
