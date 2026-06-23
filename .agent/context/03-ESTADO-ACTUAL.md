@@ -3,7 +3,31 @@
 > **Este archivo se actualiza al final de cada sesión de trabajo.** Es el primer lugar
 > donde el agente debe mirar para saber "¿dónde quedamos?".
 
-_Última actualización: 2026-06-23 (Sesión Lab 53 - )_
+_Última actualización: 2026-06-23 (Sesión Lab 53 - tarde)_
+
+## ✅ COMPLETADO — Nginx Proxy + Fix CORS (23/Jun tarde)
+
+### Problema resuelto
+- El firewall universitario bloqueaba el puerto 8082
+- CORS bloqueaba peticiones cross-origin
+
+### Solución aplicada
+- nginx.conf: agregado location /api/ con proxy_pass
+  a gateway-service:8082 interno
+- 13 páginas frontend: eliminado :8082 del fallback URL
+  (ahora usa solo window.location.hostname sin puerto)
+- gateway application.yml: CORS actualizado a 32.193.25.6
+- Todo el tráfico API ahora va por puerto 80 via Nginx
+
+### URL actual de QA
+- Frontend: http://32.193.25.6 (puerto 80)
+- API: http://32.193.25.6/api/* (proxy interno a :8082)
+- Gateway directo (interno): http://32.193.25.6:8082
+
+### Credenciales de prueba
+- estudiante@uce.edu.ec / password123
+- tutor@uce.edu.ec / password123
+- coordinador@uce.edu.ec / password123
 
 ## ✅ COMPLETADO HOY — Infraestructura Lab 53
 
