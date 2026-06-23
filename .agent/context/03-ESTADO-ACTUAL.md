@@ -394,5 +394,14 @@ Se implementaron con éxito los cambios para adoptar un self-hosted runner en el
 1. **GitHub Actions Runner en Bastion (Terraform):** Agregado `user_data` a `aws_instance.bastion` en `infra/qa/main.tf` para instalar dependencias de Docker, herramientas y preparar la carpeta del runner.
 2. **Workflow simplificado:** Modificado `deploy-qa.yml` para correr en `runs-on: self-hosted`, eliminando los pasos obsoletos de SSH Tunnel, ProxyCommand y la instalación de Ansible en cada ejecución.
 3. **CORS Dinámico:** Configurado `deploy-qa.yml` de Ansible para inyectar la variable `ALLOWED_ORIGINS` dinámicamente con la IP de la instancia a través del workflow.
-4. **Vite API URL:** Se agregó soporte para `VITE_API_BASE_URL` en el `Dockerfile` de `frontend-web`, y se actualizó `.env.production` y el CORS fallback en el gateway a `http://100.50.165.80:8082`.
+
+## ✅ COMPLETADO — Adopción de Mejoras UCE_AlumniPlatform e Integración de Cambios (23/Jun)
+
+Se adoptaron 4 mejoras del proyecto de referencia y se aplicaron las reversiones solicitadas en la rama `QA`:
+1. **Key Pairs creados por Terraform:** Se crearon recursos `aws_key_pair` en `infra/qa` e `infra/prod` utilizando llaves generadas localmente (`QA.pub`, `PROD.pub`). Las llaves privadas se agregaron a `.gitignore`.
+2. **Secrets en Ansible:** Se parametrizaron `JWT_SECRET`, `POSTGRES_PASSWORD` y `NEO4J_PASSWORD` en Ansible y GitHub Actions, eliminando credenciales hardcodeadas en texto plano.
+3. **LabInstanceProfile en EC2:** Se asoció el rol IAM de AWS Academy (`LabInstanceProfile`) a las instancias EC2 en QA y PROD para evitar errores de permisos.
+4. **Mosquitto local sin autenticación en QA:** Configurado broker Mosquitto local en el EC2 de QA con `allow_anonymous true` y redirigido `notification-service` a este broker local.
+5. **Reversiones de Frontend y CORS:** Se eliminó la IP hardcodeada de CORS fallback del gateway, se removió `.env.production` y se quitó el build arg `VITE_API_BASE_URL` del Dockerfile (el frontend resuelve el endpoint de manera dinámica usando el hostname de la ventana del navegador).
+
 
