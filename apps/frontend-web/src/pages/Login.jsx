@@ -16,7 +16,7 @@ function Login() {
   const [regEmail, setRegEmail] = useState('');
   const [regPassword, setRegPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [rol, setRol] = useState('Estudiante');
+  const [rol, setRol] = useState('ESTUDIANTE');
   const [showRegPassword, setShowRegPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [regError, setRegError] = useState(null);
@@ -94,7 +94,7 @@ function Login() {
           setRegEmail('');
           setRegPassword('');
           setConfirmPassword('');
-          setRol('Estudiante');
+          setRol('ESTUDIANTE');
         }, 2000);
       })
       .catch(err => setRegError(err.message));
@@ -185,9 +185,9 @@ function Login() {
                 onChange={(e) => setRol(e.target.value)}
                 className="bg-gray-100 rounded-lg px-4 py-3 w-full text-gray-900 focus:outline-none focus:ring-2 focus:ring-[var(--color-purple)] appearance-none cursor-pointer"
               >
-                <option value="Estudiante">Estudiante</option>
-                <option value="Tutor">Tutor</option>
-                <option value="Coordinador">Coordinador</option>
+                <option value="ESTUDIANTE">Estudiante</option>
+                <option value="TUTOR">Tutor</option>
+                <option value="COORDINADOR">Coordinador</option>
               </select>
             </div>
 
