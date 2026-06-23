@@ -481,6 +481,7 @@
           -e LINKAGE_SERVICE_URL=http://linkage-service:8084 \
           -e REDIS_HOST=redis \
           -e REDIS_PORT=6379 \
+          -e ALLOWED_ORIGINS=http://{{ qa_public_ip }}:80,http://{{ qa_public_ip }} \
           -e JWT_SECRET='v9y$B&E)H@McQfTjWmZq4t7w!z%C*F-JaNdRgUkXp2r5u8x/A?D(G+KbPeShVmYq' \
           -e JAVA_TOOL_OPTIONS="-Xmx256m -Xms128m" \
           {{ docker_image_gateway }}

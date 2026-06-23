@@ -2,11 +2,13 @@
 FROM node:20-alpine AS build
 WORKDIR /app
 
-# Argumentos para pasar los puertos de backend
+# Argumentos para pasar los puertos de backend y la URL base del API
 ARG VITE_AUTH_PORT
 ARG VITE_INTERNSHIP_PORT
+ARG VITE_API_BASE_URL
 ENV VITE_AUTH_PORT=$VITE_AUTH_PORT
 ENV VITE_INTERNSHIP_PORT=$VITE_INTERNSHIP_PORT
+ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
 
 COPY package*.json ./
 RUN npm install

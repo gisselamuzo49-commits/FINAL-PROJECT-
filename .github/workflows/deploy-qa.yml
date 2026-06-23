@@ -48,7 +48,7 @@ jobs:
 
   deploy:
     needs: detect-changes
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
 
     services:
       postgres:
@@ -216,6 +216,7 @@ jobs:
           tags: gdmuzo/frontend-web:qa
           build-args: |
             VITE_GATEWAY_PORT=8082
+            VITE_API_BASE_URL=http://${{ secrets.QA_AUTH_JOBS_IP }}:8082
 
       - name: Build and push hours-service
         if: needs.detect-changes.outputs.hours == 'true'
@@ -265,35 +266,19 @@ jobs:
           push: true
           tags: gdmuzo/ai-service:latest
 
-      - name: Setup SSH key
-        run: |
-          mkdir -p ~/.ssh
-          printf '%s' "${{ secrets.QA_SSH_KEY }}" > ~/.ssh/QA.pem
-          chmod 400 ~/.ssh/QA.pem
-          ssh-keyscan -H ${{ secrets.QA_BASTION_IP }} >> ~/.ssh/known_hosts
-          ssh -i ~/.ssh/QA.pem \
-            -o StrictHostKeyChecking=no \
-            -o ConnectTimeout=10 \
-            -v \
-            ubuntu@${{ secrets.QA_BASTION_IP }} \
-            "ssh-keyscan -H ${{ secrets.QA_AUTH_JOBS_IP }}" 2>&1 | tee /tmp/ssh_debug.txt
-          cat /tmp/ssh_debug.txt >> ~/.ssh/known_hosts || true
-          echo "SSH exit code: $?"
-
       - name: Create Ansible inventory
         run: |
           echo "[qa_ec2]" > /tmp/qa_inventory.ini
-          echo "10.0.1.61" >> /tmp/qa_inventory.ini
+          echo "${{ secrets.QA_AUTH_JOBS_IP }} ansible_user=ubuntu ansible_ssh_private_key_file=~/.ssh/QA.pem ansible_ssh_common_args='-o StrictHostKeyChecking=no'" >> /tmp/qa_inventory.ini
           cat /tmp/qa_inventory.ini
 
-      - name: Configure Ansible SSH
+      - name: Configure Ansible SSH (Local config)
         run: |
-          printf '[defaults]\nremote_user = ubuntu\nprivate_key_file = ~/.ssh/QA.pem\nhost_key_checking = False\n\n[ssh_connection]\nssh_args = -o StrictHostKeyChecking=no -o ProxyCommand="ssh -W %%h:%%p -i ~/.ssh/QA.pem -o StrictHostKeyChecking=no ubuntu@3.225.171.116"\n' > /tmp/ansible.cfg
+          printf '[defaults]\nremote_user = ubuntu\nprivate_key_file = ~/.ssh/QA.pem\nhost_key_checking = False\n' > /tmp/ansible.cfg
           cat /tmp/ansible.cfg
 
       - name: Deploy via Ansible
         run: |
-          pip install ansible
           echo "=== ANSIBLE_CONFIG ==="
           echo $ANSIBLE_CONFIG
           echo "=== ansible.cfg content ==="
@@ -310,6 +295,7 @@ jobs:
             -i /tmp/qa_inventory.ini \
             -e "aws_access_key_id=${{ secrets.AWS_ACCESS_KEY_ID }}" \
             -e "aws_secret_access_key=${{ secrets.AWS_SECRET_ACCESS_KEY }}" \
-            -e "aws_session_token=${{ secrets.AWS_SESSION_TOKEN }}"
+            -e "aws_session_token=${{ secrets.AWS_SESSION_TOKEN }}" \
+            -e "qa_public_ip=${{ secrets.QA_AUTH_JOBS_IP }}"
         env:
           ANSIBLE_CONFIG: /tmp/ansible.cfg
