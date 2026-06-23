@@ -47,7 +47,7 @@ function DashboardLayout() {
   };
 
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-gray-50 font-sans">
+    <div className="flex h-screen w-full overflow-hidden overflow-x-hidden bg-gray-50 font-sans">
       {/* Sidebar (Responsive drawer internally) */}
       <Sidebar 
         user={user} 
@@ -57,7 +57,7 @@ function DashboardLayout() {
       />
 
       {/* Main dashboard space */}
-      <div className="flex-grow flex flex-col min-w-0 h-full overflow-hidden">
+      <div className="flex-grow flex flex-col min-w-0 h-full overflow-hidden overflow-x-hidden w-full">
         {/* Header */}
         <Header 
           onMenuClick={() => setSidebarOpen(true)} 

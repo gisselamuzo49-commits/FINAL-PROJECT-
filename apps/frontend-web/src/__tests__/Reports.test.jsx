@@ -24,7 +24,7 @@ describe('Reports.jsx View', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     localStorage.clear();
-    localStorage.setItem('token', 'mocked-jwt-token');
+    localStorage.setItem('token', 'header.eyJub21icmUiOiJBbmEgVG9ycmVzIiwicm9sIjoiRVNUVURJQU5URSJ9.signature');
 
     mockFetch.mockImplementation((url) => {
       if (url.includes('/api/reports/student/1')) {

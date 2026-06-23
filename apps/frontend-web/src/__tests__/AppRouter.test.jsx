@@ -28,7 +28,7 @@ describe('AppRouter Routing Tests', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     localStorage.clear();
-    localStorage.setItem('token', 'fake-jwt-token');
+    localStorage.setItem('token', 'header.eyJub21icmUiOiJBbmEgVG9ycmVzIiwicm9sIjoiQ09PUkRJTkFET1IifQ.signature');
     localStorage.setItem('userEmail', 'estudiante@uce.edu.ec');
 
     // Default fetch mock implementation returning specific page structures
