@@ -211,6 +211,13 @@
       poll: 10
 
     # ── Levantar contenedores ────────────
+    - name: Eliminar volumen de postgres para reinicializar schema
+      shell: |
+        docker stop postgres-db 2>/dev/null || true
+        docker rm postgres-db 2>/dev/null || true
+        rm -rf /var/lib/postgresql/data
+      changed_when: false
+
     - name: Levantar postgres-db
       shell: |
         docker run -d \
