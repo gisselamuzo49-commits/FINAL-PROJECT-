@@ -20,7 +20,12 @@
 
   tasks:
 
-    - name: Prune unused Docker images, containers and networks
+    - name: Detener y remover contenedores existentes (liberar puertos e imágenes asociadas)
+      shell: |
+        docker stop auth-service internship-service user-service linkage-service gateway-service frontend-web postgres-db redis zookeeper kafka mongodb rabbitmq hours-service evaluation-service notification-service document-service report-service ai-service neo4j 2>/dev/null || true
+        docker rm   auth-service internship-service user-service linkage-service gateway-service frontend-web postgres-db redis zookeeper kafka mongodb rabbitmq hours-service evaluation-service notification-service document-service report-service ai-service neo4j 2>/dev/null || true
+
+    - name: Prune unused Docker images, containers and networks (ahora que están detenidos)
       shell: docker system prune -af || true
 
     - name: Clean apt cache
@@ -68,6 +73,19 @@
                   create_user_and_database $db
               done
           fi
+
+    - name: Limpieza agresiva de disco antes de pulls
+      shell: |
+        docker system prune -af --volumes || true
+        journalctl --vacuum-size=50M || true
+        rm -rf /tmp/* || true
+        df -h
+      register: disk_space_after
+      changed_when: false
+
+    - name: Mostrar espacio en disco después de la limpieza
+      debug:
+        var: disk_space_after.stdout_lines
 
     # ── Pull de imágenes ─────────────────
     - name: Pull postgres image
@@ -162,13 +180,6 @@
       shell: docker pull neo4j:5-community
       async: 60
       poll: 10
-
-    # ── Detener y remover contenedores viejos ──
-    - name: Detener y remover contenedores existentes
-      shell: |
-        docker stop auth-service internship-service user-service linkage-service gateway-service frontend-web postgres-db redis zookeeper kafka mongodb rabbitmq hours-service evaluation-service notification-service document-service report-service ai-service neo4j 2>/dev/null || true
-        docker rm   auth-service internship-service user-service linkage-service gateway-service frontend-web postgres-db redis zookeeper kafka mongodb rabbitmq hours-service evaluation-service notification-service document-service report-service ai-service neo4j 2>/dev/null || true
-
 
     # ── Levantar contenedores ────────────
     - name: Levantar postgres-db

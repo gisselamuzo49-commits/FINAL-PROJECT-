@@ -20,7 +20,12 @@
 
   tasks:
 
-    - name: Prune unused Docker images, containers and networks
+    - name: Detener y remover contenedores existentes (liberar puertos e imágenes asociadas)
+      shell: |
+        docker stop auth-service internship-service user-service linkage-service gateway-service frontend-web postgres-db redis neo4j 2>/dev/null || true
+        docker rm   auth-service internship-service user-service linkage-service gateway-service frontend-web postgres-db redis neo4j 2>/dev/null || true
+
+    - name: Prune unused Docker images, containers and networks (ahora que están detenidos)
       shell: docker system prune -af || true
 
     - name: Clean apt cache
@@ -113,11 +118,7 @@
       async: 60
       poll: 10
 
-    # ── Detener y remover contenedores viejos ──
-    - name: Detener y remover contenedores existentes
-      shell: |
-        docker stop auth-service internship-service user-service linkage-service gateway-service frontend-web postgres-db redis neo4j 2>/dev/null || true
-        docker rm   auth-service internship-service user-service linkage-service gateway-service frontend-web postgres-db redis neo4j 2>/dev/null || true
+    # Contenedores detenidos e imágenes liberadas al inicio
 
     # ── Levantar contenedores ────────────
     - name: Levantar postgres-db

@@ -46,7 +46,7 @@ que reemplaza la planificación genérica original.
     desplegados — backlog docente #1.
   - [ ] Workspace de Postman compartido con el docente, todas las rutas actuales —
     backlog docente #2 (parcial).
-  - [ ] Limpieza de disco en `infra/ansible/deploy-*.yml` (`docker system prune`,
+  - [x] Limpieza de disco en `infra/ansible/deploy-*.yml` (`docker system prune`,
     `apt-get clean`, truncar logs >10MB, `journalctl --vacuum-size=50M`) — ver
     09-ADOPCIONES #12.
   - [ ] `terraform fmt -check -recursive` + `validate` como step de CI, sin `apply` —
