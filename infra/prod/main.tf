@@ -269,10 +269,11 @@ resource "aws_security_group" "sg_private" {
 }
 
 # ─────────────────────────────────────────
-# KEY PAIR — PROD key ya creada en AWS
+# KEY PAIR — PROD key creada por Terraform
 # ─────────────────────────────────────────
-data "aws_key_pair" "prod_key" {
-  key_name = "PROD"
+resource "aws_key_pair" "prod_key" {
+  key_name   = "PROD"
+  public_key = file("${path.module}/PROD.pub")
 }
 
 # ─────────────────────────────────────────
@@ -287,6 +288,11 @@ data "aws_ami" "ubuntu" {
   }
 }
 
+# Perfil de instancia IAM de AWS Academy
+data "aws_iam_instance_profile" "lab_profile" {
+  name = "LabInstanceProfile"
+}
+
 # ─────────────────────────────────────────
 # BASTION HOST — jump host con IP fija (EIP)
 # La IP NO cambia entre sesiones de AWS Academy.
@@ -296,8 +302,9 @@ resource "aws_instance" "bastion" {
   ami                    = data.aws_ami.ubuntu.id
   instance_type          = "t3.micro"
   subnet_id              = aws_subnet.public_1a.id
-  key_name               = data.aws_key_pair.prod_key.key_name
+  key_name               = aws_key_pair.prod_key.key_name
   vpc_security_group_ids = [aws_security_group.sg_bastion.id]
+  iam_instance_profile   = data.aws_iam_instance_profile.lab_profile.name
   tags                   = { Name = "pasantias-prod-bastion" }
 
   lifecycle {
@@ -503,8 +510,9 @@ resource "aws_instance" "prod_auth_jobs" {
   ami                    = data.aws_ami.ubuntu.id
   instance_type          = "t3.small"
   subnet_id              = aws_subnet.private_1a.id
-  key_name               = data.aws_key_pair.prod_key.key_name
+  key_name               = aws_key_pair.prod_key.key_name
   vpc_security_group_ids = [aws_security_group.sg_private.id]
+  iam_instance_profile   = data.aws_iam_instance_profile.lab_profile.name
 
   # user_data solo instala Docker; los contenedores los despliega Ansible
   user_data = <<-EOF

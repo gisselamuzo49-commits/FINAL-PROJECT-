@@ -171,10 +171,11 @@ resource "aws_security_group" "sg_private" {
 }
 
 # ─────────────────────────────────────────
-# KEY PAIR — QA key ya creada en AWS
+# KEY PAIR — QA key creada por Terraform
 # ─────────────────────────────────────────
-data "aws_key_pair" "qa_key" {
-  key_name = "QA"
+resource "aws_key_pair" "qa_key" {
+  key_name   = "QA"
+  public_key = file("${path.module}/QA.pub")
 }
 
 # ─────────────────────────────────────────
@@ -189,6 +190,11 @@ data "aws_ami" "ubuntu" {
   }
 }
 
+# Perfil de instancia IAM de AWS Academy
+data "aws_iam_instance_profile" "lab_profile" {
+  name = "LabInstanceProfile"
+}
+
 # ─────────────────────────────────────────
 # BASTION HOST — jump host público
 # NOTA: la IP pública cambia en cada sesión de AWS Academy.
@@ -199,8 +205,9 @@ resource "aws_instance" "bastion" {
   ami                    = data.aws_ami.ubuntu.id
   instance_type          = "t3.micro"
   subnet_id              = aws_subnet.public_1a.id
-  key_name               = data.aws_key_pair.qa_key.key_name
+  key_name               = aws_key_pair.qa_key.key_name
   vpc_security_group_ids = [aws_security_group.sg_bastion.id]
+  iam_instance_profile   = data.aws_iam_instance_profile.lab_profile.name
   tags                   = { Name = "pasantias-qa-bastion" }
 
   # user_data para aprovisionar Docker, herramientas y el GitHub Actions Runner
@@ -254,8 +261,9 @@ resource "aws_instance" "qa_auth_jobs" {
   ami                    = data.aws_ami.ubuntu.id
   instance_type          = "t3.large"
   subnet_id              = aws_subnet.public_1a.id
-  key_name               = data.aws_key_pair.qa_key.key_name
+  key_name               = aws_key_pair.qa_key.key_name
   vpc_security_group_ids = [aws_security_group.sg_private.id]
+  iam_instance_profile   = data.aws_iam_instance_profile.lab_profile.name
 
   # user_data solo instala Docker; los contenedores los despliega Ansible
   user_data = <<-EOF
