@@ -16,10 +16,16 @@
     docker_image_frontend:    "gdmuzo/frontend-web:latest"
     postgres_image:           "postgres:15-alpine"
     redis_image:              "redis:7-alpine"
+    neo4j_password:           "password123"
 
   tasks:
 
-    - name: Prune unused Docker images, containers and networks
+    - name: Detener y remover contenedores existentes (liberar puertos e imágenes asociadas)
+      shell: |
+        docker stop auth-service internship-service user-service linkage-service gateway-service frontend-web postgres-db redis neo4j 2>/dev/null || true
+        docker rm   auth-service internship-service user-service linkage-service gateway-service frontend-web postgres-db redis neo4j 2>/dev/null || true
+
+    - name: Prune unused Docker images, containers and networks (ahora que están detenidos)
       shell: docker system prune -af || true
 
     - name: Clean apt cache
@@ -71,33 +77,48 @@
     # ── Pull de imágenes ─────────────────
     - name: Pull postgres image
       shell: docker pull {{ postgres_image }}
+      async: 60
+      poll: 10
 
     - name: Pull redis image
       shell: docker pull {{ redis_image }}
 
     - name: Pull auth-service image
       shell: docker pull {{ docker_image_auth }}
+      async: 60
+      poll: 10
 
     - name: Pull internship-service image
       shell: docker pull {{ docker_image_internship }}
+      async: 60
+      poll: 10
 
     - name: Pull user-service image
       shell: docker pull {{ docker_image_user }}
+      async: 60
+      poll: 10
 
     - name: Pull linkage-service image
       shell: docker pull {{ docker_image_linkage }}
+      async: 60
+      poll: 10
 
     - name: Pull gateway-service image
       shell: docker pull {{ docker_image_gateway }}
+      async: 60
+      poll: 10
 
     - name: Pull frontend-web image
       shell: docker pull {{ docker_image_frontend }}
+      async: 60
+      poll: 10
 
-    # ── Detener y remover contenedores viejos ──
-    - name: Detener y remover contenedores existentes
-      shell: |
-        docker stop auth-service internship-service user-service linkage-service gateway-service frontend-web postgres-db redis 2>/dev/null || true
-        docker rm   auth-service internship-service user-service linkage-service gateway-service frontend-web postgres-db redis 2>/dev/null || true
+    - name: Pull neo4j image
+      shell: docker pull neo4j:5-community
+      async: 60
+      poll: 10
+
+    # Contenedores detenidos e imágenes liberadas al inicio
 
     # ── Levantar contenedores ────────────
     - name: Levantar postgres-db
@@ -146,6 +167,9 @@
           -e DB_NAME=internship_db \
           -e DB_USER=postgres \
           -e DB_PASSWORD=postgres \
+          -e NEO4J_URI=bolt://neo4j:7687 \
+          -e NEO4J_USER=neo4j \
+          -e NEO4J_PASSWORD={{ neo4j_password }} \
           {{ docker_image_internship }}
 
     - name: Levantar user-service
@@ -184,6 +208,16 @@
           --restart always \
           -p 6379:6379 \
           redis:7-alpine
+
+    - name: Levantar neo4j
+      shell: >
+        docker run -d --name neo4j
+        --network pasantias-net
+        --restart always
+        -p 7474:7474
+        -p 7687:7687
+        -e NEO4J_AUTH=neo4j/{{ neo4j_password }}
+        neo4j:5-community
 
     - name: Levantar gateway-service
       shell: |

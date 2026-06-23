@@ -1,4 +1,12 @@
+@import "tailwindcss";
+
 :root {
+  --color-navy-dark: #0F1B3C;
+  --color-navy-card: #1A2547;
+  --color-gold: #C9A227;
+  --color-purple: #5B5FEF;
+  --color-purple-hover: #4A4DD6;
+
   --text: #6b6375;
   --text-h: #08060d;
   --bg: #fff;
@@ -50,16 +58,21 @@
   }
 }
 
+html, body {
+  overflow-x: hidden;
+  max-width: 100vw;
+}
+
 body {
   margin: 0;
 }
 
 #root {
-  width: 1126px;
+  width: 100%;
   max-width: 100%;
   margin: 0 auto;
   text-align: center;
-  border-inline: 1px solid var(--border);
+  border-inline: none;
   min-height: 100svh;
   display: flex;
   flex-direction: column;

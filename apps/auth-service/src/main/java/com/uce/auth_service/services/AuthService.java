@@ -1,6 +1,7 @@
 package com.uce.auth_service.services;
 
 import com.uce.auth_service.models.User;
+import com.uce.auth_service.models.Role;
 import com.uce.auth_service.repositories.UserRepository;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -25,16 +26,18 @@ public class AuthService {
 
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
-    public String registerUser(User user) {
-        // 1. Revisar si el correo ya existe
-        if (userRepository.findByEmail(user.getEmail()).isPresent()) {
-            return "Error: El correo ya está registrado en el sistema.";
+    public String registerUser(String nombre, String email, String password, String rolStr) {
+        if (userRepository.findByEmail(email).isPresent()) {
+            throw new RuntimeException("Email ya registrado");
         }
-        
-        // 2. Cifrar la contraseña con BCrypt antes de guardar
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        Role rol = Role.valueOf(rolStr.toUpperCase());
+        User user = new User();
+        user.setNombre(nombre);
+        user.setEmail(email);
+        user.setPassword(passwordEncoder.encode(password));
+        user.setRol(rol);
         userRepository.save(user);
-        return "¡Éxito! Usuario registrado en la base de datos.";
+        return generateToken(user);
     }
 
     public String loginUser(String email, String password) {
@@ -50,13 +53,16 @@ public class AuthService {
         }
 
         // 4. Generar token JWT si es correcto
-        return generateToken(user.getEmail());
+        return generateToken(user);
     }
 
-    private String generateToken(String email) {
+    private String generateToken(User user) {
         SecretKey key = Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
         return Jwts.builder()
-                .subject(email)
+                .subject(user.getEmail())
+                .claim("id", user.getId().toString())
+                .claim("nombre", user.getNombre())
+                .claim("rol", user.getRol().name())
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + 86400000)) // Expira en 1 día
                 .signWith(key)

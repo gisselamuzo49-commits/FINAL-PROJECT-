@@ -16,10 +16,16 @@
     docker_image_frontend:    "gdmuzo/frontend-web:qa"
     postgres_image:           "postgres:15-alpine"
     redis_image:              "redis:7-alpine"
+    neo4j_password:           "password123"
 
   tasks:
 
-    - name: Prune unused Docker images, containers and networks
+    - name: Detener y remover contenedores existentes (liberar puertos e imágenes asociadas)
+      shell: |
+        docker stop auth-service internship-service user-service linkage-service gateway-service frontend-web postgres-db redis zookeeper kafka mongodb rabbitmq hours-service evaluation-service notification-service document-service report-service ai-service neo4j 2>/dev/null || true
+        docker rm   auth-service internship-service user-service linkage-service gateway-service frontend-web postgres-db redis zookeeper kafka mongodb rabbitmq hours-service evaluation-service notification-service document-service report-service ai-service neo4j 2>/dev/null || true
+
+    - name: Prune unused Docker images, containers and networks (ahora que están detenidos)
       shell: docker system prune -af || true
 
     - name: Clean apt cache
@@ -36,9 +42,6 @@
         systemctl enable docker || true
         systemctl is-active --quiet docker || systemctl start docker
       changed_when: false
-
-    - name: Asegurar que existe la red de Docker para intercomunicación
-      shell: docker network create pasantias-net 2>/dev/null || true
 
     - name: Crear directorio para scripts de inicialización de Postgres
       file:
@@ -68,38 +71,153 @@
               done
           fi
 
+          psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "postgres" <<-'EOSQL'
+              \c auth_db;
+              
+              CREATE TABLE IF NOT EXISTS users (
+                id BIGSERIAL PRIMARY KEY,
+                email VARCHAR(255) NOT NULL UNIQUE,
+                password VARCHAR(255) NOT NULL,
+                nombre VARCHAR(255) NOT NULL,
+                rol VARCHAR(50) NOT NULL DEFAULT 'ESTUDIANTE'
+              );
+              
+              INSERT INTO users (nombre, email, password, rol) VALUES
+                ('Estudiante Test', 'estudiante@uce.edu.ec', 
+                 '$2a$10$1b.WUFZVb/vY4mIlKavCEOTlflS9/jFW.POQBFZ3m8wbbhUmoFuRG', 
+                 'ESTUDIANTE'),
+                ('Tutor Test', 'tutor@uce.edu.ec', 
+                 '$2a$10$1b.WUFZVb/vY4mIlKavCEOTlflS9/jFW.POQBFZ3m8wbbhUmoFuRG', 
+                 'TUTOR'),
+                ('Coordinador Test', 'coordinador@uce.edu.ec', 
+                 '$2a$10$1b.WUFZVb/vY4mIlKavCEOTlflS9/jFW.POQBFZ3m8wbbhUmoFuRG', 
+                 'COORDINADOR')
+              ON CONFLICT (email) DO NOTHING;
+          EOSQL
+
+
+    - name: Limpieza agresiva de disco antes de pulls
+      shell: |
+        docker container prune -f || true
+        docker image prune -af || true
+        docker volume prune -f || true
+        journalctl --vacuum-size=50M || true
+        find /tmp -maxdepth 1 -type f -mmin +60 -delete 2>/dev/null || true
+        find /tmp -maxdepth 1 -type d -name "tmp*" -mmin +60 \
+          ! -name "ansible*" -exec rm -rf {} + 2>/dev/null || true
+        df -h
+      register: disk_space_after
+      changed_when: false
+
+    - name: Mostrar espacio en disco después de la limpieza
+      debug:
+        var: disk_space_after.stdout_lines
+
+    - name: Asegurar que existe la red de Docker para intercomunicación
+      shell: docker network create pasantias-net 2>/dev/null || true
+
     # ── Pull de imágenes ─────────────────
     - name: Pull postgres image
       shell: docker pull {{ postgres_image }}
+      async: 60
+      poll: 10
 
     - name: Pull redis image
       shell: docker pull {{ redis_image }}
 
     - name: Pull auth-service image
       shell: docker pull {{ docker_image_auth }}
+      async: 60
+      poll: 10
 
     - name: Pull internship-service image
       shell: docker pull {{ docker_image_internship }}
+      async: 60
+      poll: 10
 
     - name: Pull user-service image
       shell: docker pull {{ docker_image_user }}
+      async: 60
+      poll: 10
 
     - name: Pull linkage-service image
       shell: docker pull {{ docker_image_linkage }}
+      async: 60
+      poll: 10
 
     - name: Pull gateway-service image
       shell: docker pull {{ docker_image_gateway }}
+      async: 60
+      poll: 10
 
     - name: Pull frontend-web image
       shell: docker pull {{ docker_image_frontend }}
+      async: 60
+      poll: 10
 
-    # ── Detener y remover contenedores viejos ──
-    - name: Detener y remover contenedores existentes
-      shell: |
-        docker stop auth-service internship-service user-service linkage-service gateway-service frontend-web postgres-db redis 2>/dev/null || true
-        docker rm   auth-service internship-service user-service linkage-service gateway-service frontend-web postgres-db redis 2>/dev/null || true
+    - name: Pull zookeeper image
+      shell: docker pull confluentinc/cp-zookeeper:7.6.0
+      async: 60
+      poll: 10
+
+    - name: Pull kafka image
+      shell: docker pull confluentinc/cp-kafka:7.6.0
+      async: 60
+      poll: 10
+
+    - name: Pull mongodb image
+      shell: docker pull mongo:7
+      async: 60
+      poll: 10
+
+    - name: Pull rabbitmq image
+      shell: docker pull rabbitmq:3-management-alpine
+      async: 60
+      poll: 10
+
+    - name: Pull hours-service image
+      shell: docker pull gdmuzo/hours-service:latest
+      async: 60
+      poll: 10
+
+    - name: Pull evaluation-service image
+      shell: docker pull gdmuzo/evaluation-service:latest
+      async: 60
+      poll: 10
+
+    - name: Pull notification-service image
+      shell: docker pull gdmuzo/notification-service:latest
+      async: 60
+      poll: 10
+
+    - name: Pull document-service image
+      shell: docker pull gdmuzo/document-service:latest
+      async: 60
+      poll: 10
+
+    - name: Pull report-service image
+      shell: docker pull gdmuzo/report-service:latest
+      async: 60
+      poll: 10
+
+    - name: Pull ai-service image
+      shell: docker pull gdmuzo/ai-service:latest
+      async: 60
+      poll: 10
+
+    - name: Pull neo4j image
+      shell: docker pull neo4j:5-community
+      async: 60
+      poll: 10
 
     # ── Levantar contenedores ────────────
+    - name: Eliminar volumen de postgres para reinicializar schema
+      shell: |
+        docker stop postgres-db 2>/dev/null || true
+        docker rm postgres-db 2>/dev/null || true
+        rm -rf /var/lib/postgresql/data
+      changed_when: false
+
     - name: Levantar postgres-db
       shell: |
         docker run -d \
@@ -110,7 +228,7 @@
           -e POSTGRES_USER=postgres \
           -e POSTGRES_PASSWORD=postgres \
           -e POSTGRES_DB=postgres \
-          -e POSTGRES_MULTIPLE_DATABASES=auth_db,internship_db,user_db,linkage_db \
+          -e POSTGRES_MULTIPLE_DATABASES=auth_db,internship_db,user_db,linkage_db,hours_db,evaluation_db,notification_db,document_db,report_db \
           -v /var/lib/postgresql/data:/var/lib/postgresql/data \
           -v /opt/postgres-init:/docker-entrypoint-initdb.d \
           {{ postgres_image }}
@@ -132,6 +250,7 @@
           -e DB_USER=postgres \
           -e DB_PASSWORD=postgres \
           -e JWT_SECRET='v9y$B&E)H@McQfTjWmZq4t7w!z%C*F-JaNdRgUkXp2r5u8x/A?D(G+KbPeShVmYq' \
+          -e JAVA_TOOL_OPTIONS="-Xmx256m -Xms128m" \
           {{ docker_image_auth }}
 
     - name: Levantar internship-service
@@ -146,6 +265,10 @@
           -e DB_NAME=internship_db \
           -e DB_USER=postgres \
           -e DB_PASSWORD=postgres \
+          -e NEO4J_URI=bolt://neo4j:7687 \
+          -e NEO4J_USER=neo4j \
+          -e NEO4J_PASSWORD={{ neo4j_password }} \
+          -e JAVA_TOOL_OPTIONS="-Xmx256m -Xms128m" \
           {{ docker_image_internship }}
 
     - name: Levantar user-service
@@ -160,6 +283,7 @@
           -e DB_NAME=user_db \
           -e DB_USER=postgres \
           -e DB_PASSWORD=postgres \
+          -e JAVA_TOOL_OPTIONS="-Xmx256m -Xms128m" \
           {{ docker_image_user }}
 
     - name: Levantar linkage-service
@@ -174,6 +298,7 @@
           -e DB_NAME=linkage_db \
           -e DB_USER=postgres \
           -e DB_PASSWORD=postgres \
+          -e JAVA_TOOL_OPTIONS="-Xmx256m -Xms128m" \
           {{ docker_image_linkage }}
 
     - name: Levantar redis
@@ -184,6 +309,164 @@
           --restart always \
           -p 6379:6379 \
           redis:7-alpine
+
+    - name: Levantar zookeeper
+      shell: >
+        docker run -d --name zookeeper
+        --network pasantias-net
+        --restart always
+        -e ZOOKEEPER_CLIENT_PORT=2181
+        -e ZOOKEEPER_TICK_TIME=2000
+        confluentinc/cp-zookeeper:7.6.0
+
+    - name: Levantar kafka
+      shell: >
+        docker run -d --name kafka
+        --network pasantias-net
+        --restart always
+        -p 9092:9092
+        -e KAFKA_BROKER_ID=1
+        -e KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
+        -e KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
+        -e KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
+        confluentinc/cp-kafka:7.6.0
+
+    - name: Esperar a que Kafka esté listo
+      shell: sleep 20
+
+    - name: Levantar mongodb
+      shell: >
+        docker run -d --name mongodb
+        --network pasantias-net
+        --restart always
+        -p 27017:27017
+        mongo:7
+
+    - name: Levantar rabbitmq
+      shell: >
+        docker run -d --name rabbitmq
+        --network pasantias-net
+        --restart always
+        -p 5672:5672
+        -p 15672:15672
+        -e RABBITMQ_DEFAULT_USER=guest
+        -e RABBITMQ_DEFAULT_PASS=guest
+        rabbitmq:3-management-alpine
+
+    - name: Levantar neo4j
+      shell: >
+        docker run -d --name neo4j
+        --network pasantias-net
+        --restart always
+        -p 7474:7474
+        -p 7687:7687
+        -e NEO4J_AUTH=neo4j/{{ neo4j_password }}
+        neo4j:5-community
+
+    - name: Levantar hours-service
+      shell: >
+        docker run -d --name hours-service
+        --network pasantias-net
+        --restart always
+        -p 8085:8085
+        -e DB_HOST=postgres-db
+        -e DB_PORT=5432
+        -e DB_NAME=hours_db
+        -e DB_USER=postgres
+        -e DB_PASSWORD=postgres
+        -e JWT_SECRET='v9y$B&E)H@McQfTjWmZq4t7w!z%C*F-JaNdRgUkXp2r5u8x/A?D(G+KbPeShVmYq'
+        -e KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+        -e MONGO_URI=mongodb://mongodb:27017/hours_read_db
+        -e USER_SERVICE_GRPC_HOST=user-service
+        -e USER_SERVICE_GRPC_PORT=9083
+        -e JAVA_TOOL_OPTIONS="-Xmx256m -Xms128m"
+        gdmuzo/hours-service:latest
+
+    - name: Levantar evaluation-service
+      shell: >
+        docker run -d --name evaluation-service
+        --network pasantias-net
+        --restart always
+        -p 8086:8086
+        -e DB_HOST=postgres-db
+        -e DB_PORT=5432
+        -e DB_NAME=evaluation_db
+        -e DB_USER=postgres
+        -e DB_PASSWORD=postgres
+        -e JWT_SECRET='v9y$B&E)H@McQfTjWmZq4t7w!z%C*F-JaNdRgUkXp2r5u8x/A?D(G+KbPeShVmYq'
+        -e USER_SERVICE_GRPC_HOST=user-service
+        -e USER_SERVICE_GRPC_PORT=9083
+        -e JAVA_TOOL_OPTIONS="-Xmx256m -Xms128m"
+        gdmuzo/evaluation-service:latest
+
+    - name: Levantar notification-service
+      shell: >
+        docker run -d --name notification-service
+        --network pasantias-net
+        --restart always
+        -p 8087:8087
+        -e DB_HOST=postgres-db
+        -e DB_PORT=5432
+        -e DB_NAME=notification_db
+        -e DB_USER=postgres
+        -e DB_PASSWORD=postgres
+        -e KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+        -e MQTT_HOST=58567514d2724107bcd88d74e13a8bd8.s1.eu.hivemq.cloud
+        -e MQTT_PORT=8883
+        -e MQTT_USER=mqttuser
+        -e MQTT_PASSWORD=Mqtt2026@
+        -e JAVA_TOOL_OPTIONS="-Xmx256m -Xms128m"
+        gdmuzo/notification-service:latest
+
+    - name: Levantar document-service
+      shell: >
+        docker run -d --name document-service
+        --network pasantias-net
+        --restart always
+        -p 8088:8088
+        -e DB_HOST=postgres-db
+        -e DB_PORT=5432
+        -e DB_NAME=document_db
+        -e DB_USER=postgres
+        -e DB_PASSWORD=postgres
+        -e KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+        -e MONGO_URI=mongodb://mongodb:27017/document_read_db
+        -e S3_BUCKET_NAME=pasantias-documents-qa
+        -e AWS_ACCESS_KEY_ID={{ aws_access_key_id }}
+        -e AWS_SECRET_ACCESS_KEY={{ aws_secret_access_key }}
+        -e AWS_SESSION_TOKEN={{ aws_session_token }}
+        -e JAVA_TOOL_OPTIONS="-Xmx256m -Xms128m"
+        gdmuzo/document-service:latest
+
+    - name: Levantar report-service
+      shell: >
+        docker run -d --name report-service
+        --network pasantias-net
+        --restart always
+        -p 8089:8089
+        -e DB_HOST=postgres-db
+        -e DB_PORT=5432
+        -e DB_NAME=report_db
+        -e DB_USER=postgres
+        -e DB_PASSWORD=postgres
+        -e KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+        -e MONGO_URI=mongodb://mongodb:27017/report_read_db
+        -e DOCUMENT_SERVICE_URL=http://document-service:8088
+        -e JAVA_TOOL_OPTIONS="-Xmx256m -Xms128m"
+        gdmuzo/report-service:latest
+
+    - name: Levantar ai-service
+      shell: >
+        docker run -d --name ai-service
+        --network pasantias-net
+        --restart always
+        -p 8090:8090
+        -e RABBITMQ_HOST=rabbitmq
+        -e RABBITMQ_PORT=5672
+        -e RABBITMQ_USER=guest
+        -e RABBITMQ_PASSWORD=guest
+        gdmuzo/ai-service:latest
+
 
     - name: Levantar gateway-service
       shell: |
@@ -199,6 +482,7 @@
           -e REDIS_HOST=redis \
           -e REDIS_PORT=6379 \
           -e JWT_SECRET='v9y$B&E)H@McQfTjWmZq4t7w!z%C*F-JaNdRgUkXp2r5u8x/A?D(G+KbPeShVmYq' \
+          -e JAVA_TOOL_OPTIONS="-Xmx256m -Xms128m" \
           {{ docker_image_gateway }}
 
     - name: Levantar frontend-web

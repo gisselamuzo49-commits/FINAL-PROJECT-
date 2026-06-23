@@ -23,8 +23,14 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public String register(@RequestBody User user) {
-        return authService.registerUser(user);
+    public ResponseEntity<Map<String, String>> register(@RequestBody Map<String, String> body) {
+        String token = authService.registerUser(
+            body.get("nombre"),
+            body.get("email"), 
+            body.get("password"),
+            body.get("rol")
+        );
+        return ResponseEntity.ok(Map.of("token", token));
     }
 
     @PostMapping("/login")
