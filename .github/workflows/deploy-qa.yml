@@ -10,6 +10,9 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # ═══════════════════════════════════════
+  # JOB 1: detect-changes
+  # ═══════════════════════════════════════
   detect-changes:
     runs-on: ubuntu-latest
     outputs:
@@ -46,33 +49,12 @@ jobs:
             ai: 'apps/ai-service/**'
             infra: 'infra/**'
 
-  deploy:
+  # ═══════════════════════════════════════
+  # JOB 2: test
+  # ═══════════════════════════════════════
+  test:
+    runs-on: ubuntu-latest
     needs: detect-changes
-    runs-on: self-hosted
-
-    services:
-      postgres:
-        image: postgres:15
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: postgres
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
-    env:
-      DB_HOST: localhost
-      DB_PORT: 5432
-      DB_NAME: postgres
-      DB_USER: postgres
-      DB_PASSWORD: postgres
-      JWT_SECRET: ${{ secrets.JWT_SECRET }}
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -161,54 +143,124 @@ jobs:
           pip install -r requirements.txt --user
           python -m pytest test_main.py -v
 
+      - name: Run tests - frontend-web
+        if: needs.detect-changes.outputs.frontend == 'true'
+        run: |
+          cd apps/frontend-web
+          npm install
+          npm test
+
+  # ═══════════════════════════════════════
+  # JOBS 3-14: build-<servicio> (paralelizados)
+  # ═══════════════════════════════════════
+  build-auth:
+    runs-on: ubuntu-latest
+    needs: [detect-changes, test]
+    if: needs.detect-changes.outputs.auth == 'true'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-      - name: Build and push auth-service
-        if: needs.detect-changes.outputs.auth == 'true'
+      - name: Build and push
         uses: docker/build-push-action@v5
         with:
           context: ./apps/auth-service
           push: true
           tags: gdmuzo/auth-service:qa
 
-      - name: Build and push internship-service
-        if: needs.detect-changes.outputs.internship == 'true'
+  build-internship:
+    runs-on: ubuntu-latest
+    needs: [detect-changes, test]
+    if: needs.detect-changes.outputs.internship == 'true'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Build and push
         uses: docker/build-push-action@v5
         with:
           context: ./apps/internship-service
           push: true
           tags: gdmuzo/internship-service:qa
 
-      - name: Build and push user-service
-        if: needs.detect-changes.outputs.user == 'true'
+  build-user:
+    runs-on: ubuntu-latest
+    needs: [detect-changes, test]
+    if: needs.detect-changes.outputs.user == 'true'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Build and push
         uses: docker/build-push-action@v5
         with:
           context: ./apps/user-service
           push: true
           tags: gdmuzo/user-service:qa
 
-      - name: Build and push linkage-service
-        if: needs.detect-changes.outputs.linkage == 'true'
+  build-linkage:
+    runs-on: ubuntu-latest
+    needs: [detect-changes, test]
+    if: needs.detect-changes.outputs.linkage == 'true'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Build and push
         uses: docker/build-push-action@v5
         with:
           context: ./apps/linkage-service
           push: true
           tags: gdmuzo/linkage-service:qa
 
-      - name: Build and push gateway-service
-        if: needs.detect-changes.outputs.gateway == 'true'
+  build-gateway:
+    runs-on: ubuntu-latest
+    needs: [detect-changes, test]
+    if: needs.detect-changes.outputs.gateway == 'true'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Build and push
         uses: docker/build-push-action@v5
         with:
           context: ./apps/gateway-service
           push: true
           tags: gdmuzo/gateway-service:qa
 
-      - name: Build and push frontend-web
-        if: needs.detect-changes.outputs.frontend == 'true'
+  build-frontend:
+    runs-on: ubuntu-latest
+    needs: [detect-changes, test]
+    if: needs.detect-changes.outputs.frontend == 'true'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Build and push
         uses: docker/build-push-action@v5
         with:
           context: ./apps/frontend-web
@@ -216,89 +268,165 @@ jobs:
           tags: gdmuzo/frontend-web:qa
           build-args: |
             VITE_GATEWAY_PORT=8082
-            VITE_API_BASE_URL=http://${{ secrets.QA_AUTH_JOBS_IP }}:8082
 
-      - name: Build and push hours-service
-        if: needs.detect-changes.outputs.hours == 'true'
+  build-hours:
+    runs-on: ubuntu-latest
+    needs: [detect-changes, test]
+    if: needs.detect-changes.outputs.hours == 'true'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Build and push
         uses: docker/build-push-action@v5
         with:
           context: ./apps/hours-service
           push: true
           tags: gdmuzo/hours-service:latest
 
-      - name: Build and push evaluation-service
-        if: needs.detect-changes.outputs.evaluation == 'true'
+  build-evaluation:
+    runs-on: ubuntu-latest
+    needs: [detect-changes, test]
+    if: needs.detect-changes.outputs.evaluation == 'true'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Build and push
         uses: docker/build-push-action@v5
         with:
           context: ./apps/evaluation-service
           push: true
           tags: gdmuzo/evaluation-service:latest
 
-      - name: Build and push notification-service
-        if: needs.detect-changes.outputs.notification == 'true'
+  build-notification:
+    runs-on: ubuntu-latest
+    needs: [detect-changes, test]
+    if: needs.detect-changes.outputs.notification == 'true'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Build and push
         uses: docker/build-push-action@v5
         with:
           context: ./apps/notification-service
           push: true
           tags: gdmuzo/notification-service:latest
 
-      - name: Build and push document-service
-        if: needs.detect-changes.outputs.document == 'true'
+  build-document:
+    runs-on: ubuntu-latest
+    needs: [detect-changes, test]
+    if: needs.detect-changes.outputs.document == 'true'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Build and push
         uses: docker/build-push-action@v5
         with:
           context: ./apps/document-service
           push: true
           tags: gdmuzo/document-service:latest
 
-      - name: Build and push report-service
-        if: needs.detect-changes.outputs.report == 'true'
+  build-report:
+    runs-on: ubuntu-latest
+    needs: [detect-changes, test]
+    if: needs.detect-changes.outputs.report == 'true'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Build and push
         uses: docker/build-push-action@v5
         with:
           context: ./apps/report-service
           push: true
           tags: gdmuzo/report-service:latest
 
-      - name: Build and push ai-service
-        if: needs.detect-changes.outputs.ai == 'true'
+  build-ai:
+    runs-on: ubuntu-latest
+    needs: [detect-changes, test]
+    if: needs.detect-changes.outputs.ai == 'true'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Build and push
         uses: docker/build-push-action@v5
         with:
           context: ./apps/ai-service
           push: true
           tags: gdmuzo/ai-service:latest
 
+  # ═══════════════════════════════════════
+  # JOB 15: deploy (Ejecución en el Bastion self-hosted)
+  # ═══════════════════════════════════════
+  deploy:
+    runs-on: self-hosted
+    needs:
+      - detect-changes
+      - test
+      - build-auth
+      - build-internship
+      - build-user
+      - build-linkage
+      - build-gateway
+      - build-frontend
+      - build-hours
+      - build-evaluation
+      - build-notification
+      - build-document
+      - build-report
+      - build-ai
+    if: |
+      always() &&
+      !contains(needs.*.result, 'failure') &&
+      !contains(needs.*.result, 'cancelled')
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Ansible if missing
+        run: which ansible || pip install ansible --break-system-packages
+
       - name: Create Ansible inventory
         run: |
           echo "[qa_ec2]" > /tmp/qa_inventory.ini
           echo "${{ secrets.QA_AUTH_JOBS_IP }} ansible_user=ubuntu ansible_ssh_private_key_file=~/.ssh/QA.pem ansible_ssh_common_args='-o StrictHostKeyChecking=no'" >> /tmp/qa_inventory.ini
-          cat /tmp/qa_inventory.ini
-
-      - name: Configure Ansible SSH (Local config)
-        run: |
-          printf '[defaults]\nremote_user = ubuntu\nprivate_key_file = ~/.ssh/QA.pem\nhost_key_checking = False\n' > /tmp/ansible.cfg
-          cat /tmp/ansible.cfg
 
       - name: Deploy via Ansible
         run: |
-          echo "=== ANSIBLE_CONFIG ==="
-          echo $ANSIBLE_CONFIG
-          echo "=== ansible.cfg content ==="
-          cat /tmp/ansible.cfg
-          echo "=== inventory content ==="
-          cat /tmp/qa_inventory.ini
-          echo "=== testing ansible connection ==="
-          ANSIBLE_CONFIG=/tmp/ansible.cfg ansible \
+          ansible-playbook infra/ansible/deploy-qa.yml \
             -i /tmp/qa_inventory.ini \
-            all -m ping \
-            -vvv 2>&1 | head -50
-          echo "=== running playbook ==="
-          ANSIBLE_CONFIG=/tmp/ansible.cfg ansible-playbook infra/ansible/deploy-qa.yml \
-            -i /tmp/qa_inventory.ini \
-            -e "aws_access_key_id=${{ secrets.AWS_ACCESS_KEY_ID }}" \
-            -e "aws_secret_access_key=${{ secrets.AWS_SECRET_ACCESS_KEY }}" \
-            -e "aws_session_token=${{ secrets.AWS_SESSION_TOKEN }}" \
-            -e "qa_public_ip=${{ secrets.QA_AUTH_JOBS_IP }}" \
             -e "jwt_secret=${{ secrets.JWT_SECRET }}" \
             -e "pg_password=${{ secrets.PG_PASSWORD }}" \
-            -e "neo4j_password=${{ secrets.NEO4J_PASSWORD }}"
-        env:
-          ANSIBLE_CONFIG: /tmp/ansible.cfg
+            -e "neo4j_password=${{ secrets.NEO4J_PASSWORD }}" \
+            -e "qa_public_ip=${{ secrets.QA_AUTH_JOBS_IP }}" \
+            -e "aws_access_key_id=${{ secrets.AWS_ACCESS_KEY_ID }}" \
+            -e "aws_secret_access_key=${{ secrets.AWS_SECRET_ACCESS_KEY }}" \
+            -e "aws_session_token=${{ secrets.AWS_SESSION_TOKEN }}"
