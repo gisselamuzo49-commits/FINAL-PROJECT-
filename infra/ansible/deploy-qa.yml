@@ -358,6 +358,14 @@
         -e RABBITMQ_DEFAULT_PASS=guest
         rabbitmq:3-management-alpine
 
+    - name: Levantar neo4j
+      shell: >
+        docker run -d --name neo4j
+        --network pasantias-net
+        --restart always
+        -p 7474:7474
+        -p 7687:7687
+        -e NEO4J_AUTH=neo4j/{{ neo4j_password }}
         neo4j:5-community
 
     - name: Levantar mosquitto
