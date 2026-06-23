@@ -426,7 +426,7 @@ jobs:
             -e "jwt_secret=${{ secrets.JWT_SECRET }}" \
             -e "pg_password=${{ secrets.PG_PASSWORD }}" \
             -e "neo4j_password=${{ secrets.NEO4J_PASSWORD }}" \
-            -e "qa_public_ip=${{ secrets.QA_AUTH_JOBS_IP }}" \
+            -e "qa_public_ip=${{ secrets.QA_PUBLIC_IP }}" \
             -e "aws_access_key_id=${{ secrets.AWS_ACCESS_KEY_ID }}" \
             -e "aws_secret_access_key=${{ secrets.AWS_SECRET_ACCESS_KEY }}" \
             -e "aws_session_token=${{ secrets.AWS_SESSION_TOKEN }}"
