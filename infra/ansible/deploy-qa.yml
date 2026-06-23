@@ -78,7 +78,9 @@
       shell: |
         docker system prune -af --volumes || true
         journalctl --vacuum-size=50M || true
-        rm -rf /tmp/* || true
+        find /tmp -maxdepth 1 -type f -mmin +60 -delete 2>/dev/null || true
+        find /tmp -maxdepth 1 -type d -name "tmp*" -mmin +60 \
+          ! -name "ansible*" -exec rm -rf {} + 2>/dev/null || true
         df -h
       register: disk_space_after
       changed_when: false
