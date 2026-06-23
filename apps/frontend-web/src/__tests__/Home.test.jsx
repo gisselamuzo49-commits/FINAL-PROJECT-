@@ -9,8 +9,6 @@ vi.mock('react-router-dom', async (importOriginal) => {
   return {
     ...actual,
     useOutletContext: () => ({
-      userProfile: { id: "1", firstName: "Ana", lastName: "Torres", role: "ESTUDIANTE" },
-      estudianteId: "1",
       getHeaders: () => ({ 'Content-Type': 'application/json' }),
       logout: vi.fn(),
     }),
@@ -24,7 +22,7 @@ describe('Home.jsx Dashboard Panels', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     localStorage.clear();
-    localStorage.setItem('token', 'header.eyJub21icmUiOiJBbmEgVG9ycmVzIiwicm9sIjoiRVNUVURJQU5URSJ9.signature');
+    localStorage.setItem('token', 'header.eyJub21icmUiOiJBbmEgVG9ycmVzIiwicm9sIjoiRVNUVURJQU5URSIsImlkIjoiMSIsInN1YiI6InRlc3RAdWNlLmVkdS5lYyJ9.signature');
 
     mockFetch.mockImplementation((url) => {
       if (url.includes('/api/hours/student/1')) {

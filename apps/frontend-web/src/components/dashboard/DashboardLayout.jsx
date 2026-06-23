@@ -8,8 +8,16 @@ function DashboardLayout() {
   const navigate = useNavigate();
 
   const API = import.meta.env.VITE_API_BASE_URL || 'http://18.232.199.190:8082';
-  const API_URL = `http://${window.location.hostname}`;
-  const GATEWAY_PORT = import.meta.env.VITE_GATEWAY_PORT || "8082";
+
+  // --- JWT-based user data ---
+  const token = localStorage.getItem('token');
+  let jwtPayload = {};
+  if (token && token.split('.').length === 3) {
+    try { jwtPayload = JSON.parse(atob(token.split('.')[1])); }
+    catch { /* ignore */ }
+  }
+  const jwtNombre = jwtPayload.nombre || jwtPayload.name || jwtPayload.firstName || null;
+  const jwtId = jwtPayload.id || jwtPayload.userId || jwtPayload.sub;
 
   const getHeaders = () => {
     const token = localStorage.getItem("token");
@@ -20,23 +28,30 @@ function DashboardLayout() {
     return headers;
   };
 
-  const [userProfile, setUserProfile] = useState(null);
-  const userEmail = localStorage.getItem("userEmail");
+  // --- Notification count from backend ---
+  const [notificationCount, setNotificationCount] = useState(0);
 
   useEffect(() => {
-    if (!userEmail) return;
-    fetch(`${API}/api/users/email/${userEmail}`, { headers: getHeaders() })
-      .then(res => res.ok ? res.json() : null)
-      .then(data => setUserProfile(data))
-      .catch(() => setUserProfile(null));
+    if (!jwtId) return;
+    fetch(`${API}/api/notifications/student/${jwtId}`, { headers: getHeaders() })
+      .then(res => {
+        if (!res.ok) return [];
+        return res.json();
+      })
+      .then(data => {
+        const unread = Array.isArray(data) ? data.filter(n => !n.leida).length : 0;
+        setNotificationCount(unread);
+      })
+      .catch(() => setNotificationCount(0));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userEmail]);
+  }, [jwtId]);
 
   const user = {
-    nombre: userProfile ? `${userProfile.firstName} ${userProfile.lastName}` : (localStorage.getItem("userEmail") || "Estudiante UCE"),
-    rol: userProfile?.role || "Estudiante Académico",
-    avatarUrl: null,
-    userProfile
+    nombre: jwtNombre
+      || localStorage.getItem("userEmail")
+      || 'Usuario UCE',
+    rol: (jwtPayload.rol || jwtPayload.role || 'Estudiante'),
+    avatarUrl: null
   };
 
   const handleLogout = () => {
@@ -61,14 +76,14 @@ function DashboardLayout() {
         {/* Header */}
         <Header 
           onMenuClick={() => setSidebarOpen(true)} 
-          notificationCount={3} // Mock notification count
+          notificationCount={notificationCount}
         />
 
         {/* Scrollable content area */}
         <main className="flex-1 overflow-y-auto p-6 flex flex-col">
           {/* Main content page injected here */}
           <div className="flex-grow">
-            <Outlet context={{ API_URL, GATEWAY_PORT, getHeaders, logout: handleLogout, userProfile, estudianteId: userProfile?.id }} />
+            <Outlet context={{ getHeaders, logout: handleLogout }} />
           </div>
 
           {/* Footer */}

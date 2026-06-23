@@ -3,8 +3,18 @@ import { useState, useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
 
 function Reports() {
-  const { getHeaders, logout, estudianteId, userProfile } = useOutletContext();
+  const { getHeaders, logout } = useOutletContext();
   const API = import.meta.env.VITE_API_BASE_URL || 'http://18.232.199.190:8082';
+
+  const token = localStorage.getItem('token');
+  let payload = {};
+  if (token && token.split('.').length === 3) {
+    try { payload = JSON.parse(atob(token.split('.')[1])); }
+    catch (e) { console.error('JWT decode error:', e); }
+  }
+  const estudianteId = payload.id || payload.userId || payload.sub;
+  const userRol = (payload.rol || payload.role || '').toUpperCase();
+  const isAcademicStaff = userRol.includes('TUTOR') || userRol.includes('COORDINADOR') || userRol.includes('ADMIN');
 
   // --- States ---
   const [studentReport, setStudentReport] = useState(null);
@@ -18,8 +28,6 @@ function Reports() {
   
   const [reportType, setReportType] = useState("horas");
   const [bannerMessage, setBannerMessage] = useState(null);
-
-  const isAcademicStaff = userProfile?.role === 'COORDINATOR' || userProfile?.role === 'TUTOR';
 
   // --- API Fetch ---
   const cargarReporteEstudiante = () => {
@@ -71,7 +79,7 @@ function Reports() {
       cargarReporteGlobal();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [estudianteId, userProfile]);
+  }, [estudianteId]);
 
   const handleGenerateReport = (e) => {
     e.preventDefault();
@@ -229,9 +237,9 @@ function Reports() {
                   </thead>
                   <tbody>
                     <tr className="border-b border-gray-50 hover:bg-gray-50/50 transition-colors">
-                      <td className="py-4 px-2 font-mono font-semibold text-gray-900">REP-{globalReport.id.toUpperCase()}</td>
+                      <td className="py-4 px-2 font-mono font-semibold text-gray-900">REP-{globalReport.id ? globalReport.id.toUpperCase() : 'N/A'}</td>
                       <td className="py-4 px-2 font-medium text-gray-800">
-                        Consolidado General ({globalReport.totalEstudiantes} estudiantes, {globalReport.totalHorasValidadas}h validadas)
+                        Consolidado General ({globalReport.totalEstudiantes || 0} estudiantes, {globalReport.totalHorasValidadas || 0}h validadas)
                       </td>
                       <td className="py-4 px-2 text-gray-500">{formatFecha(globalReport.ultimaActualizacion)}</td>
                       <td className="py-4 px-2">

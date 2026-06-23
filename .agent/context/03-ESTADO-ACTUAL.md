@@ -379,3 +379,11 @@ Y se aplicaron las siguientes correcciones adicionales:
   - Se implementó un matching de rol flexible en `Sidebar.jsx` tolerando prefijos/sufijos mediante `includes()` sobre `rol/role/authorities/authority`.
   - Se actualizó `Home.jsx` para resolver de forma flexible el nombre (`nombre/name/firstName/fullName/username`) sin usar `payload.sub` como fallback, ocultando el sufijo del nombre si no se encuentra presente en el token.
   - Se integró la sección de registro de usuarios en `Login.jsx` con campos para nombre, email (validando dominio institucional `@uce.edu.ec`), contraseña, confirmación de contraseña, y selector de rol, comunicando exitosamente con el backend mediante `POST /api/auth/register` y mostrando estados de error y éxito.
+  - **Refactorización Completa de JWT y Consistencia en Páginas (Sesión 23/Jun):**
+    - Se aplicó el patrón estándar en todas las páginas (`Home.jsx`, `Reports.jsx`, `MyApplications.jsx`, `Recommendations.jsx`), de modo que extraen `estudianteId`, `userRol`, y `nombre` decodificando directamente el JWT del `localStorage`. El `useOutletContext` ahora provee exclusivamente `getHeaders` y `logout`.
+    - Se resolvió el bug de "Cargando perfil..." infinito al desacoplar las páginas de la respuesta del `user-service`. Si el usuario no tiene una sesión válida, se muestra un mensaje de error y redirección limpia.
+    - Se eliminó el código muerto `App.jsx` y `App.css` del frontend.
+    - Se actualizó `ProtectedRoute.jsx` para validar la expiración del token JWT (`exp` claim) redireccionando a `/login` si ha expirado o está dañado.
+    - Se corrigieron los selectores del formulario de registro en `Login.jsx` para mandar los valores del rol en mayúscula (`ESTUDIANTE`, `TUTOR`, `COORDINADOR`) alineados con el enum `Role.java` de Spring Boot.
+    - Se ajustaron los mocks y payloads de JWT en los tests unitarios (`Home.test.jsx`, `Reports.test.jsx`, `AppRouter.test.jsx`), logrando que el 100% de la suite de pruebas pase exitosamente (`npm run build` y `vitest` en verde).
+

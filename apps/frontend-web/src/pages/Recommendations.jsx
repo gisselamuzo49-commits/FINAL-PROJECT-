@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
 
 function Recommendations() {
-  const { getHeaders, logout, userProfile } = useOutletContext();
+  const { getHeaders, logout } = useOutletContext();
   const API = import.meta.env.VITE_API_BASE_URL || 'http://18.232.199.190:8082';
 
   const token = localStorage.getItem('token');
@@ -21,7 +21,7 @@ function Recommendations() {
 
   const [internships, setInternships] = useState([]);
   const [loadingInternships, setLoadingInternships] = useState(true);
-  const [perfilTexto, setPerfilTexto] = useState("");
+  const [perfilTexto, setPerfilTexto] = useState("Estudiante interesado en realizar mis prácticas preprofesionales desarrollando proyectos en mi área de estudio.");
   
   // Recommender states
   const [recommendations, setRecommendations] = useState([]);
@@ -51,14 +51,7 @@ function Recommendations() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Prepopulate profile text based on userProfile when it is loaded
-  useEffect(() => {
-    if (userProfile && userProfile.carrera) {
-      Promise.resolve().then(() => {
-        setPerfilTexto(`Estudiante de la carrera de ${userProfile.carrera}. Interesado en realizar mis prácticas preprofesionales desarrollando proyectos en mi área de estudio.`);
-      });
-    }
-  }, [userProfile]);
+
 
   const obtenerRecomendaciones = (e) => {
     e.preventDefault();

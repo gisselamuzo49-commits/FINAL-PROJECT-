@@ -3,26 +3,32 @@ import { useState, useEffect } from 'react';
 import { Link, useOutletContext } from 'react-router-dom';
 
 function Home() {
-  const { userProfile, estudianteId, getHeaders, logout } = useOutletContext();
+  const { getHeaders, logout } = useOutletContext();
   const API = import.meta.env.VITE_API_BASE_URL || 'http://18.232.199.190:8082';
 
+  // --- JWT-based user data ---
+  const token = localStorage.getItem('token');
+  let jwtPayload = {};
+  if (token && token.split('.').length === 3) {
+    try { jwtPayload = JSON.parse(atob(token.split('.')[1])); }
+    catch (e) { console.error('JWT decode error:', e); }
+  }
+  const estudianteId = jwtPayload.id || jwtPayload.userId || jwtPayload.sub;
+  const nombre = jwtPayload.nombre || jwtPayload.name || jwtPayload.firstName || jwtPayload.fullName || jwtPayload.username;
+
   // --- PANEL States ---
-  // Panel 2: Hours Summary
   const [hoursSummary, setHoursSummary] = useState(null);
   const [loadingHours, setLoadingHours] = useState(true);
   const [errorHours, setErrorHours] = useState(null);
 
-  // Panel 3: Active Internship
   const [activeInternship, setActiveInternship] = useState(null);
   const [loadingInternship, setLoadingInternship] = useState(true);
   const [errorInternship, setErrorInternship] = useState(null);
 
-  // Panel 4: Notifications
   const [notifications, setNotifications] = useState([]);
   const [loadingNotifications, setLoadingNotifications] = useState(true);
   const [errorNotifications, setErrorNotifications] = useState(null);
 
-  // Panel 5: AI Recommendation
   const [recommendedOffer, setRecommendedOffer] = useState(null);
   const [recommendedScore, setRecommendedScore] = useState(null);
   const [loadingAI, setLoadingAI] = useState(true);
@@ -36,14 +42,6 @@ function Home() {
     month: 'long',
     day: 'numeric'
   });
-
-  const token = localStorage.getItem('token');
-  const payload = token && token.split('.').length === 3 ? JSON.parse(atob(token.split('.')[1])) : {};
-  const nombre = payload.nombre 
-    || payload.name 
-    || payload.firstName
-    || payload.fullName
-    || payload.username;
 
   // --- API CALLS ---
   // Load Hours Summary
@@ -129,7 +127,7 @@ function Home() {
         }
 
         // 2. Build recommend payload
-        const carrera = userProfile?.carrera || "Ingeniería";
+        const carrera = "Ingeniería";
         const payload = {
           estudianteId: String(id),
           perfil: `Estudiante de la carrera de ${carrera}. Interesado en realizar mis prácticas preprofesionales desarrollando proyectos en mi área de estudio.`,
@@ -189,7 +187,7 @@ function Home() {
       setLoadingAI(true);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [estudianteId, userProfile]);
+  }, [estudianteId]);
 
   // Donut chart calculations
   const totalRequiredHours = 240;
