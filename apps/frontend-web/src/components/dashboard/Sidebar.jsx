@@ -73,14 +73,17 @@ function Sidebar({ user = {}, onLogout, isOpen, onClose }) {
                 <NavLink to="/internships" className={subNavLinkClass} end>
                   <span>Ofertas</span>
                 </NavLink>
-                {(isEstudiante || isCoordinador) && (
-                  <NavLink to="/internships/applications" className={subNavLinkClass}>
-                    <span>Mis Postulaciones</span>
-                  </NavLink>
-                )}
               </div>
             )}
           </div>
+        )}
+
+        {/* Mis Postulaciones */}
+        {(isEstudiante || isCoordinador) && (
+          <NavLink to="/internships/applications" className={navLinkClass}>
+            <span className="mr-3 text-base">📋</span>
+            <span>Mis Postulaciones</span>
+          </NavLink>
         )}
 
         {/* Vinculación Dropdown */}
