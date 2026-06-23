@@ -8,12 +8,15 @@ function Sidebar({ user = {}, onLogout, isOpen, onClose }) {
 
   const token = localStorage.getItem('token');
   const payload = token && token.split('.').length === 3 ? JSON.parse(atob(token.split('.')[1])) : {};
-  const rol = payload.rol || payload.role || '';
+  const rol = (payload.rol 
+    || payload.role 
+    || payload.authorities 
+    || payload.authority 
+    || '').toString().toUpperCase();
 
-  const r = (rol || '').toUpperCase();
-  const isEstudiante = r === 'ESTUDIANTE';
-  const isTutor = r === 'TUTOR';
-  const isCoordinador = r === 'COORDINADOR';
+  const isEstudiante = rol.includes('ESTUDIANTE');
+  const isTutor = rol.includes('TUTOR');
+  const isCoordinador = rol.includes('COORDINADOR') || rol.includes('ADMIN');
 
   const getInitials = (name) => {
     if (!name) return 'U';
