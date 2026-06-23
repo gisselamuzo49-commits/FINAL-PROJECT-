@@ -3,7 +3,7 @@ import { useOutletContext } from 'react-router-dom';
 
 function Linkage() {
   const { getHeaders, logout } = useOutletContext();
-  const API = import.meta.env.VITE_API_BASE_URL || `http://${window.location.hostname}:8082`;
+  const API = import.meta.env.VITE_API_BASE_URL || `http://${window.location.hostname}`;
   const [projects, setProjects] = useState([]);
   const [mensajeProjects, setMensajeProjects] = useState(null);
 

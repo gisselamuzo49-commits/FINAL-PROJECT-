@@ -4,7 +4,7 @@ import { Link, useOutletContext } from 'react-router-dom';
 
 function Home() {
   const { getHeaders, logout } = useOutletContext();
-  const API = import.meta.env.VITE_API_BASE_URL || `http://${window.location.hostname}:8082`;
+  const API = import.meta.env.VITE_API_BASE_URL || `http://${window.location.hostname}`;
 
   // --- JWT-based user data ---
   const token = localStorage.getItem('token');

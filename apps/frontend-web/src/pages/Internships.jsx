@@ -3,7 +3,7 @@ import { useOutletContext } from 'react-router-dom';
 
 function Internships() {
   const { getHeaders, logout } = useOutletContext();
-  const API = import.meta.env.VITE_API_BASE_URL || `http://${window.location.hostname}:8082`;
+  const API = import.meta.env.VITE_API_BASE_URL || `http://${window.location.hostname}`;
   const [pasantias, setPasantias] = useState([]);
   const [mensajePasantias, setMensajePasantias] = useState(null);
   

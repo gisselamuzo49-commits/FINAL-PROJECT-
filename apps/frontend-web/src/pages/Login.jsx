@@ -29,7 +29,7 @@ function Login() {
   const handleSubmit = (e) => {
     e.preventDefault();
     setError(null);
-    const API = import.meta.env.VITE_API_BASE_URL || `http://${window.location.hostname}:8082`;
+    const API = import.meta.env.VITE_API_BASE_URL || `http://${window.location.hostname}`;
     fetch(`${API}/api/auth/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -64,7 +64,7 @@ function Login() {
       return;
     }
 
-    const API = import.meta.env.VITE_API_BASE_URL || `http://${window.location.hostname}:8082`;
+    const API = import.meta.env.VITE_API_BASE_URL || `http://${window.location.hostname}`;
     fetch(`${API}/api/auth/register`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
