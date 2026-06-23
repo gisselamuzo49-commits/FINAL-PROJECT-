@@ -65,17 +65,17 @@ en el `docker run`. Misma idea aplicaría a `DB_PASSWORD`. No bloqueante para ho
 ## ✅ RESUELTO — `qa_auth_jobs` con IP pública (Cloudflare/Excel, 15/jun)
 
 `qa_auth_jobs` movida de `private_1a` (10.0.3.0/24) a `public_1a` (10.0.1.0/24),
-con EIP fija **`18.232.199.190`** y puertos 80/8082 abiertos en `sg_private`.
-Nueva IP privada: `10.0.1.61` (era `10.0.3.95`). `QA_AUTH_JOBS_IP` actualizado en
+con EIP fija **`32.193.25.6`** y puertos 80/8082 abiertos en `sg_private`.
+Nueva IP privada: `10.0.1.170` (era `10.0.1.61`). `QA_AUTH_JOBS_IP` actualizado en
 GitHub Secrets.- Deploy vía Ansible re-ejecutado, pipeline verde. Verificado en `t3.large` con swap de 4GB (21/jun):
-  - `http://18.232.199.190` (Frontend) → `200 OK`, frontend React cargando.
-  - `http://18.232.199.190:8082/api/linkage/health` (Linkage via GW) → `200 OK`, `"linkage-service is running"`.
-  - `http://18.232.199.190:8082/api/evaluation/health` (Evaluation via GW) → `200 OK`, `"evaluation-service is running"`.
-  - `http://18.232.199.190:8082/api/hours/health` (Hours via GW) → Retornaba `404` por conflicto de orden de rutas en `gateway-service` (la ruta comodín `/api/hours/**` consumía `/api/hours/health`). Se corrigió el orden de rutas en `application.yml` localmente y se commiteó para el próximo despliegue. Internamente en puerto 8085 retorna `200 OK` `"hours-service is running"`.
+  - `http://32.193.25.6` (Frontend) → `200 OK`, frontend React cargando.
+  - `http://32.193.25.6:8082/api/linkage/health` (Linkage via GW) → `200 OK`, `"linkage-service is running"`.
+  - `http://32.193.25.6:8082/api/evaluation/health` (Evaluation via GW) → `200 OK`, `"evaluation-service is running"`.
+  - `http://32.193.25.6:8082/api/hours/health` (Hours via GW) → Retornaba `404` por conflicto de orden de rutas en `gateway-service` (la ruta comodín `/api/hours/**` consumía `/api/hours/health`). Se corrigió el orden de rutas en `application.yml` localmente y se commiteó para el próximo despliegue. Internamente en puerto 8085 retorna `200 OK` `"hours-service is running"`.
   - Servicios internos (`notification-service` en 8087, `document-service` en 8088, `report-service` en 8089, `ai-service` en 8090) confirmados y respondiendo `200 OK` internamente (bloqueados externamente por Security Group como debe ser).
 
 Excel de Cloudflare llenado:
-- **QA IP1** → `18.232.199.190`
+- **QA IP1** → `32.193.25.6`
 - **PRODUCCION IP** → `pasantias-prod-elb-115885246.us-east-1.elb.amazonaws.com`
 
 Cuando la cátedra asigne los subdominios `*.distribuidauce.org`, actualizar
@@ -83,13 +83,13 @@ Cuando la cátedra asigne los subdominios `*.distribuidauce.org`, actualizar
 el README principal y en la sección 6 del documento de entrega.
 
 The bastion de QA (`pasantias-qa-bastion`) ahora tiene una Elastic IP fija:
-**`3.225.171.116`** (igual que PROD). Se agregó `aws_eip.bastion_eip` a
+**`50.19.247.85`** (igual que PROD). Se agregó `aws_eip.bastion_eip` a
 `infra/qa/main.tf` (mismo patrón que PROD) + `lifecycle { ignore_changes = [ami] }` en
 `aws_instance.bastion` de **ambos** `infra/qa/main.tf` e `infra/prod/main.tf` (bug
 latente preexistente: sin esto, cualquier `plan`/`apply` futuro reemplazaría el bastion
 por completo cada vez que Canonical publica una nueva build de la AMI Ubuntu 24.04).
 `terraform apply` aplicado en QA (cuenta #2), limpio, sin destrucción de recursos.
-`QA_BASTION_IP` actualizado en GitHub Secrets a `3.225.171.116` — **no debería volver a
+`QA_BASTION_IP` actualizado en GitHub Secrets a `50.19.247.85` — **no debería volver a
 cambiar entre sesiones de AWS Academy**.
 
 1. ~~Verificar `QA_BASTION_IP` en GitHub Secrets~~ ✅ RESUELTO PERMANENTEMENTE (ver
