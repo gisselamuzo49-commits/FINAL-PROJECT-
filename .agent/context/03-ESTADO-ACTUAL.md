@@ -3,7 +3,7 @@
 > **Este archivo se actualiza al final de cada sesión de trabajo.** Es el primer lugar
 > donde el agente debe mirar para saber "¿dónde quedamos?".
 
-_Última actualización: 2026-06-12 (verificación contra REPORTE-ESTADO.md generado por Antigravity)_
+_Última actualización: 2026-06-23 (Rediseño del Frontend completado)_
 
 ## ✅ Completado / Verificado
 
@@ -27,6 +27,11 @@ _Última actualización: 2026-06-12 (verificación contra REPORTE-ESTADO.md gene
   tenga tanto `auth.db` como `linkage.db`). No es un error que requiera limpieza
   inmediata, pero conviene agregar `*.db` a `.gitignore` global para que estos archivos
   de plantilla no terminen versionados por accidente.
+
+## ✅ RESUELTO — Error 'no space left on device' en QA (22/jun)
+
+- Modificado `infra/ansible/deploy-qa.yml` para agregar la tarea "Limpieza agresiva de disco antes de pulls". Esta tarea ejecuta de forma previa a los pulls de imágenes un `docker system prune -af --volumes`, `journalctl --vacuum-size=50M` y `rm -rf /tmp/*`, registrando y mostrando el estado del espacio disponible en disco mediante `df -h`.
+- Optimizado el `Dockerfile` de `ai-service` para usar `python:3.11-slim`, usar caché desactivado en `pip install --no-cache-dir` y realizar limpieza de caché al final (`apt-get clean && rm -rf /var/lib/apt/lists/* /root/.cache`).
 
 ## ✅ RESUELTO — Limpieza de `frontend-web`
 
@@ -353,3 +358,12 @@ ruido de las otras dos PRs.
 
 Después de esto (si hay tiempo): continuar con `notification-service` (Semana 2,
 diseño por etapas).
+
+## ✅ COMPLETADO — Rediseño del Frontend (feature/frontend-redesign-v2)
+
+Se implementaron con éxito las 5 tareas de rediseño e integración del frontend en `apps/frontend-web/src/`:
+1. **AppRouter activado:** Reemplazado `src/main.jsx` para instanciar `AppRouter` como punto de entrada de la aplicación.
+2. **Dashboard de Home.jsx rediseñado:** Panel de control con 5 paneles autónomos (Header, Donut Chart de Horas en SVG puro, Pasantía activa, Últimas notificaciones y Recomendación de IA), cada uno con manejos independientes de carga (esqueleto) y errores.
+3. **Página de Reportes (Reports.jsx) creada:** Muestra el historial consolidado de horas del estudiante (`/api/reports/student/{id}`) y el reporte global consolidado para docentes/coordinadores (`/api/reports/global` de MongoDB). Botón "Generar Reporte" y selector con mensaje correspondiente.
+4. **Ruta de /reports registrada:** Configurada la subruta en `AppRouter.jsx` bajo el layout principal `DashboardLayout`.
+5. **Unificación de URLs de API:** Modificadas todas las páginas de `pages/` y `DashboardLayout.jsx` para usar la URL base unificada mediante `import.meta.env.VITE_API_BASE_URL || 'http://18.232.199.190:8082'`. Creado el archivo `.env.production` en `apps/frontend-web/` con la misma URL del gateway.

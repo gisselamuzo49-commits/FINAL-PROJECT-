@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
 
 function Recommendations() {
-  const { API_URL, GATEWAY_PORT, getHeaders, logout, estudianteId, userProfile } = useOutletContext();
+  const { getHeaders, logout, estudianteId, userProfile } = useOutletContext();
+  const API = import.meta.env.VITE_API_BASE_URL || 'http://18.232.199.190:8082';
 
   const [internships, setInternships] = useState([]);
   const [loadingInternships, setLoadingInternships] = useState(true);
@@ -15,7 +16,7 @@ function Recommendations() {
 
   // Load internships on mount
   const cargarPasantias = () => {
-    fetch(`${API_URL}:${GATEWAY_PORT}/api/internships`, { headers: getHeaders() })
+    fetch(`${API}/api/internships`, { headers: getHeaders() })
       .then(response => {
         if (response.status === 401) { logout(); throw new Error("Sesión expirada"); }
         if (!response.ok) throw new Error("Error al cargar las ofertas de pasantía");
@@ -65,7 +66,7 @@ function Recommendations() {
       }))
     };
 
-    fetch(`${API_URL}:${GATEWAY_PORT}/api/ai/recommend`, {
+    fetch(`${API}/api/ai/recommend`, {
       method: "POST",
       headers: getHeaders(),
       body: JSON.stringify(payload)

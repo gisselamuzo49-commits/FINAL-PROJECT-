@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
 
 function Linkage() {
-  const { API_URL, GATEWAY_PORT, getHeaders, logout } = useOutletContext();
+  const { getHeaders, logout } = useOutletContext();
+  const API = import.meta.env.VITE_API_BASE_URL || 'http://18.232.199.190:8082';
   const [projects, setProjects] = useState([]);
   const [mensajeProjects, setMensajeProjects] = useState(null);
 
@@ -13,7 +14,7 @@ function Linkage() {
   const [projectStatus, setProjectStatus] = useState("PLANNED");
 
   const cargarProyectos = () => {
-    fetch(`${API_URL}:${GATEWAY_PORT}/api/linkage`, { headers: getHeaders() })
+    fetch(`${API}/api/linkage`, { headers: getHeaders() })
       .then(response => {
         if (response.status === 401) { logout(); throw new Error("Sesión expirada"); }
         if (!response.ok) throw new Error("Error al conectar con Linkage-Service");
@@ -26,7 +27,7 @@ function Linkage() {
   const registrarProyecto = (e) => {
     e.preventDefault();
     setMensajeProjects(null);
-    fetch(`${API_URL}:${GATEWAY_PORT}/api/linkage`, {
+    fetch(`${API}/api/linkage`, {
       method: "POST",
       headers: getHeaders(),
       body: JSON.stringify({ name: projectName, description: projectDesc, institution, status: projectStatus })
