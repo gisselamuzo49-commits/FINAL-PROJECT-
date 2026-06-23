@@ -41,8 +41,9 @@ function Home() {
   const payload = token && token.split('.').length === 3 ? JSON.parse(atob(token.split('.')[1])) : {};
   const nombre = payload.nombre 
     || payload.name 
-    || payload.sub  // fallback al email si no hay nombre
-    || 'Usuario';
+    || payload.firstName
+    || payload.fullName
+    || payload.username;
 
   // --- API CALLS ---
   // Load Hours Summary
@@ -206,7 +207,7 @@ function Home() {
       <div className="bg-gradient-to-r from-[var(--color-navy-dark)] to-indigo-950 rounded-2xl shadow-sm border border-gray-100 p-6 text-white flex flex-col md:flex-row justify-between items-start md:items-center space-y-2 md:space-y-0">
         <div>
           <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-white" style={{ color: '#FFFFFF', textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}>
-            Bienvenido/a, {nombre}
+            Bienvenido/a{nombre ? `, ${nombre}` : ''}
           </h1>
           <p className="text-gray-300 text-sm mt-1">
             Sistema Inteligente de Gestión de Pasantías y Vinculación
