@@ -71,6 +71,31 @@
               done
           fi
 
+          psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "postgres" <<-'EOSQL'
+              \c auth_db;
+              
+              CREATE TABLE IF NOT EXISTS users (
+                id BIGSERIAL PRIMARY KEY,
+                email VARCHAR(255) NOT NULL UNIQUE,
+                password VARCHAR(255) NOT NULL,
+                nombre VARCHAR(255) NOT NULL,
+                rol VARCHAR(50) NOT NULL DEFAULT 'ESTUDIANTE'
+              );
+              
+              INSERT INTO users (nombre, email, password, rol) VALUES
+                ('Estudiante Test', 'estudiante@uce.edu.ec', 
+                 '$2a$10$1b.WUFZVb/vY4mIlKavCEOTlflS9/jFW.POQBFZ3m8wbbhUmoFuRG', 
+                 'ESTUDIANTE'),
+                ('Tutor Test', 'tutor@uce.edu.ec', 
+                 '$2a$10$1b.WUFZVb/vY4mIlKavCEOTlflS9/jFW.POQBFZ3m8wbbhUmoFuRG', 
+                 'TUTOR'),
+                ('Coordinador Test', 'coordinador@uce.edu.ec', 
+                 '$2a$10$1b.WUFZVb/vY4mIlKavCEOTlflS9/jFW.POQBFZ3m8wbbhUmoFuRG', 
+                 'COORDINADOR')
+              ON CONFLICT (email) DO NOTHING;
+          EOSQL
+
+
     - name: Limpieza agresiva de disco antes de pulls
       shell: |
         docker container prune -f || true
