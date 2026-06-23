@@ -6,6 +6,15 @@ function Sidebar({ user = {}, onLogout, isOpen, onClose }) {
   const [internshipsOpen, setInternshipsOpen] = useState(false);
   const [linkageOpen, setLinkageOpen] = useState(false);
 
+  const token = localStorage.getItem('token');
+  const payload = token && token.split('.').length === 3 ? JSON.parse(atob(token.split('.')[1])) : {};
+  const rol = payload.rol || payload.role || '';
+
+  const r = (rol || '').toUpperCase();
+  const isEstudiante = r === 'ESTUDIANTE';
+  const isTutor = r === 'TUTOR';
+  const isCoordinador = r === 'COORDINADOR';
+
   const getInitials = (name) => {
     if (!name) return 'U';
     const parts = name.split(' ');
@@ -45,95 +54,126 @@ function Sidebar({ user = {}, onLogout, isOpen, onClose }) {
         </NavLink>
 
         {/* Pasantías Dropdown */}
-        <div>
-          <button
-            onClick={() => setInternshipsOpen(!internshipsOpen)}
-            className="w-full flex items-center justify-between px-4 py-2.5 text-sm font-medium text-gray-300 rounded-lg hover:bg-white/10 hover:text-white transition-colors focus:outline-none"
-          >
-            <div className="flex items-center">
-              <span className="mr-3 text-base">💼</span>
-              <span>Pasantías</span>
-            </div>
-            <span className={`text-xs transition-transform duration-200 ${internshipsOpen ? 'rotate-90' : ''}`}>
-              ▶
-            </span>
-          </button>
-          {internshipsOpen && (
-            <div className="mt-1 space-y-1 pl-2">
-              <NavLink to="/internships" className={subNavLinkClass} end>
-                <span>Ofertas</span>
-              </NavLink>
-              <NavLink to="/internships/applications" className={subNavLinkClass}>
-                <span>Mis Postulaciones</span>
-              </NavLink>
-            </div>
-          )}
-        </div>
+        {(isEstudiante || isTutor || isCoordinador) && (
+          <div>
+            <button
+              onClick={() => setInternshipsOpen(!internshipsOpen)}
+              className="w-full flex items-center justify-between px-4 py-2.5 text-sm font-medium text-gray-300 rounded-lg hover:bg-white/10 hover:text-white transition-colors focus:outline-none"
+            >
+              <div className="flex items-center">
+                <span className="mr-3 text-base">💼</span>
+                <span>Pasantías</span>
+              </div>
+              <span className={`text-xs transition-transform duration-200 ${internshipsOpen ? 'rotate-90' : ''}`}>
+                ▶
+              </span>
+            </button>
+            {internshipsOpen && (
+              <div className="mt-1 space-y-1 pl-2">
+                <NavLink to="/internships" className={subNavLinkClass} end>
+                  <span>Ofertas</span>
+                </NavLink>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Mis Postulaciones */}
+        {(isEstudiante || isCoordinador) && (
+          <NavLink to="/internships/applications" className={navLinkClass}>
+            <span className="mr-3 text-base">📋</span>
+            <span>Mis Postulaciones</span>
+          </NavLink>
+        )}
 
         {/* Vinculación Dropdown */}
-        <div>
-          <button
-            onClick={() => setLinkageOpen(!linkageOpen)}
-            className="w-full flex items-center justify-between px-4 py-2.5 text-sm font-medium text-gray-300 rounded-lg hover:bg-white/10 hover:text-white transition-colors focus:outline-none"
-          >
-            <div className="flex items-center">
-              <span className="mr-3 text-base">🔗</span>
-              <span>Vinculación</span>
-            </div>
-            <span className={`text-xs transition-transform duration-200 ${linkageOpen ? 'rotate-90' : ''}`}>
-              ▶
-            </span>
-          </button>
-          {linkageOpen && (
-            <div className="mt-1 space-y-1 pl-2">
-              <NavLink to="/linkage" className={subNavLinkClass}>
-                <span>Proyectos</span>
-              </NavLink>
-            </div>
-          )}
-        </div>
+        {(isEstudiante || isTutor || isCoordinador) && (
+          <div>
+            <button
+              onClick={() => setLinkageOpen(!linkageOpen)}
+              className="w-full flex items-center justify-between px-4 py-2.5 text-sm font-medium text-gray-300 rounded-lg hover:bg-white/10 hover:text-white transition-colors focus:outline-none"
+            >
+              <div className="flex items-center">
+                <span className="mr-3 text-base">🔗</span>
+                <span>Vinculación</span>
+              </div>
+              <span className={`text-xs transition-transform duration-200 ${linkageOpen ? 'rotate-90' : ''}`}>
+                ▶
+              </span>
+            </button>
+            {linkageOpen && (
+              <div className="mt-1 space-y-1 pl-2">
+                <NavLink to="/linkage" className={subNavLinkClass}>
+                  <span>Proyectos</span>
+                </NavLink>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Usuarios */}
-        <NavLink to="/users" className={navLinkClass}>
-          <span className="mr-3 text-base">👤</span>
-          <span>Usuarios</span>
-        </NavLink>
+        {isCoordinador && (
+          <NavLink to="/users" className={navLinkClass}>
+            <span className="mr-3 text-base">👤</span>
+            <span>Usuarios</span>
+          </NavLink>
+        )}
 
         {/* Horas */}
-        <NavLink to="/hours" className={navLinkClass}>
-          <span className="mr-3 text-base">⏱️</span>
-          <span>Horas</span>
-        </NavLink>
+        {(isEstudiante || isTutor || isCoordinador) && (
+          <NavLink to="/hours" className={navLinkClass}>
+            <span className="mr-3 text-base">⏱️</span>
+            <span>Horas</span>
+          </NavLink>
+        )}
 
         {/* Evaluaciones */}
-        <NavLink to="/evaluations" className={navLinkClass}>
-          <span className="mr-3 text-base">📝</span>
-          <span>Evaluaciones</span>
-        </NavLink>
+        {(isEstudiante || isTutor || isCoordinador) && (
+          <NavLink to="/evaluations" className={navLinkClass}>
+            <span className="mr-3 text-base">📝</span>
+            <span>Evaluaciones</span>
+          </NavLink>
+        )}
 
         {/* Documentos */}
-        <NavLink to="/documents" className={navLinkClass}>
-          <span className="mr-3 text-base">📂</span>
-          <span>Documentos</span>
-        </NavLink>
+        {(isEstudiante || isTutor || isCoordinador) && (
+          <NavLink to="/documents" className={navLinkClass}>
+            <span className="mr-3 text-base">📂</span>
+            <span>Documentos</span>
+          </NavLink>
+        )}
 
         {/* Reportes */}
-        <NavLink to="/reports" className={navLinkClass}>
-          <span className="mr-3 text-base">📊</span>
-          <span>Reportes</span>
-        </NavLink>
+        {(isTutor || isCoordinador) && (
+          <NavLink to="/reports" className={navLinkClass}>
+            <span className="mr-3 text-base">📊</span>
+            <span>Reportes</span>
+          </NavLink>
+        )}
 
         {/* Notificaciones */}
-        <NavLink to="/notifications" className={navLinkClass}>
-          <span className="mr-3 text-base">🔔</span>
-          <span>Notificaciones</span>
-        </NavLink>
+        {(isEstudiante || isTutor || isCoordinador) && (
+          <NavLink to="/notifications" className={navLinkClass}>
+            <span className="mr-3 text-base">🔔</span>
+            <span>Notificaciones</span>
+          </NavLink>
+        )}
 
         {/* Recomendaciones */}
-        <NavLink to="/recommendations" className={navLinkClass}>
-          <span className="mr-3 text-base">🎯</span>
-          <span>Recomendaciones</span>
-        </NavLink>
+        {(isEstudiante || isCoordinador) && (
+          <NavLink to="/recommendations" className={navLinkClass}>
+            <span className="mr-3 text-base">🎯</span>
+            <span>Recomendaciones</span>
+          </NavLink>
+        )}
+
+        {/* Login */}
+        {(!isEstudiante && !isTutor && !isCoordinador) && (
+          <NavLink to="/login" className={navLinkClass}>
+            <span className="mr-3 text-base">🔑</span>
+            <span>Login</span>
+          </NavLink>
+        )}
       </nav>
 
       {/* Footer Profile & Logout */}

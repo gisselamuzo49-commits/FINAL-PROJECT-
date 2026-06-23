@@ -2,8 +2,22 @@ import { useState, useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
 
 function Recommendations() {
-  const { getHeaders, logout, estudianteId, userProfile } = useOutletContext();
+  const { getHeaders, logout, userProfile } = useOutletContext();
   const API = import.meta.env.VITE_API_BASE_URL || 'http://18.232.199.190:8082';
+
+  const token = localStorage.getItem('token');
+  let payload = {};
+  if (token && token.split('.').length === 3) {
+    try {
+      payload = JSON.parse(atob(token.split('.')[1]));
+    } catch (e) {
+      console.error(e);
+    }
+  }
+  const estudianteId = payload.id 
+    || payload.userId 
+    || payload.sub 
+    || payload.studentId;
 
   const [internships, setInternships] = useState([]);
   const [loadingInternships, setLoadingInternships] = useState(true);
@@ -90,7 +104,17 @@ function Recommendations() {
       });
   };
 
-  if (!estudianteId || loadingInternships) {
+  if (!estudianteId) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <p className="text-red-500 font-medium text-lg border border-red-200 bg-red-50 px-6 py-4 rounded-xl shadow-sm">
+          Sesión inválida, por favor inicia sesión nuevamente
+        </p>
+      </div>
+    );
+  }
+
+  if (loadingInternships) {
     return (
       <div className="flex items-center justify-center py-20">
         <p className="text-gray-500 font-medium text-lg animate-pulse">Cargando perfil...</p>
