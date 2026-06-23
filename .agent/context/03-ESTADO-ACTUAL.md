@@ -3,7 +3,60 @@
 > **Este archivo se actualiza al final de cada sesión de trabajo.** Es el primer lugar
 > donde el agente debe mirar para saber "¿dónde quedamos?".
 
-_Última actualización: 2026-06-23 (Rediseño del Frontend completado)_
+_Última actualización: 2026-06-23 (Sesión Lab 53 - )_
+
+## ✅ COMPLETADO HOY — Infraestructura Lab 53
+
+### IPs actuales de QA (Lab 53)
+- Bastion EIP: 50.19.247.85 (fija, no cambia)
+- qa_auth_jobs EIP pública: 32.193.25.6 (fija)
+- qa_auth_jobs IP privada: 10.0.1.170
+- S3 backend tfstate: estado-pasantias-gisse-lab53
+
+### Secrets de GitHub actualizados
+- QA_BASTION_IP = 50.19.247.85
+- QA_AUTH_JOBS_IP = 10.0.1.170 (IP privada para Ansible)
+- JWT_SECRET = en GitHub Secrets (ya no hardcodeado)
+- PG_PASSWORD = en GitHub Secrets
+- NEO4J_PASSWORD = en GitHub Secrets
+- QA_SSH_KEY = llave privada infra/qa/QA (generada con ssh-keygen)
+
+### Terraform QA - estado actual
+- Key pair creado por Terraform con infra/qa/QA.pub
+- LabInstanceProfile adjunto a bastion y qa_auth_jobs
+- user_data con base64encode + set -e + logs en /var/log
+- SSM Agent instalado en bastion
+- Disco 30GB en qa_auth_jobs
+- S3 backend con encrypt=true y use_lockfile=true
+
+### CI/CD - nuevo diseño deploy-qa.yml
+- 15 jobs: detect-changes → test → 12 builds paralelos → deploy
+- runs-on: self-hosted en el job deploy
+- Sin SSH tunnel, sin ProxyCommand
+- Builds paralelos por servicio con dorny/paths-filter
+- Secrets inyectados como variables Ansible
+
+### Pendiente crítico - Runner no registrado aún
+El self-hosted runner del bastion NO está registrado 
+en GitHub Actions todavía. El pipeline fallará hasta que:
+1. Se conecte al bastion: ssh -i infra/qa/QA ubuntu@50.19.247.85
+2. Se suba la llave: scp -i infra/qa/QA infra/qa/QA ubuntu@50.19.247.85:/home/ubuntu/.ssh/QA.pem
+3. Se configure el runner en GitHub Settings → Actions → Runners
+4. Se ejecute: cd /home/ubuntu/actions-runner && ./config.sh --url ... --token ...
+5. sudo ./svc.sh install ubuntu && sudo ./svc.sh start
+
+## ✅ COMPLETADO HOY — Adopción UCE_AlumniPlatform
+
+### Mejoras adoptadas del proyecto de referencia
+1. Key pair por Terraform (no manual en AWS Console)
+2. Secrets en Ansible (JWT, PG_PASSWORD, NEO4J_PASSWORD)
+3. LabInstanceProfile en EC2
+4. Mosquitto local sin autenticación (allow_anonymous true)
+5. base64encode en user_data
+6. SSM Agent en bastion
+7. 30GB disco en EC2 de servicios
+8. Pipeline rediseñado con jobs paralelos
+
 
 ## ✅ Completado / Verificado
 
