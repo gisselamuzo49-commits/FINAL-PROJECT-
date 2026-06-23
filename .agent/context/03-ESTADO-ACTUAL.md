@@ -31,19 +31,15 @@ _Última actualización: 2026-06-23 (Sesión Lab 53 - )_
 
 ### CI/CD - nuevo diseño deploy-qa.yml
 - 15 jobs: detect-changes → test → 12 builds paralelos → deploy
-- runs-on: self-hosted en el job deploy
+- runs-on: [self-hosted, linux, qa] en el job deploy
 - Sin SSH tunnel, sin ProxyCommand
 - Builds paralelos por servicio con dorny/paths-filter
 - Secrets inyectados como variables Ansible
 
-### Pendiente crítico - Runner no registrado aún
-El self-hosted runner del bastion NO está registrado 
-en GitHub Actions todavía. El pipeline fallará hasta que:
-1. Se conecte al bastion: ssh -i infra/qa/QA ubuntu@50.19.247.85
-2. Se suba la llave: scp -i infra/qa/QA infra/qa/QA ubuntu@50.19.247.85:/home/ubuntu/.ssh/QA.pem
-3. Se configure el runner en GitHub Settings → Actions → Runners
-4. Se ejecute: cd /home/ubuntu/actions-runner && ./config.sh --url ... --token ...
-5. sudo ./svc.sh install ubuntu && sudo ./svc.sh start
+### ✅ COMPLETADO — Registro del Self-Hosted Runner en Bastion
+- El self-hosted runner (`pasantias-qa-runner`) se ha registrado, configurado y arrancado exitosamente en el Bastion de QA.
+- El servicio de systemd se encuentra en estado `active (running)`.
+- Se subió y configuró correctamente la llave SSH del bastion (`~/.ssh/QA.pem`) con permisos `400` para permitir a Ansible interactuar con la instancia privada de QA.
 
 ## ✅ COMPLETADO HOY — Adopción UCE_AlumniPlatform
 
