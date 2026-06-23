@@ -404,4 +404,13 @@ Se adoptaron 4 mejoras del proyecto de referencia y se aplicaron las reversiones
 4. **Mosquitto local sin autenticación en QA:** Configurado broker Mosquitto local en el EC2 de QA con `allow_anonymous true` y redirigido `notification-service` a este broker local.
 5. **Reversiones de Frontend y CORS:** Se eliminó la IP hardcodeada de CORS fallback del gateway, se removió `.env.production` y se quitó el build arg `VITE_API_BASE_URL` del Dockerfile (el frontend resuelve el endpoint de manera dinámica usando el hostname de la ventana del navegador).
 
+## ✅ COMPLETADO — Rediseño del Pipeline de CI/CD (23/Jun)
+
+Se rediseñó por completo el pipeline de QA (`deploy-qa.yml`) logrando:
+1. **Detección de Cambios (`detect-changes`):** Ejecuta la discriminación de rutas usando `dorny/paths-filter`.
+2. **Pruebas Consolidadas (`test`):** Un solo job en `ubuntu-latest` que ejecuta condicionalmente las pruebas unitarias únicamente para los servicios modificados y las del frontend.
+3. **Compilación Paralela (`build-<servicio>`):** Se crearon 12 jobs independientes y paralelos (uno por servicio) que compilan y suben las imágenes a Docker Hub en paralelo solo si se detectaron cambios en su respectivo directorio.
+4. **Despliegue Secuencial y Seguro (`deploy`):** Ejecuta en el host `self-hosted` (Bastion de QA) una vez terminados todos los builds de forma exitosa, omitiendo de forma inteligente los builds omitidos (skipped) pero asegurando que si alguno falla, el deploy se aborte. Se removieron todas las dependencias y configuraciones SSH heredadas, así como configuraciones hardcodeadas redundantes.
+
+
 
