@@ -80,6 +80,7 @@ que reemplaza la planificación genérica original.
   09-ADOPCIONES #4).
 - [ ] `gateway-service`: rutas para los 6 servicios nuevos + soporte WebSocket.
 - [x] Deploy completo a QA (18 contenedores: microservicios + Kafka + RabbitMQ + MongoDB + Redis + Postgres). Instancia configurada como `t3.large` (8 GiB RAM) + Swap de 4GB + límites de JVM establecidos. ✅
+- [x] Configurar Self-Hosted Runner en el Bastion de QA y parametrizar dinámicamente IPs (Lab 53). ✅
 
 
 ### Semana 5 — Sesión de diseño + Terraform modular + infraestructura PROD

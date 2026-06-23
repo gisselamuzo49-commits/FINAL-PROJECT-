@@ -387,3 +387,12 @@ Y se aplicaron las siguientes correcciones adicionales:
     - Se corrigieron los selectores del formulario de registro en `Login.jsx` para mandar los valores del rol en mayúscula (`ESTUDIANTE`, `TUTOR`, `COORDINADOR`) alineados con el enum `Role.java` de Spring Boot.
     - Se ajustaron los mocks y payloads de JWT en los tests unitarios (`Home.test.jsx`, `Reports.test.jsx`, `AppRouter.test.jsx`), logrando que el 100% de la suite de pruebas pase exitosamente (`npm run build` y `vitest` en verde).
 
+
+## ✅ COMPLETADO — Migración a Self-Hosted Runner y Remoción de IPs (QA Lab 53)
+
+Se implementaron con éxito los cambios para adoptar un self-hosted runner en el Bastion de QA y eliminar IPs hardcodeadas:
+1. **GitHub Actions Runner en Bastion (Terraform):** Agregado `user_data` a `aws_instance.bastion` en `infra/qa/main.tf` para instalar dependencias de Docker, herramientas y preparar la carpeta del runner.
+2. **Workflow simplificado:** Modificado `deploy-qa.yml` para correr en `runs-on: self-hosted`, eliminando los pasos obsoletos de SSH Tunnel, ProxyCommand y la instalación de Ansible en cada ejecución.
+3. **CORS Dinámico:** Configurado `deploy-qa.yml` de Ansible para inyectar la variable `ALLOWED_ORIGINS` dinámicamente con la IP de la instancia a través del workflow.
+4. **Vite API URL:** Se agregó soporte para `VITE_API_BASE_URL` en el `Dockerfile` de `frontend-web`, y se actualizó `.env.production` y el CORS fallback en el gateway a `http://100.50.165.80:8082`.
+
