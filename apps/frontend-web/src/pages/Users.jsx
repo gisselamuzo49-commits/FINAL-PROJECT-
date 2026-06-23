@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
 
 function Users() {
-  const { API_URL, GATEWAY_PORT, getHeaders, logout } = useOutletContext();
+  const { getHeaders, logout } = useOutletContext();
+  const API = import.meta.env.VITE_API_BASE_URL || 'http://18.232.199.190:8082';
   const [profiles, setProfiles] = useState([]);
   const [mensajeProfiles, setMensajeProfiles] = useState(null);
 
@@ -14,7 +15,7 @@ function Users() {
   const [role, setRole] = useState("STUDENT");
 
   const cargarPerfiles = () => {
-    fetch(`${API_URL}:${GATEWAY_PORT}/api/users`, { headers: getHeaders() })
+    fetch(`${API}/api/users`, { headers: getHeaders() })
       .then(response => {
         if (response.status === 401) { logout(); throw new Error("Sesión expirada"); }
         if (!response.ok) throw new Error("Error al conectar con User-Service");
@@ -27,7 +28,7 @@ function Users() {
   const registrarPerfil = (e) => {
     e.preventDefault();
     setMensajeProfiles(null);
-    fetch(`${API_URL}:${GATEWAY_PORT}/api/users`, {
+    fetch(`${API}/api/users`, {
       method: "POST",
       headers: getHeaders(),
       body: JSON.stringify({ firstName, lastName, email: profileEmail, phone, role })

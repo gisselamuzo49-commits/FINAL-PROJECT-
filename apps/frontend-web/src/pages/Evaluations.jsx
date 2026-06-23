@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
 
 function Evaluations() {
-  const { API_URL, GATEWAY_PORT, getHeaders, logout, estudianteId } = useOutletContext();
+  const { getHeaders, logout, estudianteId } = useOutletContext();
+  const API = import.meta.env.VITE_API_BASE_URL || 'http://18.232.199.190:8082';
 
   const [evaluations, setEvaluations] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -10,7 +11,7 @@ function Evaluations() {
 
   const cargarEvaluaciones = () => {
     if (!estudianteId) return;
-    fetch(`${API_URL}:${GATEWAY_PORT}/api/evaluations/student/${estudianteId}`, { headers: getHeaders() })
+    fetch(`${API}/api/evaluations/student/${estudianteId}`, { headers: getHeaders() })
       .then(response => {
         if (response.status === 401) { logout(); throw new Error("Sesión expirada"); }
         if (response.status === 404) {

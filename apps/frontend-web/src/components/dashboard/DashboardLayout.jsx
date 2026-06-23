@@ -7,6 +7,7 @@ function DashboardLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const navigate = useNavigate();
 
+  const API = import.meta.env.VITE_API_BASE_URL || 'http://18.232.199.190:8082';
   const API_URL = `http://${window.location.hostname}`;
   const GATEWAY_PORT = import.meta.env.VITE_GATEWAY_PORT || "8082";
 
@@ -24,7 +25,7 @@ function DashboardLayout() {
 
   useEffect(() => {
     if (!userEmail) return;
-    fetch(`${API_URL}:${GATEWAY_PORT}/api/users/email/${userEmail}`, { headers: getHeaders() })
+    fetch(`${API}/api/users/email/${userEmail}`, { headers: getHeaders() })
       .then(res => res.ok ? res.json() : null)
       .then(data => setUserProfile(data))
       .catch(() => setUserProfile(null));

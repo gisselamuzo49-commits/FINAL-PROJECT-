@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
 
 function Internships() {
-  const { API_URL, GATEWAY_PORT, getHeaders, logout } = useOutletContext();
+  const { getHeaders, logout } = useOutletContext();
+  const API = import.meta.env.VITE_API_BASE_URL || 'http://18.232.199.190:8082';
   const [pasantias, setPasantias] = useState([]);
   const [mensajePasantias, setMensajePasantias] = useState(null);
   
@@ -13,7 +14,7 @@ function Internships() {
   const [statusPasantia, setStatusPasantia] = useState("ABIERTA");
 
   const cargarPasantias = () => {
-    fetch(`${API_URL}:${GATEWAY_PORT}/api/internships`, { headers: getHeaders() })
+    fetch(`${API}/api/internships`, { headers: getHeaders() })
       .then(response => {
         if (response.status === 401) { logout(); throw new Error("Sesión expirada"); }
         if (!response.ok) throw new Error("Error al conectar con Internship-Service");
@@ -26,7 +27,7 @@ function Internships() {
   const registrarPasantia = (e) => {
     e.preventDefault();
     setMensajePasantias(null);
-    fetch(`${API_URL}:${GATEWAY_PORT}/api/internships`, {
+    fetch(`${API}/api/internships`, {
       method: "POST",
       headers: getHeaders(),
       body: JSON.stringify({ title, company, description, status: statusPasantia })

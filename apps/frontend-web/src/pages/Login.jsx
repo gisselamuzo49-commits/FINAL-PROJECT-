@@ -17,9 +17,8 @@ function Login() {
   const handleSubmit = (e) => {
     e.preventDefault();
     setError(null);
-    const API_URL = `http://${window.location.hostname}`;
-    const GATEWAY_PORT = import.meta.env.VITE_GATEWAY_PORT || "8082";
-    fetch(`${API_URL}:${GATEWAY_PORT}/api/auth/login`, {
+    const API = import.meta.env.VITE_API_BASE_URL || 'http://18.232.199.190:8082';
+    fetch(`${API}/api/auth/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password })

@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
 
 function Hours() {
-  const { API_URL, GATEWAY_PORT, getHeaders, logout, estudianteId } = useOutletContext();
+  const { getHeaders, logout, estudianteId } = useOutletContext();
+  const API = import.meta.env.VITE_API_BASE_URL || 'http://18.232.199.190:8082';
 
   const [summary, setSummary] = useState({
     totalHorasValidadas: 0.0,
@@ -21,7 +22,7 @@ function Hours() {
 
   const cargarResumen = () => {
     if (!estudianteId) return;
-    fetch(`${API_URL}:${GATEWAY_PORT}/api/hours/student/${estudianteId}`, { headers: getHeaders() })
+    fetch(`${API}/api/hours/student/${estudianteId}`, { headers: getHeaders() })
       .then(response => {
         if (response.status === 401) { logout(); throw new Error("Sesión expirada"); }
         if (response.status === 404) {
@@ -66,7 +67,7 @@ function Hours() {
       estado: "PENDIENTE"
     };
 
-    fetch(`${API_URL}:${GATEWAY_PORT}/api/hours`, {
+    fetch(`${API}/api/hours`, {
       method: "POST",
       headers: getHeaders(),
       body: JSON.stringify(payload)
