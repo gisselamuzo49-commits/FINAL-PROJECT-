@@ -349,7 +349,8 @@
 
     - name: Levantar rabbitmq
       shell: >
-        docker run -d --name rabbitmq
+        docker run -d
+        --name rabbitmq
         --network pasantias-net
         --restart always
         -p 5672:5672
