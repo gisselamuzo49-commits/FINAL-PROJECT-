@@ -10,9 +10,11 @@ terraform {
     }
   }
   backend "s3" {
-    bucket = "estado-pasantias-gisse-2026"
-    key    = "qa/terraform.tfstate"
-    region = "us-east-1"
+    bucket       = "estado-pasantias-gisse-lab53"
+    key          = "qa/terraform.tfstate"
+    region       = "us-east-1"
+    use_lockfile = true
+    encrypt      = true
   }
 }
 
@@ -210,24 +212,18 @@ resource "aws_instance" "bastion" {
   iam_instance_profile   = data.aws_iam_instance_profile.lab_profile.name
   tags                   = { Name = "pasantias-qa-bastion" }
 
-  # user_data para aprovisionar Docker, herramientas y el GitHub Actions Runner
-  user_data = <<-EOF
+  user_data = base64encode(<<-EOF
     #!/bin/bash
-    apt-get update -y
-    apt-get install -y ca-certificates curl gnupg apt-transport-https unzip jq ansible git
+    set -e
+    exec > /var/log/pasantias-bastion-init.log 2>&1
 
-    # Instalar Docker
-    install -m 0755 -d /etc/apt/keyrings
-    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-    chmod a+r /etc/apt/keyrings/docker.gpg
-    echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu noble stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
     apt-get update -y
-    apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
-    systemctl enable docker
-    systemctl start docker
-    usermod -aG docker ubuntu
+    apt-get install -y curl unzip jq ansible git
 
-    # Descargar y preparar el GitHub Actions runner
+    snap install amazon-ssm-agent --classic || true
+    systemctl enable snap.amazon-ssm-agent.amazon-ssm-agent.service || true
+    systemctl start snap.amazon-ssm-agent.amazon-ssm-agent.service || true
+
     mkdir -p /home/ubuntu/actions-runner
     cd /home/ubuntu/actions-runner
     curl -o runner.tar.gz -L https://github.com/actions/runner/releases/download/v2.322.0/actions-runner-linux-x64-2.322.0.tar.gz
@@ -235,11 +231,13 @@ resource "aws_instance" "bastion" {
     rm runner.tar.gz
     chown -R ubuntu:ubuntu /home/ubuntu/actions-runner
 
-    # Preparar el directorio SSH de ubuntu
     mkdir -p /home/ubuntu/.ssh
     chmod 700 /home/ubuntu/.ssh
     chown ubuntu:ubuntu /home/ubuntu/.ssh
+
+    echo "Bastion init complete"
   EOF
+  )
 
   lifecycle {
     ignore_changes = [user_data, ami]
@@ -265,24 +263,33 @@ resource "aws_instance" "qa_auth_jobs" {
   vpc_security_group_ids = [aws_security_group.sg_private.id]
   iam_instance_profile   = data.aws_iam_instance_profile.lab_profile.name
 
-  # user_data solo instala Docker; los contenedores los despliega Ansible
-  user_data = <<-EOF
+  user_data = base64encode(<<-EOF
     #!/bin/bash
+    set -e
+    exec > /var/log/pasantias-ec2-init.log 2>&1
+
     apt-get update -y
-    apt-get install -y ca-certificates curl gnupg apt-transport-https
+    apt-get install -y ca-certificates curl gnupg git apt-transport-https
+
     install -m 0755 -d /etc/apt/keyrings
     curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
     chmod a+r /etc/apt/keyrings/docker.gpg
+
     echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu noble stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
+
     apt-get update -y
     apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
+
     systemctl enable docker
     systemctl start docker
     usermod -aG docker ubuntu
+
+    echo "EC2 init complete"
   EOF
+  )
 
   root_block_device {
-    volume_size = 20
+    volume_size = 30
     volume_type = "gp3"
   }
 
