@@ -3,7 +3,22 @@
 > **Este archivo se actualiza al final de cada sesión de trabajo.** Es el primer lugar
 > donde el agente debe mirar para saber "¿dónde quedamos?".
 
-_Última actualización: 2026-06-24 (Sesión Lab 53 - mañana)_
+_Última actualización: 2026-06-24 (Sesión Lab 54 - tarde)_
+
+## ✅ COMPLETADO HOY — Infraestructura PROD Lab 54 (24/Jun tarde)
+
+### IPs y Recursos actuales de PROD (Lab 54)
+- **Bastion EIP (fija)**: `34.235.174.136`
+- **PROD ALB DNS**: `pasantias-prod-elb-1617123986.us-east-1.elb.amazonaws.com`
+- **prod_auth_jobs IP privada**: `10.0.3.93`
+- **S3 Bucket Documentos**: `pasantias-documents-prod`
+- **S3 Backend tfstate**: `estado-pasantias-gisse-2026-prod` (actualizado en `infra/prod/main.tf` para resolver la colisión global de nombres de bucket)
+
+### Secrets de GitHub para PROD (Actualizar si aplica)
+- `PROD_BASTION_IP` = `34.235.174.136`
+- `PROD_AUTH_JOBS_IP` = `10.0.3.93` (IP privada para Ansible vía Bastion)
+- `PROD_SSH_KEY` = Llave privada SSH para producción (`infra/prod/PROD`)
+
 
 ## ✅ COMPLETADO — Ajuste de Configuración SSH de Ansible para QA (24/Jun mañana)
 
@@ -183,7 +198,7 @@ GitHub Secrets.- Deploy vía Ansible re-ejecutado, pipeline verde. Verificado en
 
 Excel de Cloudflare llenado:
 - **QA IP1** → `32.193.25.6`
-- **PRODUCCION IP** → `pasantias-prod-elb-115885246.us-east-1.elb.amazonaws.com`
+- **PRODUCCION IP** → `pasantias-prod-elb-1617123986.us-east-1.elb.amazonaws.com`
 
 Cuando la cátedra asigne los subdominios `*.distribuidauce.org`, actualizar
 `01-REQUERIMIENTOS-MAESTROS.md` requisito #5 a "✅" y documentar los dominios en
