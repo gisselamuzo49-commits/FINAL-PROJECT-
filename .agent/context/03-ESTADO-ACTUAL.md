@@ -26,7 +26,7 @@ _Última actualización: 2026-06-23 (Sesión Lab 53 - noche)_
 - Se añadió `ignore_errors: true` a las tareas de pull y run de los 6 nuevos servicios y neo4j en `deploy-qa.yml` para evitar fallas en el despliegue cuando las imágenes no existan o por timeouts.
 - Se configuró `async: 120` y `poll: 10` en las 20 tareas de levantar contenedores ("Levantar") que ejecutan `docker run` en `deploy-qa.yml` para evitar bloqueos y cuelgues por SSH.
 - Se configuró el disco root_block_device de la instancia del bastion a 20GB y de la de servicios a 30GB en el Terraform de QA (`infra/qa/main.tf`), agregando y alineando sus bloques `lifecycle` correspondientes.
-- Se configuró la variable `gh_runner_token` y el `user_data` de la instancia `bastion` en `infra/qa/main.tf` para permitir la instalación y el auto-registro del Actions Runner utilizando el Personal Access Token de GitHub de manera desasistida.
+- Se simplificó el `user_data` de la instancia `bastion` en `infra/qa/main.tf` eliminando la variable `gh_runner_token` y la lógica de registro automático del runner, retornando a una inicialización básica del bastion host.
 
 ## ✅ COMPLETADO — Nginx Proxy + Fix CORS (23/Jun tarde)
 
@@ -506,6 +506,6 @@ Se rediseñó por completo el pipeline de QA (`deploy-qa.yml`) logrando:
 1. **Detección de Cambios (`detect-changes`):** Ejecuta la discriminación de rutas usando `dorny/paths-filter`.
 2. **Pruebas Consolidadas (`test`):** Un solo job en `ubuntu-latest` que ejecuta condicionalmente las pruebas unitarias únicamente para los servicios modificados y las del frontend.
 3. **Compilación Paralela (`build-<servicio>`):** Se crearon 12 jobs independientes y paralelos (uno por servicio) que compilan y suben las imágenes a Docker Hub en paralelo solo si se detectaron cambios en su respectivo directorio.
-4. **Despliegue Secuencial y Seguro (`deploy`):** Ejecuta en el host `self-hosted` (Bastion de QA) una vez terminados todos los builds de forma exitosa, omitiendo de forma inteligente los builds omitidos (skipped) pero asegurando que si alguno falla, el deploy se aborte. Se removieron todas las dependencias y configuraciones SSH heredadas, así como configuraciones hardcodeadas redundantes.
+4. **Despliegue Secuencial y Seguro (`deploy`):** Ejecuta en el host `self-hosted` (Bastion de QA) una vez terminados todos los builds de forma exitosa, omitiendo de forma inteligente los builds omitidos (skipped) pero asegurando que si alguno falla, el deploy se aborte. Se removieron todas las dependencias y configuraciones SSH heredadas, así como configuraciones hardcodeadas redundantes. Asimismo, se configuró el bastion en el inventario como `localhost` con `ansible_connection=local` para ejecutar las tareas locales sin necesidad de conexiones SSH.
 
 Última ejecución y deploy de prueba: 2026-06-24 (reintentado tras fix ssh)
