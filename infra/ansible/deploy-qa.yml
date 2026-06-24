@@ -231,36 +231,43 @@
       shell: docker pull {{ docker_image_hours }}
       async: 60
       poll: 10
+      ignore_errors: true
 
     - name: Pull evaluation-service image
       shell: docker pull {{ docker_image_evaluation }}
       async: 60
       poll: 10
+      ignore_errors: true
 
     - name: Pull notification-service image
       shell: docker pull {{ docker_image_notification }}
       async: 60
       poll: 10
+      ignore_errors: true
 
     - name: Pull document-service image
       shell: docker pull {{ docker_image_document }}
       async: 60
       poll: 10
+      ignore_errors: true
 
     - name: Pull report-service image
       shell: docker pull {{ docker_image_report }}
       async: 60
       poll: 10
+      ignore_errors: true
 
     - name: Pull ai-service image
       shell: docker pull {{ docker_image_ai }}
       async: 60
       poll: 10
+      ignore_errors: true
 
     - name: Pull neo4j image
       shell: docker pull neo4j:5-community
       async: 60
       poll: 10
+      ignore_errors: true
 
     # ── Levantar contenedores ────────────
     - name: Eliminar volumen de postgres para reinicializar schema
@@ -446,6 +453,7 @@
           -e NEO4J_server_memory_heap_max__size=512m \
           -e NEO4J_server_memory_pagecache__size=256m \
           neo4j:5-community
+      ignore_errors: true
 
     - name: Levantar hours-service
       shell: >
@@ -465,6 +473,7 @@
         -e USER_SERVICE_GRPC_PORT=9083
         -e JAVA_TOOL_OPTIONS="-Xmx256m -Xms128m"
         {{ docker_image_hours }}
+      ignore_errors: true
 
     - name: Levantar evaluation-service
       shell: >
@@ -482,6 +491,7 @@
         -e USER_SERVICE_GRPC_PORT=9083
         -e JAVA_TOOL_OPTIONS="-Xmx256m -Xms128m"
         {{ docker_image_evaluation }}
+      ignore_errors: true
 
     - name: Levantar notification-service
       shell: >
@@ -501,6 +511,7 @@
         -e MQTT_PASSWORD={{ mqtt_password }}
         -e JAVA_TOOL_OPTIONS="-Xmx256m -Xms128m"
         {{ docker_image_notification }}
+      ignore_errors: true
 
     - name: Levantar document-service
       shell: >
@@ -521,6 +532,7 @@
         -e AWS_SESSION_TOKEN={{ aws_session_token }}
         -e JAVA_TOOL_OPTIONS="-Xmx256m -Xms128m"
         {{ docker_image_document }}
+      ignore_errors: true
 
     - name: Levantar report-service
       shell: >
@@ -538,6 +550,7 @@
         -e DOCUMENT_SERVICE_URL=http://document-service:8088
         -e JAVA_TOOL_OPTIONS="-Xmx256m -Xms128m"
         {{ docker_image_report }}
+      ignore_errors: true
 
     - name: Levantar ai-service
       shell: >
@@ -550,6 +563,7 @@
         -e RABBITMQ_USER=guest
         -e RABBITMQ_PASSWORD=guest
         {{ docker_image_ai }}
+      ignore_errors: true
 
 
     - name: Levantar gateway-service

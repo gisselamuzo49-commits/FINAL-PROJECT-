@@ -23,6 +23,7 @@ _Última actualización: 2026-06-23 (Sesión Lab 53 - noche)_
 - Se añadió la automatización para el GitHub Actions runner configurándolo como servicio `systemd` en el Bastion mediante un segundo play en `deploy-qa.yml` y agregando el grupo `[bastion]` al inventario generado en el workflow de GitHub Actions.
 - Se configuró la instalación automática de Docker (si no existe en el EC2 de QA) dentro de los prerrequisitos del playbook de Ansible.
 - Se agregaron tareas en el playbook de Ansible para expandir automáticamente la partición y el filesystem del volumen EBS (`growpart` y `resize2fs`) en la instancia EC2 de QA.
+- Se añadió `ignore_errors: true` a las tareas de pull y run de los 6 nuevos servicios y neo4j en `deploy-qa.yml` para evitar fallas en el despliegue cuando las imágenes no existan o por timeouts.
 
 ## ✅ COMPLETADO — Nginx Proxy + Fix CORS (23/Jun tarde)
 
