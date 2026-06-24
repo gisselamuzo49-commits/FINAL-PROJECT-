@@ -265,6 +265,7 @@ jobs:
           push: true
           tags: gdmuzo/ai-service:latest
 
+      # ── SSH setup ────────────────────────────────────────────────────────────
       - name: Setup SSH key
         run: |
           mkdir -p ~/.ssh
@@ -273,43 +274,42 @@ jobs:
           ssh-keyscan -H ${{ secrets.QA_BASTION_IP }} >> ~/.ssh/known_hosts
           ssh -i ~/.ssh/QA.pem \
             -o StrictHostKeyChecking=no \
-            -o ConnectTimeout=10 \
-            -v \
+            -o ConnectTimeout=15 \
             ubuntu@${{ secrets.QA_BASTION_IP }} \
-            "ssh-keyscan -H ${{ secrets.QA_AUTH_JOBS_IP }}" 2>&1 | tee /tmp/ssh_debug.txt
-          cat /tmp/ssh_debug.txt >> ~/.ssh/known_hosts || true
-          echo "SSH exit code: $?"
+            "ssh-keyscan -H ${{ secrets.QA_AUTH_JOBS_IP }}" >> ~/.ssh/known_hosts || true
 
+      # ── Ansible inventory (usando secrets, sin IPs hardcodeadas) ─────────────
       - name: Create Ansible inventory
         run: |
           echo "[qa_ec2]" > /tmp/qa_inventory.ini
           echo "${{ secrets.QA_AUTH_JOBS_IP }}" >> /tmp/qa_inventory.ini
           cat /tmp/qa_inventory.ini
 
+      # ── Ansible config con proxy a través del bastion (IPs desde secrets) ────
       - name: Configure Ansible SSH
         run: |
           printf '[defaults]\nremote_user = ubuntu\nprivate_key_file = ~/.ssh/QA.pem\nhost_key_checking = False\n\n[ssh_connection]\nssh_args = -o StrictHostKeyChecking=no -o ProxyCommand="ssh -W %%h:%%p -i ~/.ssh/QA.pem -o StrictHostKeyChecking=no ubuntu@${{ secrets.QA_BASTION_IP }}"\n' > /tmp/ansible.cfg
           cat /tmp/ansible.cfg
 
-      - name: Deploy via Ansible
+      - name: Install Ansible
+        run: pip install ansible
+
+      - name: Test Ansible connection
         run: |
-          pip install ansible
-          echo "=== ANSIBLE_CONFIG ==="
-          echo $ANSIBLE_CONFIG
-          echo "=== ansible.cfg content ==="
-          cat /tmp/ansible.cfg
-          echo "=== inventory content ==="
-          cat /tmp/qa_inventory.ini
-          echo "=== testing ansible connection ==="
           ANSIBLE_CONFIG=/tmp/ansible.cfg ansible \
             -i /tmp/qa_inventory.ini \
-            all -m ping \
-            -vvv 2>&1 | head -50
-          echo "=== running playbook ==="
+            all -m ping -vvv 2>&1 | head -60
+        env:
+          ANSIBLE_CONFIG: /tmp/ansible.cfg
+
+      - name: Deploy via Ansible
+        run: |
           ANSIBLE_CONFIG=/tmp/ansible.cfg ansible-playbook infra/ansible/deploy-qa.yml \
             -i /tmp/qa_inventory.ini \
             -e "aws_access_key_id=${{ secrets.AWS_ACCESS_KEY_ID }}" \
             -e "aws_secret_access_key=${{ secrets.AWS_SECRET_ACCESS_KEY }}" \
-            -e "aws_session_token=${{ secrets.AWS_SESSION_TOKEN }}"
+            -e "aws_session_token=${{ secrets.AWS_SESSION_TOKEN }}" \
+            -e "dockerhub_username=${{ secrets.DOCKERHUB_USERNAME }}" \
+            -e "dockerhub_token=${{ secrets.DOCKERHUB_TOKEN }}"
         env:
           ANSIBLE_CONFIG: /tmp/ansible.cfg

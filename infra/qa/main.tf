@@ -10,11 +10,9 @@ terraform {
     }
   }
   backend "s3" {
-    bucket       = "estado-pasantias-gisse-lab53"
-    key          = "qa/terraform.tfstate"
-    region       = "us-east-1"
-    use_lockfile = true
-    encrypt      = true
+    bucket = "estado-pasantias-gisse-2026"
+    key    = "qa/terraform.tfstate"
+    region = "us-east-1"
   }
 }
 
@@ -73,8 +71,7 @@ resource "aws_route_table_association" "public_1a" {
 }
 
 # ─────────────────────────────────────────
-# NAT GATEWAY — permite a la subnet privada
-#               hacer docker pull sin IP pública
+# NAT GATEWAY
 # ─────────────────────────────────────────
 resource "aws_eip" "nat" {
   domain = "vpc"
@@ -130,10 +127,10 @@ resource "aws_security_group" "sg_bastion" {
 # Private: servicios accesibles dentro de la VPC + SSH desde bastion
 resource "aws_security_group" "sg_private" {
   name        = "pasantias-qa-private"
-  description = "Private EC2 - auth, internship, frontend"
+  description = "Private EC2 - todos los servicios"
   vpc_id      = aws_vpc.main.id
 
-  # Todo el tráfico interno de la VPC (health checks, comunicación entre servicios)
+  # Todo el tráfico interno de la VPC
   ingress {
     from_port   = 0
     to_port     = 0
@@ -153,15 +150,15 @@ resource "aws_security_group" "sg_private" {
     to_port     = 80
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
-    description = "Frontend web access"
+    description = "Frontend web"
   }
-  # Acceso HTTP público al gateway
+  # Acceso HTTP público al gateway (único punto de entrada a los microservicios)
   ingress {
     from_port   = 8082
     to_port     = 8082
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
-    description = "Gateway API access"
+    description = "Gateway API"
   }
   egress {
     from_port   = 0
@@ -173,11 +170,10 @@ resource "aws_security_group" "sg_private" {
 }
 
 # ─────────────────────────────────────────
-# KEY PAIR — QA key creada por Terraform
+# KEY PAIR — QA key ya creada en AWS
 # ─────────────────────────────────────────
-resource "aws_key_pair" "qa_key" {
-  key_name   = "pasantias-qa-key"
-  public_key = file("${path.module}/QA.pub")
+data "aws_key_pair" "qa_key" {
+  key_name = "QA"
 }
 
 # ─────────────────────────────────────────
@@ -192,56 +188,20 @@ data "aws_ami" "ubuntu" {
   }
 }
 
-# Perfil de instancia IAM de AWS Academy
-data "aws_iam_instance_profile" "lab_profile" {
-  name = "LabInstanceProfile"
-}
-
 # ─────────────────────────────────────────
 # BASTION HOST — jump host público
-# NOTA: la IP pública cambia en cada sesión de AWS Academy.
-#       Después de cada "terraform apply -refresh-only" actualiza
-#       el secret QA_BASTION_IP en GitHub Actions.
+# NOTA: la EIP permanece fija entre sesiones de AWS Academy.
 # ─────────────────────────────────────────
 resource "aws_instance" "bastion" {
   ami                    = data.aws_ami.ubuntu.id
   instance_type          = "t3.micro"
   subnet_id              = aws_subnet.public_1a.id
-  key_name               = aws_key_pair.qa_key.key_name
+  key_name               = data.aws_key_pair.qa_key.key_name
   vpc_security_group_ids = [aws_security_group.sg_bastion.id]
-  iam_instance_profile   = data.aws_iam_instance_profile.lab_profile.name
   tags                   = { Name = "pasantias-qa-bastion" }
 
-  user_data = base64encode(<<-EOF
-    #!/bin/bash
-    set -e
-    exec > /var/log/bastion-init.log 2>&1
-
-    apt-get update -y
-    apt-get install -y curl jq
-
-    mkdir -p /home/ubuntu/actions-runner
-    cd /home/ubuntu/actions-runner
-    curl -o runner.tar.gz -L https://github.com/actions/runner/releases/download/v2.322.0/actions-runner-linux-x64-2.322.0.tar.gz
-    tar xzf runner.tar.gz
-    rm runner.tar.gz
-    chown -R ubuntu:ubuntu /home/ubuntu/actions-runner
-
-    mkdir -p /home/ubuntu/.ssh
-    chmod 700 /home/ubuntu/.ssh
-    chown ubuntu:ubuntu /home/ubuntu/.ssh
-
-    echo "Bastion init complete"
-  EOF
-  )
-
-  root_block_device {
-    volume_size = 20
-    volume_type = "gp3"
-  }
-
   lifecycle {
-    ignore_changes = [ami, user_data]
+    ignore_changes = [ami]
   }
 }
 
@@ -254,52 +214,39 @@ resource "aws_eip" "bastion_eip" {
 }
 
 # ─────────────────────────────────────────
-# EC2 — QA Services (auth + internship + frontend)
+# EC2 — QA Services (todos los microservicios)
 # ─────────────────────────────────────────
 resource "aws_instance" "qa_auth_jobs" {
   ami                    = data.aws_ami.ubuntu.id
   instance_type          = "t3.large"
   subnet_id              = aws_subnet.public_1a.id
-  key_name               = aws_key_pair.qa_key.key_name
+  key_name               = data.aws_key_pair.qa_key.key_name
   vpc_security_group_ids = [aws_security_group.sg_private.id]
-  iam_instance_profile   = data.aws_iam_instance_profile.lab_profile.name
 
-  user_data = base64encode(<<-EOF
+  user_data = <<-EOF
     #!/bin/bash
-    set -e
-    exec > /var/log/pasantias-ec2-init.log 2>&1
-
     apt-get update -y
-    apt-get install -y ca-certificates curl gnupg git apt-transport-https
-
+    apt-get install -y ca-certificates curl gnupg apt-transport-https
     install -m 0755 -d /etc/apt/keyrings
     curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
     chmod a+r /etc/apt/keyrings/docker.gpg
-
     echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu noble stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
-
     apt-get update -y
     apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
-
     systemctl enable docker
     systemctl start docker
     usermod -aG docker ubuntu
-
-    echo "EC2 init complete"
   EOF
-  )
 
   root_block_device {
-    volume_size = 30
+    volume_size = 20
     volume_type = "gp3"
   }
 
   tags = { Name = "pasantias-qa-ec2-services" }
 
-  # Evitar que Terraform destruya y recree la instancia cuando
-  # Ansible modifica los contenedores o cuando cambia la AMI
   lifecycle {
-    ignore_changes = [ami, user_data]
+    ignore_changes = [user_data, ami]
   }
 }
 
@@ -312,18 +259,42 @@ resource "aws_eip" "qa_auth_jobs_eip" {
 }
 
 # ─────────────────────────────────────────
+# S3 BUCKET — para document-service
+# Se crea aquí para que exista antes del primer deploy.
+# AWS Academy: este bucket persiste entre sesiones.
+# ─────────────────────────────────────────
+resource "aws_s3_bucket" "documents_qa" {
+  bucket        = "pasantias-documents-qa"
+  force_destroy = true
+  tags          = { Name = "pasantias-documents-qa" }
+}
+
+resource "aws_s3_bucket_ownership_controls" "documents_qa" {
+  bucket = aws_s3_bucket.documents_qa.id
+  rule {
+    object_ownership = "BucketOwnerPreferred"
+  }
+}
+
+resource "aws_s3_bucket_acl" "documents_qa" {
+  depends_on = [aws_s3_bucket_ownership_controls.documents_qa]
+  bucket     = aws_s3_bucket.documents_qa.id
+  acl        = "private"
+}
+
+# ─────────────────────────────────────────
 # OUTPUTS
 # Comandos para obtener los valores:
 #   terraform apply -refresh-only
 #   terraform output
 # ─────────────────────────────────────────
 output "bastion_public_ip" {
-  description = "QA Bastion EIP — fija entre sesiones de AWS Academy, no requiere actualizar QA_BASTION_IP"
+  description = "QA Bastion EIP — fija entre sesiones de AWS Academy, usar como QA_BASTION_IP en GitHub Secrets"
   value       = aws_eip.bastion_eip.public_ip
 }
 
 output "qa_auth_jobs_private_ip" {
-  description = "IP privada del EC2 de servicios (actualizar QA_AUTH_JOBS_IP en GitHub Secrets)"
+  description = "IP privada del EC2 de servicios — usar como QA_AUTH_JOBS_IP en GitHub Secrets"
   value       = aws_instance.qa_auth_jobs.private_ip
 }
 
@@ -332,3 +303,7 @@ output "qa_auth_jobs_public_ip" {
   value       = aws_eip.qa_auth_jobs_eip.public_ip
 }
 
+output "documents_bucket_qa" {
+  description = "Nombre del bucket S3 para document-service QA"
+  value       = aws_s3_bucket.documents_qa.bucket
+}
