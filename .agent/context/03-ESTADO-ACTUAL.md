@@ -3,7 +3,23 @@
 > **Este archivo se actualiza al final de cada sesión de trabajo.** Es el primer lugar
 > donde el agente debe mirar para saber "¿dónde quedamos?".
 
-_Última actualización: 2026-06-23 (Sesión Lab 53 - tarde)_
+_Última actualización: 2026-06-23 (Sesión Lab 53 - noche)_
+
+## ✅ COMPLETADO — Corrección de Bugs en Playbook de QA de Ansible (23/Jun noche)
+
+### Problema resuelto
+- Tres bugs críticos en `infra/ansible/deploy-qa.yml` impedían el despliegue correcto de los 6 nuevos servicios.
+- Mosquitto local no tenía autenticación y causaba conflictos con `notification-service`.
+- `gateway-service` no tenía mapeadas las 6 URLs de los nuevos servicios, lo que impedía que enrutara el tráfico correctamente.
+- Los nuevos microservicios usaban la etiqueta `:latest` de Docker en lugar de `:qa` en los pulls y ejecuciones del contenedor.
+
+### Solución aplicada
+- Se configuró Mosquitto local (self-hosted) con autenticación deshabilitando el acceso anónimo y utilizando un archivo de contraseñas montado desde `/opt/mosquitto/passwd` (copiado desde `infra/mosquitto/passwd`).
+- Se parametrizó la contraseña mediante `mqtt_password` en la sección de variables de Ansible con el default `changeme`. Asimismo, se inyectó como variable extra (`-e "mqtt_password=${{ secrets.MQTT_PASSWORD }}"`) en el workflow de CI/CD de QA (`.github/workflows/deploy-qa.yml`).
+- Se corrigió `notification-service` para usar el broker local de Mosquitto con usuario `mqttuser` y contraseña parametrizada.
+- Se añadieron las 6 URLs faltantes (`HOURS_SERVICE_URL`, `EVALUATION_SERVICE_URL`, `NOTIFICATION_SERVICE_URL`, `DOCUMENT_SERVICE_URL`, `REPORT_SERVICE_URL`, `AI_SERVICE_URL`) al docker run de `gateway-service`.
+- Se parametrizaron las imágenes de los 6 nuevos servicios con etiqueta `:qa` utilizando variables globales en el playbook de Ansible (`docker_image_hours`, `docker_image_evaluation`, etc.) eliminando todas las referencias a `:latest`.
+- Se unificó el pull de la imagen de Mosquitto ubicándolo en la sección correspondiente después de MongoDB.
 
 ## ✅ COMPLETADO — Nginx Proxy + Fix CORS (23/Jun tarde)
 
