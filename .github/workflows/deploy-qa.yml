@@ -414,6 +414,12 @@ jobs:
       - name: Install Ansible if missing
         run: which ansible || pip install ansible --break-system-packages
 
+      - name: Escribir clave SSH en el bastion
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.QA_SSH_KEY }}" > ~/.ssh/QA.pem
+          chmod 600 ~/.ssh/QA.pem
+
       - name: Create Ansible inventory
         run: |
           echo "[qa_ec2]" > /tmp/qa_inventory.ini
