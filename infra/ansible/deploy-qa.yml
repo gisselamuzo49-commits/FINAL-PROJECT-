@@ -4,7 +4,7 @@
 # Despliega los servicios y la base de datos PostgreSQL en el EC2 de QA
 # ─────────────────────────────────────────
 - name: Deploy QA — postgres-db, auth-service, internship-service, user-service, linkage-service, gateway-service, frontend-web
-  hosts: all
+  hosts: qa_ec2
   become: true
 
   vars:
