@@ -507,5 +507,4 @@ Se rediseñó por completo el pipeline de QA (`deploy-qa.yml`) logrando:
 3. **Compilación Paralela (`build-<servicio>`):** Se crearon 12 jobs independientes y paralelos (uno por servicio) que compilan y suben las imágenes a Docker Hub en paralelo solo si se detectaron cambios en su respectivo directorio.
 4. **Despliegue Secuencial y Seguro (`deploy`):** Ejecuta en el host `self-hosted` (Bastion de QA) una vez terminados todos los builds de forma exitosa, omitiendo de forma inteligente los builds omitidos (skipped) pero asegurando que si alguno falla, el deploy se aborte. Se removieron todas las dependencias y configuraciones SSH heredadas, así como configuraciones hardcodeadas redundantes.
 
-
-
+Última ejecución y deploy de prueba: 2026-06-24
