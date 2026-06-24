@@ -20,6 +20,7 @@ _Última actualización: 2026-06-23 (Sesión Lab 53 - noche)_
 - Se añadieron las 6 URLs faltantes (`HOURS_SERVICE_URL`, `EVALUATION_SERVICE_URL`, `NOTIFICATION_SERVICE_URL`, `DOCUMENT_SERVICE_URL`, `REPORT_SERVICE_URL`, `AI_SERVICE_URL`) al docker run de `gateway-service`.
 - Se parametrizaron las imágenes de los 6 nuevos servicios con etiqueta `:qa` utilizando variables globales en el playbook de Ansible (`docker_image_hours`, `docker_image_evaluation`, etc.) eliminando todas las referencias a `:latest`.
 - Se unificó el pull de la imagen de Mosquitto ubicándolo en la sección correspondiente después de MongoDB.
+- Se añadió la automatización para el GitHub Actions runner configurándolo como servicio `systemd` en el Bastion mediante un segundo play en `deploy-qa.yml` y agregando el grupo `[bastion]` al inventario generado en el workflow de GitHub Actions.
 
 ## ✅ COMPLETADO — Nginx Proxy + Fix CORS (23/Jun tarde)
 
