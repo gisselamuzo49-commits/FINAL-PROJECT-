@@ -520,3 +520,4 @@ Se restauró el pipeline de QA (`deploy-qa.yml`) al esquema secuencial original 
 Última ejecución y deploy de prueba: 2026-06-24 (esquema ProxyCommand restaurado al 100% con IPs dinámicas en ProxyCommand y nombres de secretos de Docker Hub corregidos)
 
 Trigger: Deploy QA ProxyCommand restored (2026-06-24)
+Trigger: Deploy QA workflow restaurado (2026-06-24)
