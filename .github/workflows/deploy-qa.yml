@@ -412,7 +412,8 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Install Ansible if missing
-        run: which ansible || pip install ansible --break-system-packages
+        run: |
+          which ansible || (sudo apt-get update -y && sudo apt-get install -y ansible)
 
       - name: Escribir clave SSH en el bastion
         run: |
