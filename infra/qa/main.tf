@@ -239,8 +239,13 @@ resource "aws_instance" "bastion" {
   EOF
   )
 
+  root_block_device {
+    volume_size = 20
+    volume_type = "gp3"
+  }
+
   lifecycle {
-    ignore_changes = [user_data, ami]
+    ignore_changes = [ami, user_data]
   }
 }
 
@@ -298,7 +303,7 @@ resource "aws_instance" "qa_auth_jobs" {
   # Evitar que Terraform destruya y recree la instancia cuando
   # Ansible modifica los contenedores o cuando cambia la AMI
   lifecycle {
-    ignore_changes = [user_data, ami]
+    ignore_changes = [ami, user_data]
   }
 }
 
