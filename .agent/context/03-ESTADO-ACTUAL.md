@@ -7,6 +7,11 @@ _Última actualización: 2026-06-24 (Sesión Lab 54 - tarde)_
 
 ## ✅ COMPLETADO HOY — Infraestructura PROD Lab 54 (24/Jun tarde)
 
+### Mosquitto Local Broker (Autohospedado)
+- Creada la rama `feature/mosquitto-local-broker` para independizar el sistema de HiveMQ Cloud.
+- Modificados `infra/ansible/deploy-qa.yml` y `infra/ansible/deploy-prod.yml` para aprovisionar automáticamente un contenedor `mosquitto` con autenticación básica (`notifuser` / password hash en `passwd`) sobre la red interna `pasantias-net`.
+- Redirigido `notification-service` para conectarse al host `mosquitto` en el puerto `1883` con credenciales `notifuser`/`MqttN0t1f2026Uce` (removiendo HiveMQ por completo).
+
 ### IPs y Recursos actuales de PROD (Lab 54)
 - **Bastion EIP (fija)**: `34.235.174.136`
 - **PROD ALB DNS**: `pasantias-prod-elb-1617123986.us-east-1.elb.amazonaws.com`
