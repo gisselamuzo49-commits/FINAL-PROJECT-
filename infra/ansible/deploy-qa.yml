@@ -553,3 +553,44 @@
     - name: Mostrar estado
       debug:
         var: container_status.stdout_lines
+
+# ─────────────────────────────────────────
+# PLAY 2 — Configurar runner como servicio
+#           systemd en el bastion
+# ─────────────────────────────────────────
+- name: Configurar GitHub Actions runner como servicio systemd en bastion
+  hosts: bastion
+  become: true
+
+  tasks:
+    - name: Instalar el runner como servicio systemd
+      shell: |
+        cd /home/ubuntu/actions-runner
+        ./svc.sh install ubuntu || true
+      args:
+        executable: /bin/bash
+
+    - name: Habilitar el servicio para que arranque con el sistema
+      systemd:
+        name: actions.runner.*
+        enabled: true
+        daemon_reload: true
+      ignore_errors: true
+
+    - name: Iniciar el servicio del runner si no está corriendo
+      shell: |
+        cd /home/ubuntu/actions-runner
+        ./svc.sh start || true
+      args:
+        executable: /bin/bash
+
+    - name: Verificar estado del runner
+      shell: |
+        cd /home/ubuntu/actions-runner
+        ./svc.sh status
+      register: runner_status
+      changed_when: false
+
+    - name: Mostrar estado del runner
+      debug:
+        var: runner_status.stdout_lines
