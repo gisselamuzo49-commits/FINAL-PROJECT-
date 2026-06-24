@@ -503,10 +503,8 @@ Se adoptaron 4 mejoras del proyecto de referencia y se aplicaron las reversiones
 
 ## ✅ COMPLETADO — Rediseño del Pipeline de CI/CD (23/Jun)
 
-Se rediseñó por completo el pipeline de QA (`deploy-qa.yml`) logrando:
+Se restauró el pipeline de QA (`deploy-qa.yml`) al esquema secuencial original que funcionaba:
 1. **Detección de Cambios (`detect-changes`):** Ejecuta la discriminación de rutas usando `dorny/paths-filter`.
-2. **Pruebas Consolidadas (`test`):** Un solo job en `ubuntu-latest` que ejecuta condicionalmente las pruebas unitarias únicamente para los servicios modificados y las del frontend.
-3. **Compilación Paralela (`build-<servicio>`):** Se crearon 12 jobs independientes y paralelos (uno por servicio) que compilan y suben las imágenes a Docker Hub en paralelo solo si se detectaron cambios en su respectivo directorio.
-4. **Despliegue Secuencial y Seguro (`deploy`):** Ejecuta en `ubuntu-latest` usando el esquema ProxyCommand original para conectarse a la instancia `qa_ec2` a través del Bastion de QA, una vez terminados todos los builds de forma exitosa, omitiendo de forma inteligente los builds omitidos (skipped) pero asegurando que si alguno falla, el deploy se aborte. Se configuró el play principal de Ansible para ejecutarse sobre `hosts: qa_ec2` y la conexión SSH en el pipeline a través de la configuración ProxyCommand.
+2. **Ejecución y Despliegue en un solo job (`deploy`):** Ejecuta en `ubuntu-latest`, corriendo condicionalmente las pruebas unitarias y compilaciones de Docker Hub secuencialmente. Luego, utiliza el túnel SSH ProxyCommand a través del bastion para ejecutar Ansible en `hosts: all`.
 
-Última ejecución y deploy de prueba: 2026-06-24 (retornado a esquema ProxyCommand)
+Última ejecución y deploy de prueba: 2026-06-24 (esquema ProxyCommand restaurado al 100% con IPs actualizadas)
