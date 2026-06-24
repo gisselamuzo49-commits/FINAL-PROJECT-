@@ -10,7 +10,7 @@ terraform {
     }
   }
   backend "s3" {
-    bucket = "estado-pasantias-gisse-2026"
+    bucket = "estado-pasantias-gisse-2026-prod"
     key    = "prod/terraform.tfstate"
     region = "us-east-1"
   }
