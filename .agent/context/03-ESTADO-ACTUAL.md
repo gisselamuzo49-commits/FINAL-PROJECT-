@@ -54,9 +54,9 @@ _Última actualización: 2026-06-24 (Sesión Lab 53 - mañana)_
 - Todo el tráfico API ahora va por puerto 80 via Nginx
 
 ### URL actual de QA
-- Frontend: http://32.193.25.6 (puerto 80)
-- API: http://32.193.25.6/api/* (proxy interno a :8082)
-- Gateway directo (interno): http://32.193.25.6:8082
+- Frontend: http://50.19.247.85 (puerto 80)
+- API: http://50.19.247.85/api/* (proxy interno a :8082)
+- Gateway directo (interno): http://50.19.247.85:8082
 
 ### Credenciales de prueba
 - estudiante@uce.edu.ec / password123
@@ -66,14 +66,14 @@ _Última actualización: 2026-06-24 (Sesión Lab 53 - mañana)_
 ## ✅ COMPLETADO HOY — Infraestructura Lab 53
 
 ### IPs actuales de QA (Lab 53)
-- Bastion EIP: 50.19.247.85 (fija, no cambia)
-- qa_auth_jobs EIP pública: 32.193.25.6 (fija)
-- qa_auth_jobs IP privada: 10.0.1.170
-- S3 backend tfstate: estado-pasantias-gisse-lab53
+- Bastion EIP: 54.144.154.118 (fija, no cambia)
+- qa_auth_jobs EIP pública: 50.19.247.85 (fija)
+- qa_auth_jobs IP privada: 10.0.1.238
+- S3 backend tfstate: estado-pasantias-gisse-2026
 
-### Secrets de GitHub actualizados
-- QA_BASTION_IP = 50.19.247.85
-- QA_AUTH_JOBS_IP = 10.0.1.170 (IP privada para Ansible)
+### Secrets de GitHub actualizados (Requiere actualizar en GitHub Secrets)
+- QA_BASTION_IP = 54.144.154.118
+- QA_AUTH_JOBS_IP = 10.0.1.238 (IP privada para Ansible)
 - JWT_SECRET = en GitHub Secrets (ya no hardcodeado)
 - PG_PASSWORD = en GitHub Secrets
 - NEO4J_PASSWORD = en GitHub Secrets
