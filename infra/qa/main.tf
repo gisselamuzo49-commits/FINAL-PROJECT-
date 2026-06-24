@@ -176,7 +176,7 @@ resource "aws_security_group" "sg_private" {
 # KEY PAIR — QA key creada por Terraform
 # ─────────────────────────────────────────
 resource "aws_key_pair" "qa_key" {
-  key_name   = "QA"
+  key_name   = "pasantias-qa-key"
   public_key = file("${path.module}/QA.pub")
 }
 
