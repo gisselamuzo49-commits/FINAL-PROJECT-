@@ -291,6 +291,8 @@
           -v /var/lib/postgresql/data:/var/lib/postgresql/data \
           -v /opt/postgres-init:/docker-entrypoint-initdb.d \
           {{ postgres_image }}
+      async: 120
+      poll: 10
 
     - name: Esperar a que la base de datos esté lista
       pause:
@@ -311,6 +313,8 @@
           -e JWT_SECRET="{{ jwt_secret }}" \
           -e JAVA_TOOL_OPTIONS="-Xmx256m -Xms128m" \
           {{ docker_image_auth }}
+      async: 120
+      poll: 10
 
     - name: Levantar internship-service
       shell: |
@@ -329,6 +333,8 @@
           -e NEO4J_PASSWORD={{ neo4j_password }} \
           -e JAVA_TOOL_OPTIONS="-Xmx256m -Xms128m" \
           {{ docker_image_internship }}
+      async: 120
+      poll: 10
 
     - name: Levantar user-service
       shell: |
@@ -344,6 +350,8 @@
           -e DB_PASSWORD="{{ pg_password }}" \
           -e JAVA_TOOL_OPTIONS="-Xmx256m -Xms128m" \
           {{ docker_image_user }}
+      async: 120
+      poll: 10
 
     - name: Levantar linkage-service
       shell: |
@@ -359,6 +367,8 @@
           -e DB_PASSWORD="{{ pg_password }}" \
           -e JAVA_TOOL_OPTIONS="-Xmx256m -Xms128m" \
           {{ docker_image_linkage }}
+      async: 120
+      poll: 10
 
     - name: Levantar redis
       shell: |
@@ -368,6 +378,8 @@
           --restart always \
           -p 6379:6379 \
           redis:7-alpine
+      async: 120
+      poll: 10
 
     - name: Levantar zookeeper
       shell: >
@@ -377,6 +389,8 @@
         -e ZOOKEEPER_CLIENT_PORT=2181
         -e ZOOKEEPER_TICK_TIME=2000
         confluentinc/cp-zookeeper:7.6.0
+      async: 120
+      poll: 10
 
     - name: Levantar kafka
       shell: >
@@ -389,6 +403,8 @@
         -e KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
         -e KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
         confluentinc/cp-kafka:7.6.0
+      async: 120
+      poll: 10
 
     - name: Esperar a que Kafka esté listo
       shell: sleep 20
@@ -400,6 +416,8 @@
         --restart always
         -p 27017:27017
         mongo:7
+      async: 120
+      poll: 10
 
     - name: Copiar configuración de Mosquitto al host
       copy:
@@ -426,6 +444,8 @@
           -v /opt/mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro \
           -v /opt/mosquitto/passwd:/mosquitto/config/passwd:ro \
           eclipse-mosquitto:2.0
+      async: 120
+      poll: 10
 
     - name: Esperar a que Mosquitto esté listo
       shell: sleep 5
@@ -440,6 +460,8 @@
           -e RABBITMQ_DEFAULT_USER=guest \
           -e RABBITMQ_DEFAULT_PASS=guest \
           rabbitmq:3-management-alpine
+      async: 120
+      poll: 10
 
     - name: Levantar neo4j
       shell: |
@@ -453,6 +475,8 @@
           -e NEO4J_server_memory_heap_max__size=512m \
           -e NEO4J_server_memory_pagecache__size=256m \
           neo4j:5-community
+      async: 120
+      poll: 10
       ignore_errors: true
 
     - name: Levantar hours-service
@@ -473,6 +497,8 @@
         -e USER_SERVICE_GRPC_PORT=9083
         -e JAVA_TOOL_OPTIONS="-Xmx256m -Xms128m"
         {{ docker_image_hours }}
+      async: 120
+      poll: 10
       ignore_errors: true
 
     - name: Levantar evaluation-service
@@ -491,6 +517,8 @@
         -e USER_SERVICE_GRPC_PORT=9083
         -e JAVA_TOOL_OPTIONS="-Xmx256m -Xms128m"
         {{ docker_image_evaluation }}
+      async: 120
+      poll: 10
       ignore_errors: true
 
     - name: Levantar notification-service
@@ -511,6 +539,8 @@
         -e MQTT_PASSWORD={{ mqtt_password }}
         -e JAVA_TOOL_OPTIONS="-Xmx256m -Xms128m"
         {{ docker_image_notification }}
+      async: 120
+      poll: 10
       ignore_errors: true
 
     - name: Levantar document-service
@@ -532,6 +562,8 @@
         -e AWS_SESSION_TOKEN={{ aws_session_token }}
         -e JAVA_TOOL_OPTIONS="-Xmx256m -Xms128m"
         {{ docker_image_document }}
+      async: 120
+      poll: 10
       ignore_errors: true
 
     - name: Levantar report-service
@@ -550,6 +582,8 @@
         -e DOCUMENT_SERVICE_URL=http://document-service:8088
         -e JAVA_TOOL_OPTIONS="-Xmx256m -Xms128m"
         {{ docker_image_report }}
+      async: 120
+      poll: 10
       ignore_errors: true
 
     - name: Levantar ai-service
@@ -563,6 +597,8 @@
         -e RABBITMQ_USER=guest
         -e RABBITMQ_PASSWORD=guest
         {{ docker_image_ai }}
+      async: 120
+      poll: 10
       ignore_errors: true
 
 
@@ -589,6 +625,8 @@
           -e JWT_SECRET="{{ jwt_secret }}" \
           -e JAVA_TOOL_OPTIONS="-Xmx256m -Xms128m" \
           {{ docker_image_gateway }}
+      async: 120
+      poll: 10
 
     - name: Levantar frontend-web
       shell: |
@@ -598,6 +636,8 @@
           --restart always \
           -p 80:80 \
           {{ docker_image_frontend }}
+      async: 120
+      poll: 10
 
     # ── Verificación ─────────────────────
     - name: Estado de los contenedores
