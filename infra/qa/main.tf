@@ -23,6 +23,15 @@ provider "aws" {
 }
 
 # ─────────────────────────────────────────
+# VARIABLES
+# ─────────────────────────────────────────
+variable "gh_runner_token" {
+  description = "GitHub Personal Access Token para registrar el runner"
+  type        = string
+  sensitive   = true
+}
+
+# ─────────────────────────────────────────
 # VPC
 # ─────────────────────────────────────────
 resource "aws_vpc" "main" {
@@ -215,14 +224,10 @@ resource "aws_instance" "bastion" {
   user_data = base64encode(<<-EOF
     #!/bin/bash
     set -e
-    exec > /var/log/pasantias-bastion-init.log 2>&1
+    exec > /var/log/bastion-init.log 2>&1
 
     apt-get update -y
-    apt-get install -y curl unzip jq ansible git
-
-    snap install amazon-ssm-agent --classic || true
-    systemctl enable snap.amazon-ssm-agent.amazon-ssm-agent.service || true
-    systemctl start snap.amazon-ssm-agent.amazon-ssm-agent.service || true
+    apt-get install -y curl jq
 
     mkdir -p /home/ubuntu/actions-runner
     cd /home/ubuntu/actions-runner
@@ -235,7 +240,29 @@ resource "aws_instance" "bastion" {
     chmod 700 /home/ubuntu/.ssh
     chown ubuntu:ubuntu /home/ubuntu/.ssh
 
-    echo "Bastion init complete"
+    # Obtener token de registro usando Personal Access Token
+    RUNNER_TOKEN=$(curl -s -X POST \
+      -H "Authorization: token ${gh_runner_token}" \
+      -H "Accept: application/vnd.github.v3+json" \
+      https://api.github.com/repos/gisselamuzo49-commits/FINAL-PROJECT-/actions/runners/registration-token \
+      | jq -r .token)
+
+    # Configurar el runner
+    sudo -u ubuntu /home/ubuntu/actions-runner/config.sh \
+      --url https://github.com/gisselamuzo49-commits/FINAL-PROJECT- \
+      --token $RUNNER_TOKEN \
+      --name pasantias-qa-runner \
+      --labels self-hosted,linux,qa \
+      --work _work \
+      --unattended \
+      --replace
+
+    # Instalar como servicio systemd
+    cd /home/ubuntu/actions-runner
+    ./svc.sh install ubuntu
+    ./svc.sh start
+
+    echo "Runner instalado y corriendo"
   EOF
   )
 
