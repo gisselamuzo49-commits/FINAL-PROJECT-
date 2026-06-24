@@ -25,6 +25,7 @@ _Última actualización: 2026-06-23 (Sesión Lab 53 - noche)_
 - Se agregaron tareas en el playbook de Ansible para expandir automáticamente la partición y el filesystem del volumen EBS (`growpart` y `resize2fs`) en la instancia EC2 de QA.
 - Se añadió `ignore_errors: true` a las tareas de pull y run de los 6 nuevos servicios y neo4j en `deploy-qa.yml` para evitar fallas en el despliegue cuando las imágenes no existan o por timeouts.
 - Se configuró `async: 120` y `poll: 10` en las 20 tareas de levantar contenedores ("Levantar") que ejecutan `docker run` en `deploy-qa.yml` para evitar bloqueos y cuelgues por SSH.
+- Se configuró el disco root_block_device de la instancia del bastion a 20GB y de la de servicios a 30GB en el Terraform de QA (`infra/qa/main.tf`), agregando y alineando sus bloques `lifecycle` correspondientes.
 
 ## ✅ COMPLETADO — Nginx Proxy + Fix CORS (23/Jun tarde)
 
