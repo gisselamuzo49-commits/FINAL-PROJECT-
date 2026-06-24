@@ -7,6 +7,12 @@ function Linkage() {
   const [projects, setProjects] = useState([]);
   const [mensajeProjects, setMensajeProjects] = useState(null);
 
+  // --- Decodificar Rol desde JWT ---
+  const token = localStorage.getItem('token');
+  const payload = token && token.split('.').length === 3 ? JSON.parse(atob(token.split('.')[1])) : {};
+  const rol = (payload.rol || payload.role || '').toString().toUpperCase();
+  const canPublish = rol.includes('TUTOR') || rol.includes('COORDINADOR') || rol.includes('ADMIN');
+
   // Form States
   const [projectName, setProjectName] = useState("");
   const [projectDesc, setProjectDesc] = useState("");
@@ -66,9 +72,10 @@ function Linkage() {
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 p-1">
+    <div className={`grid grid-cols-1 ${canPublish ? 'lg:grid-cols-2' : 'w-full'} gap-6 p-1`}>
       {/* Create Project Card */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col">
+      {canPublish && (
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col">
         <h2 className="text-xl font-bold text-gray-800 border-b border-gray-100 pb-3 mb-5 flex items-center">
           <span className="mr-2">🔗</span> Registrar Proyecto de Vinculación
         </h2>
@@ -139,6 +146,7 @@ function Linkage() {
           </button>
         </form>
       </div>
+      )}
 
       {/* Active Projects Card */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col h-[600px] lg:h-auto">
