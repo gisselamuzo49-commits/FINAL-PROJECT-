@@ -71,7 +71,7 @@ jobs:
       DB_NAME: postgres
       DB_USER: postgres
       DB_PASSWORD: postgres
-      JWT_SECRET: ${{ secrets.JWT_SECRET }}
+      JWT_SECRET: v9y$B&E)H@McQfTjWmZq4t7w!z%C*F-JaNdRgUkXp2r5u8x/A?D(G+KbPeShVmYq
 
     steps:
       - name: Checkout code
@@ -223,7 +223,7 @@ jobs:
         with:
           context: ./apps/hours-service
           push: true
-          tags: gdmuzo/hours-service:qa
+          tags: gdmuzo/hours-service:latest
 
       - name: Build and push evaluation-service
         if: needs.detect-changes.outputs.evaluation == 'true'
@@ -231,7 +231,7 @@ jobs:
         with:
           context: ./apps/evaluation-service
           push: true
-          tags: gdmuzo/evaluation-service:qa
+          tags: gdmuzo/evaluation-service:latest
 
       - name: Build and push notification-service
         if: needs.detect-changes.outputs.notification == 'true'
@@ -239,7 +239,7 @@ jobs:
         with:
           context: ./apps/notification-service
           push: true
-          tags: gdmuzo/notification-service:qa
+          tags: gdmuzo/notification-service:latest
 
       - name: Build and push document-service
         if: needs.detect-changes.outputs.document == 'true'
@@ -247,7 +247,7 @@ jobs:
         with:
           context: ./apps/document-service
           push: true
-          tags: gdmuzo/document-service:qa
+          tags: gdmuzo/document-service:latest
 
       - name: Build and push report-service
         if: needs.detect-changes.outputs.report == 'true'
@@ -255,7 +255,7 @@ jobs:
         with:
           context: ./apps/report-service
           push: true
-          tags: gdmuzo/report-service:qa
+          tags: gdmuzo/report-service:latest
 
       - name: Build and push ai-service
         if: needs.detect-changes.outputs.ai == 'true'
@@ -263,44 +263,53 @@ jobs:
         with:
           context: ./apps/ai-service
           push: true
-          tags: gdmuzo/ai-service:qa
+          tags: gdmuzo/ai-service:latest
 
       - name: Setup SSH key
         run: |
           mkdir -p ~/.ssh
           printf '%s' "${{ secrets.QA_SSH_KEY }}" > ~/.ssh/QA.pem
           chmod 400 ~/.ssh/QA.pem
-          ssh-keyscan -H ${{ secrets.QA_BASTION_IP }} >> ~/.ssh/known_hosts 2>/dev/null || true
+          ssh-keyscan -H ${{ secrets.QA_BASTION_IP }} >> ~/.ssh/known_hosts
+          ssh -i ~/.ssh/QA.pem \
+            -o StrictHostKeyChecking=no \
+            -o ConnectTimeout=10 \
+            -v \
+            ubuntu@${{ secrets.QA_BASTION_IP }} \
+            "ssh-keyscan -H ${{ secrets.QA_AUTH_JOBS_IP }}" 2>&1 | tee /tmp/ssh_debug.txt
+          cat /tmp/ssh_debug.txt >> ~/.ssh/known_hosts || true
+          echo "SSH exit code: $?"
 
       - name: Create Ansible inventory
         run: |
-          cat > /tmp/qa_inventory.ini << EOF
-          [qa_ec2]
-          ${{ secrets.QA_AUTH_JOBS_IP }} ansible_user=ubuntu ansible_ssh_private_key_file=~/.ssh/QA.pem ansible_ssh_common_args='-o StrictHostKeyChecking=no -o ProxyCommand="ssh -W %h:%p -i ~/.ssh/QA.pem -o StrictHostKeyChecking=no ubuntu@${{ secrets.QA_BASTION_IP }}"'
-          EOF
+          echo "[qa_ec2]" > /tmp/qa_inventory.ini
+          echo "${{ secrets.QA_AUTH_JOBS_IP }}" >> /tmp/qa_inventory.ini
           cat /tmp/qa_inventory.ini
 
-      - name: Install Ansible
-        run: pip install ansible
-
-      - name: Debug inventario
+      - name: Configure Ansible SSH
         run: |
-          echo "=== INVENTARIO ==="
-          cat /tmp/qa_inventory.ini
-          echo "=== BASTION IP ==="
-          echo "${{ secrets.QA_BASTION_IP }}"
-          echo "=== AUTH JOBS IP ==="
-          echo "${{ secrets.QA_AUTH_JOBS_IP }}"
+          printf '[defaults]\nremote_user = ubuntu\nprivate_key_file = ~/.ssh/QA.pem\nhost_key_checking = False\n\n[ssh_connection]\nssh_args = -o StrictHostKeyChecking=no -o ProxyCommand="ssh -W %%h:%%p -i ~/.ssh/QA.pem -o StrictHostKeyChecking=no ubuntu@${{ secrets.QA_BASTION_IP }}"\n' > /tmp/ansible.cfg
+          cat /tmp/ansible.cfg
 
       - name: Deploy via Ansible
         run: |
-          ansible-playbook infra/ansible/deploy-qa.yml \
+          pip install ansible
+          echo "=== ANSIBLE_CONFIG ==="
+          echo $ANSIBLE_CONFIG
+          echo "=== ansible.cfg content ==="
+          cat /tmp/ansible.cfg
+          echo "=== inventory content ==="
+          cat /tmp/qa_inventory.ini
+          echo "=== testing ansible connection ==="
+          ANSIBLE_CONFIG=/tmp/ansible.cfg ansible \
             -i /tmp/qa_inventory.ini \
-            -e "jwt_secret=${{ secrets.JWT_SECRET }}" \
-            -e "pg_password=${{ secrets.PG_PASSWORD }}" \
-            -e "mqtt_password=${{ secrets.MQTT_PASSWORD }}" \
-            -e "neo4j_password=${{ secrets.NEO4J_PASSWORD }}" \
-            -e "qa_public_ip=${{ secrets.QA_AUTH_JOBS_IP }}" \
+            all -m ping \
+            -vvv 2>&1 | head -50
+          echo "=== running playbook ==="
+          ANSIBLE_CONFIG=/tmp/ansible.cfg ansible-playbook infra/ansible/deploy-qa.yml \
+            -i /tmp/qa_inventory.ini \
             -e "aws_access_key_id=${{ secrets.AWS_ACCESS_KEY_ID }}" \
             -e "aws_secret_access_key=${{ secrets.AWS_SECRET_ACCESS_KEY }}" \
             -e "aws_session_token=${{ secrets.AWS_SESSION_TOKEN }}"
+        env:
+          ANSIBLE_CONFIG: /tmp/ansible.cfg
