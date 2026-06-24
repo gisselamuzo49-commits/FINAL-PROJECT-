@@ -22,6 +22,7 @@ _Última actualización: 2026-06-23 (Sesión Lab 53 - noche)_
 - Se unificó el pull de la imagen de Mosquitto ubicándolo en la sección correspondiente después de MongoDB.
 - Se añadió la automatización para el GitHub Actions runner configurándolo como servicio `systemd` en el Bastion mediante un segundo play en `deploy-qa.yml` y agregando el grupo `[bastion]` al inventario generado en el workflow de GitHub Actions.
 - Se configuró la instalación automática de Docker (si no existe en el EC2 de QA) dentro de los prerrequisitos del playbook de Ansible.
+- Se agregaron tareas en el playbook de Ansible para expandir automáticamente la partición y el filesystem del volumen EBS (`growpart` y `resize2fs`) en la instancia EC2 de QA.
 
 ## ✅ COMPLETADO — Nginx Proxy + Fix CORS (23/Jun tarde)
 
