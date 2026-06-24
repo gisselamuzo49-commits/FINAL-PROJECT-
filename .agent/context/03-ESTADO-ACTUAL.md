@@ -3,7 +3,17 @@
 > **Este archivo se actualiza al final de cada sesión de trabajo.** Es el primer lugar
 > donde el agente debe mirar para saber "¿dónde quedamos?".
 
-_Última actualización: 2026-06-23 (Sesión Lab 53 - noche)_
+_Última actualización: 2026-06-24 (Sesión Lab 53 - mañana)_
+
+## ✅ COMPLETADO — Ajuste de Configuración SSH de Ansible para QA (24/Jun mañana)
+
+### Problema resuelto
+- El pipeline de despliegue a QA (`deploy-qa.yml`) no podía establecer conexión correctamente debido a discrepancias en el túnel SSH a través del Bastion.
+
+### Solución aplicada
+- Se eliminó el step `Configure Ansible SSH` en `.github/workflows/deploy-qa.yml`.
+- Se adaptó la creación del inventario para inyectar inline la configuración SSH (`ansible_ssh_common_args` con el `ProxyCommand` y la clave privada `QA.pem`), unificando el patrón con `deploy-prod.yml`.
+- Se removieron los overrides `ANSIBLE_CONFIG` del step `Deploy via Ansible`.
 
 ## ✅ COMPLETADO — Corrección de Bugs en Playbook de QA de Ansible (23/Jun noche)
 
@@ -79,8 +89,8 @@ _Última actualización: 2026-06-23 (Sesión Lab 53 - noche)_
 
 ### CI/CD - nuevo diseño deploy-qa.yml
 - 15 jobs: detect-changes → test → 12 builds paralelos → deploy
-- runs-on: [self-hosted, linux, qa] en el job deploy
-- Sin SSH tunnel, sin ProxyCommand
+- runs-on: ubuntu-latest en el job deploy
+- Uso de ProxyCommand inline en el inventario (mismo patrón que PROD)
 - Builds paralelos por servicio con dorny/paths-filter
 - Secrets inyectados como variables Ansible
 
