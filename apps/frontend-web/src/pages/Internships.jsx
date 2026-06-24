@@ -3,9 +3,15 @@ import { useOutletContext } from 'react-router-dom';
 
 function Internships() {
   const { getHeaders, logout } = useOutletContext();
-  const API = import.meta.env.VITE_API_BASE_URL || 'http://18.232.199.190:8082';
+  const API = import.meta.env.VITE_API_BASE_URL || `http://${window.location.hostname}`;
   const [pasantias, setPasantias] = useState([]);
   const [mensajePasantias, setMensajePasantias] = useState(null);
+
+  // --- Decodificar Rol desde JWT ---
+  const token = localStorage.getItem('token');
+  const payload = token && token.split('.').length === 3 ? JSON.parse(atob(token.split('.')[1])) : {};
+  const rol = (payload.rol || payload.role || '').toString().toUpperCase();
+  const canPublish = rol.includes('TUTOR') || rol.includes('COORDINADOR') || rol.includes('ADMIN');
   
   // Form States
   const [title, setTitle] = useState("");
@@ -54,78 +60,80 @@ function Internships() {
   }, []);
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 p-1">
+    <div className={`grid grid-cols-1 ${canPublish ? 'lg:grid-cols-2' : 'max-w-3xl mx-auto'} gap-6 p-1`}>
       {/* Create Internship Card */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col">
-        <h2 className="text-xl font-bold text-gray-800 border-b border-gray-100 pb-3 mb-5 flex items-center">
-          <span className="mr-2">💼</span> Publicar Oferta de Pasantía
-        </h2>
-        
-        {mensajePasantias && mensajePasantias.type === "success" && (
-          <div className="bg-green-50 text-green-700 text-sm p-4 rounded-lg mb-5 font-medium border border-green-200">
-            {mensajePasantias.text}
-          </div>
-        )}
-
-        <form onSubmit={registrarPasantia} className="space-y-4 flex-1 flex flex-col justify-between">
-          <div className="space-y-4">
-            <div className="flex flex-col">
-              <label className="text-sm font-medium text-gray-700 text-left block mb-1">Título del Puesto:</label>
-              <input
-                type="text"
-                required
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                className="bg-gray-100 rounded-lg px-4 py-3 w-full text-gray-900 focus:outline-none focus:ring-2 focus:ring-[var(--color-purple)]"
-                placeholder="Desarrollador Java Fullstack"
-              />
+      {canPublish && (
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col">
+          <h2 className="text-xl font-bold text-gray-800 border-b border-gray-100 pb-3 mb-5 flex items-center">
+            <span className="mr-2">💼</span> Publicar Oferta de Pasantía
+          </h2>
+          
+          {mensajePasantias && mensajePasantias.type === "success" && (
+            <div className="bg-green-50 text-green-700 text-sm p-4 rounded-lg mb-5 font-medium border border-green-200">
+              {mensajePasantias.text}
             </div>
-            
-            <div className="flex flex-col">
-              <label className="text-sm font-medium text-gray-700 text-left block mb-1">Empresa / Institución:</label>
-              <input
-                type="text"
-                required
-                value={company}
-                onChange={(e) => setCompany(e.target.value)}
-                className="bg-gray-100 rounded-lg px-4 py-3 w-full text-gray-900 focus:outline-none focus:ring-2 focus:ring-[var(--color-purple)]"
-                placeholder="Corporación Financiera Nacional"
-              />
+          )}
+
+          <form onSubmit={registrarPasantia} className="space-y-4 flex-1 flex flex-col justify-between">
+            <div className="space-y-4">
+              <div className="flex flex-col">
+                <label className="text-sm font-medium text-gray-700 text-left block mb-1">Título del Puesto:</label>
+                <input
+                  type="text"
+                  required
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  className="bg-gray-100 rounded-lg px-4 py-3 w-full text-gray-900 focus:outline-none focus:ring-2 focus:ring-[var(--color-purple)]"
+                  placeholder="Desarrollador Java Fullstack"
+                />
+              </div>
+              
+              <div className="flex flex-col">
+                <label className="text-sm font-medium text-gray-700 text-left block mb-1">Empresa / Institución:</label>
+                <input
+                  type="text"
+                  required
+                  value={company}
+                  onChange={(e) => setCompany(e.target.value)}
+                  className="bg-gray-100 rounded-lg px-4 py-3 w-full text-gray-900 focus:outline-none focus:ring-2 focus:ring-[var(--color-purple)]"
+                  placeholder="Corporación Financiera Nacional"
+                />
+              </div>
+
+              <div className="flex flex-col">
+                <label className="text-sm font-medium text-gray-700 text-left block mb-1">Descripción de Actividades:</label>
+                <textarea
+                  required
+                  rows="3"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  className="bg-gray-100 rounded-lg px-4 py-3 w-full text-gray-900 focus:outline-none focus:ring-2 focus:ring-[var(--color-purple)] resize-none"
+                  placeholder="Detalles sobre las tareas a realizar y requisitos del estudiante..."
+                />
+              </div>
+
+              <div className="flex flex-col">
+                <label className="text-sm font-medium text-gray-700 text-left block mb-1">Estado de la Oferta:</label>
+                <select
+                  value={statusPasantia}
+                  onChange={(e) => setStatusPasantia(e.target.value)}
+                  className="bg-gray-100 rounded-lg px-4 py-3 w-full text-gray-900 focus:outline-none focus:ring-2 focus:ring-[var(--color-purple)] appearance-none cursor-pointer"
+                >
+                  <option value="ABIERTA">Abierta</option>
+                  <option value="CERRADA">Cerrada</option>
+                </select>
+              </div>
             </div>
 
-            <div className="flex flex-col">
-              <label className="text-sm font-medium text-gray-700 text-left block mb-1">Descripción de Actividades:</label>
-              <textarea
-                required
-                rows="3"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                className="bg-gray-100 rounded-lg px-4 py-3 w-full text-gray-900 focus:outline-none focus:ring-2 focus:ring-[var(--color-purple)] resize-none"
-                placeholder="Detalles sobre las tareas a realizar y requisitos del estudiante..."
-              />
-            </div>
-
-            <div className="flex flex-col">
-              <label className="text-sm font-medium text-gray-700 text-left block mb-1">Estado de la Oferta:</label>
-              <select
-                value={statusPasantia}
-                onChange={(e) => setStatusPasantia(e.target.value)}
-                className="bg-gray-100 rounded-lg px-4 py-3 w-full text-gray-900 focus:outline-none focus:ring-2 focus:ring-[var(--color-purple)] appearance-none cursor-pointer"
-              >
-                <option value="ABIERTA">Abierta</option>
-                <option value="CERRADA">Cerrada</option>
-              </select>
-            </div>
-          </div>
-
-          <button 
-            type="submit" 
-            className="bg-[var(--color-purple)] hover:bg-[var(--color-purple-hover)] text-white font-semibold rounded-lg py-3 px-4 w-full transition shadow-sm mt-6"
-          >
-            Publicar Oferta
-          </button>
-        </form>
-      </div>
+            <button 
+              type="submit" 
+              className="bg-[var(--color-purple)] hover:bg-[var(--color-purple-hover)] text-white font-semibold rounded-lg py-3 px-4 w-full transition shadow-sm mt-6"
+            >
+              Publicar Oferta
+            </button>
+          </form>
+        </div>
+      )}
 
       {/* Available Internships Card */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col h-[600px] lg:h-auto">

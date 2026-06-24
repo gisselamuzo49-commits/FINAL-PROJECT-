@@ -139,10 +139,10 @@ resource "aws_security_group" "sg_bastion" {
   tags = { Name = "pasantias-prod-bastion" }
 }
 
-# ELB: puertos públicos 80 (frontend), 8080 (auth), 8081 (internship)
+# ELB: puertos públicos — frontend, gateway y todos los microservicios
 resource "aws_security_group" "sg_elb" {
   name        = "pasantias-prod-elb"
-  description = "Application Load Balancer - frontend, auth, internship"
+  description = "Application Load Balancer - todos los servicios"
   vpc_id      = aws_vpc.main.id
 
   ingress {
@@ -167,16 +167,16 @@ resource "aws_security_group" "sg_elb" {
     cidr_blocks = ["0.0.0.0/0"]
   }
   ingress {
-    description = "User service"
-    from_port   = 8083
-    to_port     = 8083
+    description = "Gateway service"
+    from_port   = 8082
+    to_port     = 8082
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
   ingress {
-    description = "Gateway service"
-    from_port   = 8082
-    to_port     = 8082
+    description = "User service"
+    from_port   = 8083
+    to_port     = 8083
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
@@ -239,16 +239,16 @@ resource "aws_security_group" "sg_private" {
     security_groups = [aws_security_group.sg_elb.id]
   }
   ingress {
-    description     = "User service desde ELB"
-    from_port       = 8083
-    to_port         = 8083
+    description     = "Gateway service desde ELB"
+    from_port       = 8082
+    to_port         = 8082
     protocol        = "tcp"
     security_groups = [aws_security_group.sg_elb.id]
   }
   ingress {
-    description     = "Gateway service desde ELB"
-    from_port       = 8082
-    to_port         = 8082
+    description     = "User service desde ELB"
+    from_port       = 8083
+    to_port         = 8083
     protocol        = "tcp"
     security_groups = [aws_security_group.sg_elb.id]
   }
@@ -376,6 +376,22 @@ resource "aws_lb_target_group" "internship_tg" {
   tags = { Name = "pasantias-prod-internship-tg" }
 }
 
+resource "aws_lb_target_group" "gateway_tg" {
+  name     = "pasantias-prod-gateway-tg"
+  port     = 8082
+  protocol = "HTTP"
+  vpc_id   = aws_vpc.main.id
+
+  health_check {
+    path                = "/api/users/health"
+    interval            = 30
+    timeout             = 5
+    healthy_threshold   = 2
+    unhealthy_threshold = 3
+  }
+  tags = { Name = "pasantias-prod-gateway-tg" }
+}
+
 resource "aws_lb_target_group" "user_tg" {
   name     = "pasantias-prod-user-tg"
   port     = 8083
@@ -408,27 +424,8 @@ resource "aws_lb_target_group" "linkage_tg" {
   tags = { Name = "pasantias-prod-linkage-tg" }
 }
 
-resource "aws_lb_target_group" "gateway_tg" {
-  name     = "pasantias-prod-gateway-tg"
-  port     = 8082
-  protocol = "HTTP"
-  vpc_id   = aws_vpc.main.id
-
-  health_check {
-    path                = "/api/users/health"
-    interval            = 30
-    timeout             = 5
-    healthy_threshold   = 2
-    unhealthy_threshold = 3
-  }
-  tags = { Name = "pasantias-prod-gateway-tg" }
-}
-
 # ─────────────────────────────────────────
-# ELB LISTENERS — 3 puertos separados
-#   :80   → frontend-web
-#   :8080 → auth-service
-#   :8081 → internship-service
+# ELB LISTENERS
 # ─────────────────────────────────────────
 resource "aws_lb_listener" "frontend_listener" {
   load_balancer_arn = aws_lb.prod_elb.arn
@@ -463,6 +460,17 @@ resource "aws_lb_listener" "internship_listener" {
   }
 }
 
+resource "aws_lb_listener" "gateway_listener" {
+  load_balancer_arn = aws_lb.prod_elb.arn
+  port              = 8082
+  protocol          = "HTTP"
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.gateway_tg.arn
+  }
+}
+
 resource "aws_lb_listener" "user_listener" {
   load_balancer_arn = aws_lb.prod_elb.arn
   port              = 8083
@@ -485,28 +493,19 @@ resource "aws_lb_listener" "linkage_listener" {
   }
 }
 
-resource "aws_lb_listener" "gateway_listener" {
-  load_balancer_arn = aws_lb.prod_elb.arn
-  port              = 8082
-  protocol          = "HTTP"
-
-  default_action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.gateway_tg.arn
-  }
-}
-
 # ─────────────────────────────────────────
-# EC2 — PROD Services (auth + internship + frontend)
+# EC2 — PROD Services (todos los microservicios)
+# Subido de t3.small a t3.large para soportar
+# kafka + zookeeper + mongo + rabbitmq + neo4j
+# + 12 microservicios Java/Python
 # ─────────────────────────────────────────
 resource "aws_instance" "prod_auth_jobs" {
   ami                    = data.aws_ami.ubuntu.id
-  instance_type          = "t3.small"
+  instance_type          = "t3.large"
   subnet_id              = aws_subnet.private_1a.id
   key_name               = data.aws_key_pair.prod_key.key_name
   vpc_security_group_ids = [aws_security_group.sg_private.id]
 
-  # user_data solo instala Docker; los contenedores los despliega Ansible
   user_data = <<-EOF
     #!/bin/bash
     apt-get update -y
@@ -523,14 +522,12 @@ resource "aws_instance" "prod_auth_jobs" {
   EOF
 
   root_block_device {
-    volume_size = 20
+    volume_size = 30
     volume_type = "gp3"
   }
 
   tags = { Name = "pasantias-prod-ec2-services" }
 
-  # Evitar que Terraform destruya y recree la instancia cuando
-  # Ansible modifica los contenedores o cuando cambia la AMI
   lifecycle {
     ignore_changes = [user_data, ami]
   }
@@ -557,6 +554,12 @@ resource "aws_lb_target_group_attachment" "internship_attachment" {
   port             = 8081
 }
 
+resource "aws_lb_target_group_attachment" "gateway_attachment" {
+  target_group_arn = aws_lb_target_group.gateway_tg.arn
+  target_id        = aws_instance.prod_auth_jobs.id
+  port             = 8082
+}
+
 resource "aws_lb_target_group_attachment" "user_attachment" {
   target_group_arn = aws_lb_target_group.user_tg.arn
   target_id        = aws_instance.prod_auth_jobs.id
@@ -569,10 +572,26 @@ resource "aws_lb_target_group_attachment" "linkage_attachment" {
   port             = 8084
 }
 
-resource "aws_lb_target_group_attachment" "gateway_attachment" {
-  target_group_arn = aws_lb_target_group.gateway_tg.arn
-  target_id        = aws_instance.prod_auth_jobs.id
-  port             = 8082
+# ─────────────────────────────────────────
+# S3 BUCKET — para document-service PROD
+# ─────────────────────────────────────────
+resource "aws_s3_bucket" "documents_prod" {
+  bucket        = "pasantias-documents-prod"
+  force_destroy = true
+  tags          = { Name = "pasantias-documents-prod" }
+}
+
+resource "aws_s3_bucket_ownership_controls" "documents_prod" {
+  bucket = aws_s3_bucket.documents_prod.id
+  rule {
+    object_ownership = "BucketOwnerPreferred"
+  }
+}
+
+resource "aws_s3_bucket_acl" "documents_prod" {
+  depends_on = [aws_s3_bucket_ownership_controls.documents_prod]
+  bucket     = aws_s3_bucket.documents_prod.id
+  acl        = "private"
 }
 
 # ─────────────────────────────────────────
@@ -582,16 +601,21 @@ resource "aws_lb_target_group_attachment" "gateway_attachment" {
 #   terraform output
 # ─────────────────────────────────────────
 output "bastion_eip" {
-  description = "IP pública fija del bastion PROD (usar como PROD_BASTION_IP en GitHub Secrets — no cambia entre sesiones)"
+  description = "IP pública fija del bastion PROD — usar como PROD_BASTION_IP en GitHub Secrets (no cambia entre sesiones)"
   value       = aws_eip.bastion_eip.public_ip
 }
 
 output "elb_dns_name" {
-  description = "DNS del Load Balancer (usar en build-args del frontend para VITE_AUTH_URL y VITE_INTERNSHIP_URL)"
+  description = "DNS del Load Balancer PROD — usar en VITE_GATEWAY_URL del frontend si aplica"
   value       = aws_lb.prod_elb.dns_name
 }
 
 output "prod_auth_jobs_private_ip" {
-  description = "IP privada del EC2 de servicios (usar como PROD_AUTH_JOBS_IP en GitHub Secrets)"
+  description = "IP privada del EC2 de servicios — usar como PROD_AUTH_JOBS_IP en GitHub Secrets"
   value       = aws_instance.prod_auth_jobs.private_ip
+}
+
+output "documents_bucket_prod" {
+  description = "Nombre del bucket S3 para document-service PROD"
+  value       = aws_s3_bucket.documents_prod.bucket
 }

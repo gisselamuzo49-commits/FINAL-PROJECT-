@@ -31,3 +31,8 @@ ENV/
 env/
 .env
 
+
+# SSH Keys
+infra/qa/QA
+infra/prod/PROD
+

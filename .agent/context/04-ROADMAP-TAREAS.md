@@ -78,8 +78,10 @@ que reemplaza la planificación genérica original.
 - [ ] `ai-service` (8090, FastAPI): spaCy, TF-IDF + similitud de coseno, Random Forest
   de riesgo de deserción, cola RabbitMQ (contenedor con healthcheck — ver
   09-ADOPCIONES #4).
-- [ ] `gateway-service`: rutas para los 6 servicios nuevos + soporte WebSocket.
+- [x] `gateway-service`: rutas para los 6 servicios nuevos (URLs añadidas en deploy-qa.yml) + soporte WebSocket. ✅
+- [x] Corregir bugs críticos en `infra/ansible/deploy-qa.yml` (Mosquitto autotenticado, mapeo de URLs en gateway, tags :qa en servicios). ✅
 - [x] Deploy completo a QA (18 contenedores: microservicios + Kafka + RabbitMQ + MongoDB + Redis + Postgres). Instancia configurada como `t3.large` (8 GiB RAM) + Swap de 4GB + límites de JVM establecidos. ✅
+- [x] Configurar Self-Hosted Runner en el Bastion de QA y parametrizar dinámicamente IPs (Lab 53). ✅
 
 
 ### Semana 5 — Sesión de diseño + Terraform modular + infraestructura PROD

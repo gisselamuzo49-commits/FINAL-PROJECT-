@@ -3,7 +3,114 @@
 > **Este archivo se actualiza al final de cada sesión de trabajo.** Es el primer lugar
 > donde el agente debe mirar para saber "¿dónde quedamos?".
 
-_Última actualización: 2026-06-23 (Rediseño del Frontend completado)_
+_Última actualización: 2026-06-24 (Sesión Lab 53 - mañana)_
+
+## ✅ COMPLETADO — Ajuste de Configuración SSH de Ansible para QA (24/Jun mañana)
+
+### Problema resuelto
+- El pipeline de despliegue a QA (`deploy-qa.yml`) no podía establecer conexión correctamente debido a discrepancias en el túnel SSH a través del Bastion.
+
+### Solución aplicada
+- Se eliminó el step `Configure Ansible SSH` en `.github/workflows/deploy-qa.yml`.
+- Se adaptó la creación del inventario para inyectar inline la configuración SSH (`ansible_ssh_common_args` con el `ProxyCommand` y la clave privada `QA.pem`), unificando el patrón con `deploy-prod.yml`.
+- Se removieron los overrides `ANSIBLE_CONFIG` del step `Deploy via Ansible`.
+
+## ✅ COMPLETADO — Corrección de Bugs en Playbook de QA de Ansible (23/Jun noche)
+
+### Problema resuelto
+- Tres bugs críticos en `infra/ansible/deploy-qa.yml` impedían el despliegue correcto de los 6 nuevos servicios.
+- Mosquitto local no tenía autenticación y causaba conflictos con `notification-service`.
+- `gateway-service` no tenía mapeadas las 6 URLs de los nuevos servicios, lo que impedía que enrutara el tráfico correctamente.
+- Los nuevos microservicios usaban la etiqueta `:latest` de Docker en lugar de `:qa` en los pulls y ejecuciones del contenedor.
+
+### Solución aplicada
+- Se configuró Mosquitto local (self-hosted) con autenticación deshabilitando el acceso anónimo y utilizando un archivo de contraseñas montado desde `/opt/mosquitto/passwd` (copiado desde `infra/mosquitto/passwd`).
+- Se parametrizó la contraseña mediante `mqtt_password` en la sección de variables de Ansible con el default `changeme`. Asimismo, se inyectó como variable extra (`-e "mqtt_password=${{ secrets.MQTT_PASSWORD }}"`) en el workflow de CI/CD de QA (`.github/workflows/deploy-qa.yml`).
+- Se corrigió `notification-service` para usar el broker local de Mosquitto con usuario `mqttuser` y contraseña parametrizada.
+- Se añadieron las 6 URLs faltantes (`HOURS_SERVICE_URL`, `EVALUATION_SERVICE_URL`, `NOTIFICATION_SERVICE_URL`, `DOCUMENT_SERVICE_URL`, `REPORT_SERVICE_URL`, `AI_SERVICE_URL`) al docker run de `gateway-service`.
+- Se parametrizaron las imágenes de los 6 nuevos servicios con etiqueta `:qa` utilizando variables globales en el playbook de Ansible (`docker_image_hours`, `docker_image_evaluation`, etc.) eliminando todas las referencias a `:latest`.
+- Se unificó el pull de la imagen de Mosquitto ubicándolo en la sección correspondiente después de MongoDB.
+- Se añadió la automatización para el GitHub Actions runner configurándolo como servicio `systemd` en el Bastion mediante un segundo play en `deploy-qa.yml` y agregando el grupo `[bastion]` al inventario generado en el workflow de GitHub Actions.
+- Se configuró la instalación automática de Docker (si no existe en el EC2 de QA) dentro de los prerrequisitos del playbook de Ansible.
+- Se agregaron tareas en el playbook de Ansible para expandir automáticamente la partición y el filesystem del volumen EBS (`growpart` y `resize2fs`) en la instancia EC2 de QA.
+- Se añadió `ignore_errors: true` a las tareas de pull y run de los 6 nuevos servicios y neo4j en `deploy-qa.yml` para evitar fallas en el despliegue cuando las imágenes no existan o por timeouts.
+- Se configuró `async: 120` y `poll: 10` en las 20 tareas de levantar contenedores ("Levantar") que ejecutan `docker run` en `deploy-qa.yml` para evitar bloqueos y cuelgues por SSH.
+- Se configuró el disco root_block_device de la instancia del bastion a 20GB y de la de servicios a 30GB en el Terraform de QA (`infra/qa/main.tf`), agregando y alineando sus bloques `lifecycle` correspondientes.
+- Se simplificó el `user_data` de la instancia `bastion` en `infra/qa/main.tf` eliminando la variable `gh_runner_token` y la lógica de registro automático del runner, retornando a una inicialización básica del bastion host.
+- Se configuró el Key Pair de QA como un recurso fijo en Terraform (`infra/qa/main.tf`) con nombre `pasantias-qa-key` utilizando la llave pública `QA.pub` commiteada en el repositorio.
+
+## ✅ COMPLETADO — Nginx Proxy + Fix CORS (23/Jun tarde)
+
+### Problema resuelto
+- El firewall universitario bloqueaba el puerto 8082
+- CORS bloqueaba peticiones cross-origin
+
+### Solución aplicada
+- nginx.conf: agregado location /api/ con proxy_pass
+  a gateway-service:8082 interno
+- 13 páginas frontend: eliminado :8082 del fallback URL
+  (ahora usa solo window.location.hostname sin puerto)
+- gateway application.yml: CORS actualizado a 32.193.25.6
+- Todo el tráfico API ahora va por puerto 80 via Nginx
+
+### URL actual de QA
+- Frontend: http://50.19.247.85 (puerto 80)
+- API: http://50.19.247.85/api/* (proxy interno a :8082)
+- Gateway directo (interno): http://50.19.247.85:8082
+
+### Credenciales de prueba
+- estudiante@uce.edu.ec / password123
+- tutor@uce.edu.ec / password123
+- coordinador@uce.edu.ec / password123
+
+## ✅ COMPLETADO HOY — Infraestructura Lab 53
+
+### IPs actuales de QA (Lab 53)
+- Bastion EIP: 54.144.154.118 (fija, no cambia)
+- qa_auth_jobs EIP pública: 50.19.247.85 (fija)
+- qa_auth_jobs IP privada: 10.0.1.238
+- S3 backend tfstate: estado-pasantias-gisse-2026
+
+### Secrets de GitHub actualizados (Requiere actualizar en GitHub Secrets)
+- QA_BASTION_IP = 54.144.154.118
+- QA_AUTH_JOBS_IP = 10.0.1.238 (IP privada para Ansible)
+- JWT_SECRET = en GitHub Secrets (ya no hardcodeado)
+- PG_PASSWORD = en GitHub Secrets
+- NEO4J_PASSWORD = en GitHub Secrets
+- QA_SSH_KEY = llave privada infra/qa/QA (generada con ssh-keygen)
+
+### Terraform QA - estado actual
+- Key pair creado por Terraform con infra/qa/QA.pub
+- LabInstanceProfile adjunto a bastion y qa_auth_jobs
+- user_data con base64encode + set -e + logs en /var/log
+- SSM Agent instalado en bastion
+- Disco 30GB en qa_auth_jobs
+- S3 backend con encrypt=true y use_lockfile=true
+
+### CI/CD - nuevo diseño deploy-qa.yml
+- 15 jobs: detect-changes → test → 12 builds paralelos → deploy
+- runs-on: ubuntu-latest en el job deploy
+- Uso de ProxyCommand inline en el inventario (mismo patrón que PROD)
+- Builds paralelos por servicio con dorny/paths-filter
+- Secrets inyectados como variables Ansible
+
+### ✅ COMPLETADO — Registro del Self-Hosted Runner en Bastion
+- El self-hosted runner (`pasantias-qa-runner`) se ha registrado, configurado y arrancado exitosamente en el Bastion de QA.
+- El servicio de systemd se encuentra en estado `active (running)`.
+- Se subió y configuró correctamente la llave SSH del bastion (`~/.ssh/QA.pem`) con permisos `400` para permitir a Ansible interactuar con la instancia privada de QA.
+
+## ✅ COMPLETADO HOY — Adopción UCE_AlumniPlatform
+
+### Mejoras adoptadas del proyecto de referencia
+1. Key pair por Terraform (no manual en AWS Console)
+2. Secrets en Ansible (JWT, PG_PASSWORD, NEO4J_PASSWORD)
+3. LabInstanceProfile en EC2
+4. Mosquitto local sin autenticación (allow_anonymous true)
+5. base64encode en user_data
+6. SSM Agent en bastion
+7. 30GB disco en EC2 de servicios
+8. Pipeline rediseñado con jobs paralelos
+
 
 ## ✅ Completado / Verificado
 
@@ -65,17 +172,17 @@ en el `docker run`. Misma idea aplicaría a `DB_PASSWORD`. No bloqueante para ho
 ## ✅ RESUELTO — `qa_auth_jobs` con IP pública (Cloudflare/Excel, 15/jun)
 
 `qa_auth_jobs` movida de `private_1a` (10.0.3.0/24) a `public_1a` (10.0.1.0/24),
-con EIP fija **`18.232.199.190`** y puertos 80/8082 abiertos en `sg_private`.
-Nueva IP privada: `10.0.1.61` (era `10.0.3.95`). `QA_AUTH_JOBS_IP` actualizado en
+con EIP fija **`32.193.25.6`** y puertos 80/8082 abiertos en `sg_private`.
+Nueva IP privada: `10.0.1.170` (era `10.0.1.61`). `QA_AUTH_JOBS_IP` actualizado en
 GitHub Secrets.- Deploy vía Ansible re-ejecutado, pipeline verde. Verificado en `t3.large` con swap de 4GB (21/jun):
-  - `http://18.232.199.190` (Frontend) → `200 OK`, frontend React cargando.
-  - `http://18.232.199.190:8082/api/linkage/health` (Linkage via GW) → `200 OK`, `"linkage-service is running"`.
-  - `http://18.232.199.190:8082/api/evaluation/health` (Evaluation via GW) → `200 OK`, `"evaluation-service is running"`.
-  - `http://18.232.199.190:8082/api/hours/health` (Hours via GW) → Retornaba `404` por conflicto de orden de rutas en `gateway-service` (la ruta comodín `/api/hours/**` consumía `/api/hours/health`). Se corrigió el orden de rutas en `application.yml` localmente y se commiteó para el próximo despliegue. Internamente en puerto 8085 retorna `200 OK` `"hours-service is running"`.
+  - `http://32.193.25.6` (Frontend) → `200 OK`, frontend React cargando.
+  - `http://32.193.25.6:8082/api/linkage/health` (Linkage via GW) → `200 OK`, `"linkage-service is running"`.
+  - `http://32.193.25.6:8082/api/evaluation/health` (Evaluation via GW) → `200 OK`, `"evaluation-service is running"`.
+  - `http://32.193.25.6:8082/api/hours/health` (Hours via GW) → Retornaba `404` por conflicto de orden de rutas en `gateway-service` (la ruta comodín `/api/hours/**` consumía `/api/hours/health`). Se corrigió el orden de rutas en `application.yml` localmente y se commiteó para el próximo despliegue. Internamente en puerto 8085 retorna `200 OK` `"hours-service is running"`.
   - Servicios internos (`notification-service` en 8087, `document-service` en 8088, `report-service` en 8089, `ai-service` en 8090) confirmados y respondiendo `200 OK` internamente (bloqueados externamente por Security Group como debe ser).
 
 Excel de Cloudflare llenado:
-- **QA IP1** → `18.232.199.190`
+- **QA IP1** → `32.193.25.6`
 - **PRODUCCION IP** → `pasantias-prod-elb-115885246.us-east-1.elb.amazonaws.com`
 
 Cuando la cátedra asigne los subdominios `*.distribuidauce.org`, actualizar
@@ -83,13 +190,13 @@ Cuando la cátedra asigne los subdominios `*.distribuidauce.org`, actualizar
 el README principal y en la sección 6 del documento de entrega.
 
 The bastion de QA (`pasantias-qa-bastion`) ahora tiene una Elastic IP fija:
-**`3.225.171.116`** (igual que PROD). Se agregó `aws_eip.bastion_eip` a
+**`50.19.247.85`** (igual que PROD). Se agregó `aws_eip.bastion_eip` a
 `infra/qa/main.tf` (mismo patrón que PROD) + `lifecycle { ignore_changes = [ami] }` en
 `aws_instance.bastion` de **ambos** `infra/qa/main.tf` e `infra/prod/main.tf` (bug
 latente preexistente: sin esto, cualquier `plan`/`apply` futuro reemplazaría el bastion
 por completo cada vez que Canonical publica una nueva build de la AMI Ubuntu 24.04).
 `terraform apply` aplicado en QA (cuenta #2), limpio, sin destrucción de recursos.
-`QA_BASTION_IP` actualizado en GitHub Secrets a `3.225.171.116` — **no debería volver a
+`QA_BASTION_IP` actualizado en GitHub Secrets a `50.19.247.85` — **no debería volver a
 cambiar entre sesiones de AWS Academy**.
 
 1. ~~Verificar `QA_BASTION_IP` en GitHub Secrets~~ ✅ RESUELTO PERMANENTEMENTE (ver
@@ -387,3 +494,31 @@ Y se aplicaron las siguientes correcciones adicionales:
     - Se corrigieron los selectores del formulario de registro en `Login.jsx` para mandar los valores del rol en mayúscula (`ESTUDIANTE`, `TUTOR`, `COORDINADOR`) alineados con el enum `Role.java` de Spring Boot.
     - Se ajustaron los mocks y payloads de JWT en los tests unitarios (`Home.test.jsx`, `Reports.test.jsx`, `AppRouter.test.jsx`), logrando que el 100% de la suite de pruebas pase exitosamente (`npm run build` y `vitest` en verde).
 
+
+## ✅ COMPLETADO — Migración a Self-Hosted Runner y Remoción de IPs (QA Lab 53)
+
+Se implementaron con éxito los cambios para adoptar un self-hosted runner en el Bastion de QA y eliminar IPs hardcodeadas:
+1. **GitHub Actions Runner en Bastion (Terraform):** Agregado `user_data` a `aws_instance.bastion` en `infra/qa/main.tf` para instalar dependencias de Docker, herramientas y preparar la carpeta del runner.
+2. **Workflow simplificado:** Modificado `deploy-qa.yml` para correr en `runs-on: self-hosted`, eliminando los pasos obsoletos de SSH Tunnel, ProxyCommand y la instalación de Ansible en cada ejecución.
+3. **CORS Dinámico:** Configurado `deploy-qa.yml` de Ansible para inyectar la variable `ALLOWED_ORIGINS` dinámicamente con la IP de la instancia a través del workflow.
+
+## ✅ COMPLETADO — Adopción de Mejoras UCE_AlumniPlatform e Integración de Cambios (23/Jun)
+
+Se adoptaron 4 mejoras del proyecto de referencia y se aplicaron las reversiones solicitadas en la rama `QA`:
+1. **Key Pairs creados por Terraform:** Se crearon recursos `aws_key_pair` en `infra/qa` e `infra/prod` utilizando llaves generadas localmente (`QA.pub`, `PROD.pub`). Las llaves privadas se agregaron a `.gitignore`.
+2. **Secrets en Ansible:** Se parametrizaron `JWT_SECRET`, `POSTGRES_PASSWORD` y `NEO4J_PASSWORD` en Ansible y GitHub Actions, eliminando credenciales hardcodeadas en texto plano.
+3. **LabInstanceProfile en EC2:** Se asoció el rol IAM de AWS Academy (`LabInstanceProfile`) a las instancias EC2 en QA y PROD para evitar errores de permisos.
+4. **Mosquitto local sin autenticación en QA:** Configurado broker Mosquitto local en el EC2 de QA con `allow_anonymous true` y redirigido `notification-service` a este broker local.
+5. **Reversiones de Frontend y CORS:** Se eliminó la IP hardcodeada de CORS fallback del gateway, se removió `.env.production` y se quitó el build arg `VITE_API_BASE_URL` del Dockerfile (el frontend resuelve el endpoint de manera dinámica usando el hostname de la ventana del navegador).
+
+## ✅ COMPLETADO — Rediseño del Pipeline de CI/CD (23/Jun)
+
+Se restauró el pipeline de QA (`deploy-qa.yml`) al esquema secuencial original que funcionaba:
+1. **Detección de Cambios (`detect-changes`):** Ejecuta la discriminación de rutas usando `dorny/paths-filter`.
+2. **Ejecución y Despliegue en un solo job (`deploy`):** Ejecuta en `ubuntu-latest`, corriendo condicionalmente las pruebas unitarias y compilaciones de Docker Hub secuencialmente. Luego, utiliza el túnel SSH ProxyCommand a través del bastion para ejecutar Ansible en `hosts: all`.
+
+Última ejecución y deploy de prueba: 2026-06-24 (esquema ProxyCommand restaurado al 100% con IPs dinámicas en ProxyCommand y nombres de secretos de Docker Hub corregidos)
+
+Trigger: Deploy QA ProxyCommand restored (2026-06-24)
+Trigger: Deploy QA workflow restaurado (2026-06-24)
+Trigger: Restrict internships publication to roles in frontend (2026-06-24)

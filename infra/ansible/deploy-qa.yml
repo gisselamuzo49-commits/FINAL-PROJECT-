@@ -25,7 +25,7 @@
         docker stop auth-service internship-service user-service linkage-service gateway-service frontend-web postgres-db redis zookeeper kafka mongodb rabbitmq hours-service evaluation-service notification-service document-service report-service ai-service neo4j 2>/dev/null || true
         docker rm   auth-service internship-service user-service linkage-service gateway-service frontend-web postgres-db redis zookeeper kafka mongodb rabbitmq hours-service evaluation-service notification-service document-service report-service ai-service neo4j 2>/dev/null || true
 
-    - name: Prune unused Docker images, containers and networks (ahora que están detenidos)
+    - name: Prune unused Docker images, containers and networks
       shell: docker system prune -af || true
 
     - name: Clean apt cache
@@ -42,6 +42,12 @@
         systemctl enable docker || true
         systemctl is-active --quiet docker || systemctl start docker
       changed_when: false
+
+    # ── Docker Hub login en el EC2 (para poder hacer pull de imágenes privadas)
+    - name: Login en Docker Hub
+      shell: |
+        echo "{{ dockerhub_token }}" | docker login --username "{{ dockerhub_username }}" --password-stdin
+      no_log: true
 
     - name: Crear directorio para scripts de inicialización de Postgres
       file:
@@ -94,7 +100,6 @@
                  'COORDINADOR')
               ON CONFLICT (email) DO NOTHING;
           EOSQL
-
 
     - name: Limpieza agresiva de disco antes de pulls
       shell: |
@@ -466,7 +471,6 @@
         -e RABBITMQ_USER=guest
         -e RABBITMQ_PASSWORD=guest
         gdmuzo/ai-service:latest
-
 
     - name: Levantar gateway-service
       shell: |

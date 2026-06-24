@@ -71,8 +71,7 @@ resource "aws_route_table_association" "public_1a" {
 }
 
 # ─────────────────────────────────────────
-# NAT GATEWAY — permite a la subnet privada
-#               hacer docker pull sin IP pública
+# NAT GATEWAY
 # ─────────────────────────────────────────
 resource "aws_eip" "nat" {
   domain = "vpc"
@@ -128,10 +127,10 @@ resource "aws_security_group" "sg_bastion" {
 # Private: servicios accesibles dentro de la VPC + SSH desde bastion
 resource "aws_security_group" "sg_private" {
   name        = "pasantias-qa-private"
-  description = "Private EC2 - auth, internship, frontend"
+  description = "Private EC2 - todos los servicios"
   vpc_id      = aws_vpc.main.id
 
-  # Todo el tráfico interno de la VPC (health checks, comunicación entre servicios)
+  # Todo el tráfico interno de la VPC
   ingress {
     from_port   = 0
     to_port     = 0
@@ -151,15 +150,15 @@ resource "aws_security_group" "sg_private" {
     to_port     = 80
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
-    description = "Frontend web access"
+    description = "Frontend web"
   }
-  # Acceso HTTP público al gateway
+  # Acceso HTTP público al gateway (único punto de entrada a los microservicios)
   ingress {
     from_port   = 8082
     to_port     = 8082
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
-    description = "Gateway API access"
+    description = "Gateway API"
   }
   egress {
     from_port   = 0
@@ -191,9 +190,7 @@ data "aws_ami" "ubuntu" {
 
 # ─────────────────────────────────────────
 # BASTION HOST — jump host público
-# NOTA: la IP pública cambia en cada sesión de AWS Academy.
-#       Después de cada "terraform apply -refresh-only" actualiza
-#       el secret QA_BASTION_IP en GitHub Actions.
+# NOTA: la EIP permanece fija entre sesiones de AWS Academy.
 # ─────────────────────────────────────────
 resource "aws_instance" "bastion" {
   ami                    = data.aws_ami.ubuntu.id
@@ -217,7 +214,7 @@ resource "aws_eip" "bastion_eip" {
 }
 
 # ─────────────────────────────────────────
-# EC2 — QA Services (auth + internship + frontend)
+# EC2 — QA Services (todos los microservicios)
 # ─────────────────────────────────────────
 resource "aws_instance" "qa_auth_jobs" {
   ami                    = data.aws_ami.ubuntu.id
@@ -226,7 +223,6 @@ resource "aws_instance" "qa_auth_jobs" {
   key_name               = data.aws_key_pair.qa_key.key_name
   vpc_security_group_ids = [aws_security_group.sg_private.id]
 
-  # user_data solo instala Docker; los contenedores los despliega Ansible
   user_data = <<-EOF
     #!/bin/bash
     apt-get update -y
@@ -249,8 +245,6 @@ resource "aws_instance" "qa_auth_jobs" {
 
   tags = { Name = "pasantias-qa-ec2-services" }
 
-  # Evitar que Terraform destruya y recree la instancia cuando
-  # Ansible modifica los contenedores o cuando cambia la AMI
   lifecycle {
     ignore_changes = [user_data, ami]
   }
@@ -265,18 +259,42 @@ resource "aws_eip" "qa_auth_jobs_eip" {
 }
 
 # ─────────────────────────────────────────
+# S3 BUCKET — para document-service
+# Se crea aquí para que exista antes del primer deploy.
+# AWS Academy: este bucket persiste entre sesiones.
+# ─────────────────────────────────────────
+resource "aws_s3_bucket" "documents_qa" {
+  bucket        = "pasantias-documents-qa"
+  force_destroy = true
+  tags          = { Name = "pasantias-documents-qa" }
+}
+
+resource "aws_s3_bucket_ownership_controls" "documents_qa" {
+  bucket = aws_s3_bucket.documents_qa.id
+  rule {
+    object_ownership = "BucketOwnerPreferred"
+  }
+}
+
+resource "aws_s3_bucket_acl" "documents_qa" {
+  depends_on = [aws_s3_bucket_ownership_controls.documents_qa]
+  bucket     = aws_s3_bucket.documents_qa.id
+  acl        = "private"
+}
+
+# ─────────────────────────────────────────
 # OUTPUTS
 # Comandos para obtener los valores:
 #   terraform apply -refresh-only
 #   terraform output
 # ─────────────────────────────────────────
 output "bastion_public_ip" {
-  description = "QA Bastion EIP — fija entre sesiones de AWS Academy, no requiere actualizar QA_BASTION_IP"
+  description = "QA Bastion EIP — fija entre sesiones de AWS Academy, usar como QA_BASTION_IP en GitHub Secrets"
   value       = aws_eip.bastion_eip.public_ip
 }
 
 output "qa_auth_jobs_private_ip" {
-  description = "IP privada del EC2 de servicios (actualizar QA_AUTH_JOBS_IP en GitHub Secrets)"
+  description = "IP privada del EC2 de servicios — usar como QA_AUTH_JOBS_IP en GitHub Secrets"
   value       = aws_instance.qa_auth_jobs.private_ip
 }
 
@@ -285,3 +303,7 @@ output "qa_auth_jobs_public_ip" {
   value       = aws_eip.qa_auth_jobs_eip.public_ip
 }
 
+output "documents_bucket_qa" {
+  description = "Nombre del bucket S3 para document-service QA"
+  value       = aws_s3_bucket.documents_qa.bucket
+}
