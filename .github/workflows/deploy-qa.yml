@@ -281,6 +281,7 @@ jobs:
       - name: Configure Ansible SSH
         run: |
           printf '[defaults]\nremote_user = ubuntu\nprivate_key_file = ~/.ssh/QA.pem\nhost_key_checking = False\n\n[ssh_connection]\nssh_args = -o StrictHostKeyChecking=no -o ProxyCommand="ssh -W %%h:%%p -i ~/.ssh/QA.pem -o StrictHostKeyChecking=no ubuntu@${{ secrets.QA_BASTION_IP }}"\n' > /tmp/ansible.cfg
+          cat /tmp/ansible.cfg
 
       - name: Install Ansible
         run: pip install ansible

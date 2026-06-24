@@ -507,6 +507,6 @@ Se restauró el pipeline de QA (`deploy-qa.yml`) al esquema secuencial original 
 1. **Detección de Cambios (`detect-changes`):** Ejecuta la discriminación de rutas usando `dorny/paths-filter`.
 2. **Ejecución y Despliegue en un solo job (`deploy`):** Ejecuta en `ubuntu-latest`, corriendo condicionalmente las pruebas unitarias y compilaciones de Docker Hub secuencialmente. Luego, utiliza el túnel SSH ProxyCommand a través del bastion para ejecutar Ansible en `hosts: all`.
 
-Última ejecución y deploy de prueba: 2026-06-24 (esquema ProxyCommand restaurado al 100% con IPs y nombres de secretos de Docker Hub corregidos)
+Última ejecución y deploy de prueba: 2026-06-24 (esquema ProxyCommand restaurado al 100% con IPs dinámicas en ProxyCommand y nombres de secretos de Docker Hub corregidos)
 
 Trigger: Deploy QA ProxyCommand restored (2026-06-24)
