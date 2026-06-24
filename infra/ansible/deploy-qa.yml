@@ -14,25 +14,18 @@
     docker_image_linkage:     "gdmuzo/linkage-service:qa"
     docker_image_gateway:     "gdmuzo/gateway-service:qa"
     docker_image_frontend:    "gdmuzo/frontend-web:qa"
-    docker_image_hours:        "gdmuzo/hours-service:qa"
-    docker_image_evaluation:   "gdmuzo/evaluation-service:qa"
-    docker_image_notification: "gdmuzo/notification-service:qa"
-    docker_image_document:     "gdmuzo/document-service:qa"
-    docker_image_report:       "gdmuzo/report-service:qa"
-    docker_image_ai:           "gdmuzo/ai-service:qa"
     postgres_image:           "postgres:15-alpine"
     redis_image:              "redis:7-alpine"
-    neo4j_password:           "{{ neo4j_password }}"
-    mqtt_password:            "{{ mqtt_password | default('changeme') }}"
+    neo4j_password:           "password123"
 
   tasks:
 
     - name: Detener y remover contenedores existentes (liberar puertos e imágenes asociadas)
       shell: |
-        docker stop auth-service internship-service user-service linkage-service gateway-service frontend-web postgres-db redis zookeeper kafka mongodb rabbitmq hours-service evaluation-service notification-service document-service report-service ai-service neo4j mosquitto 2>/dev/null || true
-        docker rm   auth-service internship-service user-service linkage-service gateway-service frontend-web postgres-db redis zookeeper kafka mongodb rabbitmq hours-service evaluation-service notification-service document-service report-service ai-service neo4j mosquitto 2>/dev/null || true
+        docker stop auth-service internship-service user-service linkage-service gateway-service frontend-web postgres-db redis zookeeper kafka mongodb rabbitmq hours-service evaluation-service notification-service document-service report-service ai-service neo4j 2>/dev/null || true
+        docker rm   auth-service internship-service user-service linkage-service gateway-service frontend-web postgres-db redis zookeeper kafka mongodb rabbitmq hours-service evaluation-service notification-service document-service report-service ai-service neo4j 2>/dev/null || true
 
-    - name: Prune unused Docker images, containers and networks (ahora que están detenidos)
+    - name: Prune unused Docker images, containers and networks
       shell: docker system prune -af || true
 
     - name: Clean apt cache
@@ -44,32 +37,17 @@
         journalctl --vacuum-size=50M || true
 
     # ── Prerequisitos ────────────────────
-    - name: Instalar Docker si no existe
-      shell: |
-        if ! command -v docker &> /dev/null; then
-          apt-get update -y
-          apt-get install -y ca-certificates curl gnupg
-          install -m 0755 -d /etc/apt/keyrings
-          curl -fsSL https://download.docker.com/linux/ubuntu/gpg | \
-            gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-          chmod a+r /etc/apt/keyrings/docker.gpg
-          echo "deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.gpg] \
-            https://download.docker.com/linux/ubuntu noble stable" | \
-            tee /etc/apt/sources.list.d/docker.list > /dev/null
-          apt-get update -y
-          apt-get install -y docker-ce docker-ce-cli containerd.io \
-            docker-compose-plugin
-          systemctl enable docker
-          systemctl start docker
-          usermod -aG docker ubuntu
-        fi
-      args:
-        executable: /bin/bash
-
     - name: Asegurar que Docker está corriendo
-      shell: systemctl is-active --quiet docker || systemctl start docker
-      args:
-        executable: /bin/bash
+      shell: |
+        systemctl enable docker || true
+        systemctl is-active --quiet docker || systemctl start docker
+      changed_when: false
+
+    # ── Docker Hub login en el EC2 (para poder hacer pull de imágenes privadas)
+    - name: Login en Docker Hub
+      shell: |
+        echo "{{ dockerhub_token }}" | docker login --username "{{ dockerhub_username }}" --password-stdin
+      no_log: true
 
     - name: Crear directorio para scripts de inicialización de Postgres
       file:
@@ -123,7 +101,6 @@
               ON CONFLICT (email) DO NOTHING;
           EOSQL
 
-
     - name: Limpieza agresiva de disco antes de pulls
       shell: |
         docker container prune -f || true
@@ -140,25 +117,6 @@
     - name: Mostrar espacio en disco después de la limpieza
       debug:
         var: disk_space_after.stdout_lines
-
-    - name: Expandir partición raíz al tamaño completo del volumen EBS
-      shell: growpart /dev/nvme0n1 1 || true
-      args:
-        executable: /bin/bash
-
-    - name: Expandir filesystem al tamaño completo de la partición
-      shell: resize2fs /dev/nvme0n1p1 || true
-      args:
-        executable: /bin/bash
-
-    - name: Mostrar espacio disponible tras expansión
-      shell: df -h /
-      register: disk_after_expand
-      changed_when: false
-
-    - name: Imprimir espacio disponible
-      debug:
-        var: disk_after_expand.stdout_lines
 
     - name: Asegurar que existe la red de Docker para intercomunicación
       shell: docker network create pasantias-net 2>/dev/null || true
@@ -217,57 +175,45 @@
       async: 60
       poll: 10
 
-    - name: Pull mosquitto image
-      shell: docker pull eclipse-mosquitto:2.0
-      async: 60
-      poll: 10
-
     - name: Pull rabbitmq image
       shell: docker pull rabbitmq:3-management-alpine
       async: 60
       poll: 10
 
     - name: Pull hours-service image
-      shell: docker pull {{ docker_image_hours }}
+      shell: docker pull gdmuzo/hours-service:latest
       async: 60
       poll: 10
-      ignore_errors: true
 
     - name: Pull evaluation-service image
-      shell: docker pull {{ docker_image_evaluation }}
+      shell: docker pull gdmuzo/evaluation-service:latest
       async: 60
       poll: 10
-      ignore_errors: true
 
     - name: Pull notification-service image
-      shell: docker pull {{ docker_image_notification }}
+      shell: docker pull gdmuzo/notification-service:latest
       async: 60
       poll: 10
-      ignore_errors: true
 
     - name: Pull document-service image
-      shell: docker pull {{ docker_image_document }}
+      shell: docker pull gdmuzo/document-service:latest
       async: 60
       poll: 10
-      ignore_errors: true
 
     - name: Pull report-service image
-      shell: docker pull {{ docker_image_report }}
+      shell: docker pull gdmuzo/report-service:latest
       async: 60
       poll: 10
-      ignore_errors: true
 
     - name: Pull ai-service image
-      shell: docker pull {{ docker_image_ai }}
+      shell: docker pull gdmuzo/ai-service:latest
       async: 60
       poll: 10
-      ignore_errors: true
 
     - name: Pull neo4j image
       shell: docker pull neo4j:5-community
       async: 60
       poll: 10
-      ignore_errors: true
 
     # ── Levantar contenedores ────────────
     - name: Eliminar volumen de postgres para reinicializar schema
@@ -285,14 +231,12 @@
           --restart always \
           -p 5432:5432 \
           -e POSTGRES_USER=postgres \
-          -e POSTGRES_PASSWORD="{{ pg_password }}" \
+          -e POSTGRES_PASSWORD=postgres \
           -e POSTGRES_DB=postgres \
           -e POSTGRES_MULTIPLE_DATABASES=auth_db,internship_db,user_db,linkage_db,hours_db,evaluation_db,notification_db,document_db,report_db \
           -v /var/lib/postgresql/data:/var/lib/postgresql/data \
           -v /opt/postgres-init:/docker-entrypoint-initdb.d \
           {{ postgres_image }}
-      async: 120
-      poll: 10
 
     - name: Esperar a que la base de datos esté lista
       pause:
@@ -309,12 +253,10 @@
           -e DB_PORT=5432 \
           -e DB_NAME=auth_db \
           -e DB_USER=postgres \
-          -e DB_PASSWORD="{{ pg_password }}" \
-          -e JWT_SECRET="{{ jwt_secret }}" \
+          -e DB_PASSWORD=postgres \
+          -e JWT_SECRET='v9y$B&E)H@McQfTjWmZq4t7w!z%C*F-JaNdRgUkXp2r5u8x/A?D(G+KbPeShVmYq' \
           -e JAVA_TOOL_OPTIONS="-Xmx256m -Xms128m" \
           {{ docker_image_auth }}
-      async: 120
-      poll: 10
 
     - name: Levantar internship-service
       shell: |
@@ -327,14 +269,12 @@
           -e DB_PORT=5432 \
           -e DB_NAME=internship_db \
           -e DB_USER=postgres \
-          -e DB_PASSWORD="{{ pg_password }}" \
+          -e DB_PASSWORD=postgres \
           -e NEO4J_URI=bolt://neo4j:7687 \
           -e NEO4J_USER=neo4j \
           -e NEO4J_PASSWORD={{ neo4j_password }} \
           -e JAVA_TOOL_OPTIONS="-Xmx256m -Xms128m" \
           {{ docker_image_internship }}
-      async: 120
-      poll: 10
 
     - name: Levantar user-service
       shell: |
@@ -347,11 +287,9 @@
           -e DB_PORT=5432 \
           -e DB_NAME=user_db \
           -e DB_USER=postgres \
-          -e DB_PASSWORD="{{ pg_password }}" \
+          -e DB_PASSWORD=postgres \
           -e JAVA_TOOL_OPTIONS="-Xmx256m -Xms128m" \
           {{ docker_image_user }}
-      async: 120
-      poll: 10
 
     - name: Levantar linkage-service
       shell: |
@@ -364,11 +302,9 @@
           -e DB_PORT=5432 \
           -e DB_NAME=linkage_db \
           -e DB_USER=postgres \
-          -e DB_PASSWORD="{{ pg_password }}" \
+          -e DB_PASSWORD=postgres \
           -e JAVA_TOOL_OPTIONS="-Xmx256m -Xms128m" \
           {{ docker_image_linkage }}
-      async: 120
-      poll: 10
 
     - name: Levantar redis
       shell: |
@@ -378,8 +314,6 @@
           --restart always \
           -p 6379:6379 \
           redis:7-alpine
-      async: 120
-      poll: 10
 
     - name: Levantar zookeeper
       shell: >
@@ -389,8 +323,6 @@
         -e ZOOKEEPER_CLIENT_PORT=2181
         -e ZOOKEEPER_TICK_TIME=2000
         confluentinc/cp-zookeeper:7.6.0
-      async: 120
-      poll: 10
 
     - name: Levantar kafka
       shell: >
@@ -403,8 +335,6 @@
         -e KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
         -e KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
         confluentinc/cp-kafka:7.6.0
-      async: 120
-      poll: 10
 
     - name: Esperar a que Kafka esté listo
       shell: sleep 20
@@ -416,68 +346,27 @@
         --restart always
         -p 27017:27017
         mongo:7
-      async: 120
-      poll: 10
-
-    - name: Copiar configuración de Mosquitto al host
-      copy:
-        dest: /opt/mosquitto/mosquitto.conf
-        mode: "0644"
-        content: |
-          listener 1883
-          allow_anonymous false
-          password_file /mosquitto/config/passwd
-
-    - name: Copiar archivo de contraseñas de Mosquitto al host
-      copy:
-        src: "{{ playbook_dir }}/../../infra/mosquitto/passwd"
-        dest: /opt/mosquitto/passwd
-        mode: "0600"
-
-    - name: Levantar Mosquitto self-hosted
-      shell: |
-        docker ps --filter "name=mosquitto" --filter "status=running" | grep -q mosquitto || \
-        docker run -d --name mosquitto \
-          --network pasantias-net \
-          --restart always \
-          -p 1883:1883 \
-          -v /opt/mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro \
-          -v /opt/mosquitto/passwd:/mosquitto/config/passwd:ro \
-          eclipse-mosquitto:2.0
-      async: 120
-      poll: 10
-
-    - name: Esperar a que Mosquitto esté listo
-      shell: sleep 5
 
     - name: Levantar rabbitmq
-      shell: |
-        docker run -d --name rabbitmq \
-          --network pasantias-net \
-          --restart always \
-          -p 5672:5672 \
-          -p 15672:15672 \
-          -e RABBITMQ_DEFAULT_USER=guest \
-          -e RABBITMQ_DEFAULT_PASS=guest \
-          rabbitmq:3-management-alpine
-      async: 120
-      poll: 10
+      shell: >
+        docker run -d --name rabbitmq
+        --network pasantias-net
+        --restart always
+        -p 5672:5672
+        -p 15672:15672
+        -e RABBITMQ_DEFAULT_USER=guest
+        -e RABBITMQ_DEFAULT_PASS=guest
+        rabbitmq:3-management-alpine
 
     - name: Levantar neo4j
-      shell: |
-        docker run -d --name neo4j \
-          --network pasantias-net \
-          --restart always \
-          -p 7474:7474 \
-          -p 7687:7687 \
-          -e NEO4J_AUTH=neo4j/{{ neo4j_password }} \
-          -e NEO4J_server_memory_heap_initial__size=256m \
-          -e NEO4J_server_memory_heap_max__size=512m \
-          -e NEO4J_server_memory_pagecache__size=256m \
-          neo4j:5-community
-      async: 120
-      poll: 10
-      ignore_errors: true
+      shell: >
+        docker run -d --name neo4j
+        --network pasantias-net
+        --restart always
+        -p 7474:7474
+        -p 7687:7687
+        -e NEO4J_AUTH=neo4j/{{ neo4j_password }}
+        neo4j:5-community
 
     - name: Levantar hours-service
       shell: >
@@ -489,17 +378,14 @@
         -e DB_PORT=5432
         -e DB_NAME=hours_db
         -e DB_USER=postgres
-        -e DB_PASSWORD="{{ pg_password }}"
-        -e JWT_SECRET="{{ jwt_secret }}"
+        -e DB_PASSWORD=postgres
+        -e JWT_SECRET='v9y$B&E)H@McQfTjWmZq4t7w!z%C*F-JaNdRgUkXp2r5u8x/A?D(G+KbPeShVmYq'
         -e KAFKA_BOOTSTRAP_SERVERS=kafka:9092
         -e MONGO_URI=mongodb://mongodb:27017/hours_read_db
         -e USER_SERVICE_GRPC_HOST=user-service
         -e USER_SERVICE_GRPC_PORT=9083
         -e JAVA_TOOL_OPTIONS="-Xmx256m -Xms128m"
-        {{ docker_image_hours }}
-      async: 120
-      poll: 10
-      ignore_errors: true
+        gdmuzo/hours-service:latest
 
     - name: Levantar evaluation-service
       shell: >
@@ -511,15 +397,12 @@
         -e DB_PORT=5432
         -e DB_NAME=evaluation_db
         -e DB_USER=postgres
-        -e DB_PASSWORD="{{ pg_password }}"
-        -e JWT_SECRET="{{ jwt_secret }}"
+        -e DB_PASSWORD=postgres
+        -e JWT_SECRET='v9y$B&E)H@McQfTjWmZq4t7w!z%C*F-JaNdRgUkXp2r5u8x/A?D(G+KbPeShVmYq'
         -e USER_SERVICE_GRPC_HOST=user-service
         -e USER_SERVICE_GRPC_PORT=9083
         -e JAVA_TOOL_OPTIONS="-Xmx256m -Xms128m"
-        {{ docker_image_evaluation }}
-      async: 120
-      poll: 10
-      ignore_errors: true
+        gdmuzo/evaluation-service:latest
 
     - name: Levantar notification-service
       shell: >
@@ -531,17 +414,14 @@
         -e DB_PORT=5432
         -e DB_NAME=notification_db
         -e DB_USER=postgres
-        -e DB_PASSWORD="{{ pg_password }}"
+        -e DB_PASSWORD=postgres
         -e KAFKA_BOOTSTRAP_SERVERS=kafka:9092
-        -e MQTT_HOST=mosquitto
-        -e MQTT_PORT=1883
+        -e MQTT_HOST=58567514d2724107bcd88d74e13a8bd8.s1.eu.hivemq.cloud
+        -e MQTT_PORT=8883
         -e MQTT_USER=mqttuser
-        -e MQTT_PASSWORD={{ mqtt_password }}
+        -e MQTT_PASSWORD=Mqtt2026@
         -e JAVA_TOOL_OPTIONS="-Xmx256m -Xms128m"
-        {{ docker_image_notification }}
-      async: 120
-      poll: 10
-      ignore_errors: true
+        gdmuzo/notification-service:latest
 
     - name: Levantar document-service
       shell: >
@@ -553,7 +433,7 @@
         -e DB_PORT=5432
         -e DB_NAME=document_db
         -e DB_USER=postgres
-        -e DB_PASSWORD="{{ pg_password }}"
+        -e DB_PASSWORD=postgres
         -e KAFKA_BOOTSTRAP_SERVERS=kafka:9092
         -e MONGO_URI=mongodb://mongodb:27017/document_read_db
         -e S3_BUCKET_NAME=pasantias-documents-qa
@@ -561,10 +441,7 @@
         -e AWS_SECRET_ACCESS_KEY={{ aws_secret_access_key }}
         -e AWS_SESSION_TOKEN={{ aws_session_token }}
         -e JAVA_TOOL_OPTIONS="-Xmx256m -Xms128m"
-        {{ docker_image_document }}
-      async: 120
-      poll: 10
-      ignore_errors: true
+        gdmuzo/document-service:latest
 
     - name: Levantar report-service
       shell: >
@@ -576,15 +453,12 @@
         -e DB_PORT=5432
         -e DB_NAME=report_db
         -e DB_USER=postgres
-        -e DB_PASSWORD="{{ pg_password }}"
+        -e DB_PASSWORD=postgres
         -e KAFKA_BOOTSTRAP_SERVERS=kafka:9092
         -e MONGO_URI=mongodb://mongodb:27017/report_read_db
         -e DOCUMENT_SERVICE_URL=http://document-service:8088
         -e JAVA_TOOL_OPTIONS="-Xmx256m -Xms128m"
-        {{ docker_image_report }}
-      async: 120
-      poll: 10
-      ignore_errors: true
+        gdmuzo/report-service:latest
 
     - name: Levantar ai-service
       shell: >
@@ -596,11 +470,7 @@
         -e RABBITMQ_PORT=5672
         -e RABBITMQ_USER=guest
         -e RABBITMQ_PASSWORD=guest
-        {{ docker_image_ai }}
-      async: 120
-      poll: 10
-      ignore_errors: true
-
+        gdmuzo/ai-service:latest
 
     - name: Levantar gateway-service
       shell: |
@@ -613,20 +483,11 @@
           -e INTERNSHIP_SERVICE_URL=http://internship-service:8081 \
           -e USER_SERVICE_URL=http://user-service:8083 \
           -e LINKAGE_SERVICE_URL=http://linkage-service:8084 \
-          -e HOURS_SERVICE_URL=http://hours-service:8085 \
-          -e EVALUATION_SERVICE_URL=http://evaluation-service:8086 \
-          -e NOTIFICATION_SERVICE_URL=http://notification-service:8087 \
-          -e DOCUMENT_SERVICE_URL=http://document-service:8088 \
-          -e REPORT_SERVICE_URL=http://report-service:8089 \
-          -e AI_SERVICE_URL=http://ai-service:8090 \
           -e REDIS_HOST=redis \
           -e REDIS_PORT=6379 \
-          -e ALLOWED_ORIGINS=http://{{ qa_public_ip }}:80,http://{{ qa_public_ip }} \
-          -e JWT_SECRET="{{ jwt_secret }}" \
+          -e JWT_SECRET='v9y$B&E)H@McQfTjWmZq4t7w!z%C*F-JaNdRgUkXp2r5u8x/A?D(G+KbPeShVmYq' \
           -e JAVA_TOOL_OPTIONS="-Xmx256m -Xms128m" \
           {{ docker_image_gateway }}
-      async: 120
-      poll: 10
 
     - name: Levantar frontend-web
       shell: |
@@ -636,8 +497,6 @@
           --restart always \
           -p 80:80 \
           {{ docker_image_frontend }}
-      async: 120
-      poll: 10
 
     # ── Verificación ─────────────────────
     - name: Estado de los contenedores
@@ -647,44 +506,3 @@
     - name: Mostrar estado
       debug:
         var: container_status.stdout_lines
-
-# ─────────────────────────────────────────
-# PLAY 2 — Configurar runner como servicio
-#           systemd en el bastion
-# ─────────────────────────────────────────
-- name: Configurar GitHub Actions runner como servicio systemd en bastion
-  hosts: bastion
-  become: true
-
-  tasks:
-    - name: Instalar el runner como servicio systemd
-      shell: |
-        cd /home/ubuntu/actions-runner
-        ./svc.sh install ubuntu || true
-      args:
-        executable: /bin/bash
-
-    - name: Habilitar el servicio para que arranque con el sistema
-      systemd:
-        name: actions.runner.*
-        enabled: true
-        daemon_reload: true
-      ignore_errors: true
-
-    - name: Iniciar el servicio del runner si no está corriendo
-      shell: |
-        cd /home/ubuntu/actions-runner
-        ./svc.sh start || true
-      args:
-        executable: /bin/bash
-
-    - name: Verificar estado del runner
-      shell: |
-        cd /home/ubuntu/actions-runner
-        ./svc.sh status
-      register: runner_status
-      changed_when: false
-
-    - name: Mostrar estado del runner
-      debug:
-        var: runner_status.stdout_lines
