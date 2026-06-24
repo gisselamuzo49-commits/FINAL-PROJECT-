@@ -283,6 +283,15 @@ jobs:
       - name: Install Ansible
         run: pip install ansible
 
+      - name: Debug inventario
+        run: |
+          echo "=== INVENTARIO ==="
+          cat /tmp/qa_inventory.ini
+          echo "=== BASTION IP ==="
+          echo "${{ secrets.QA_BASTION_IP }}"
+          echo "=== AUTH JOBS IP ==="
+          echo "${{ secrets.QA_AUTH_JOBS_IP }}"
+
       - name: Deploy via Ansible
         run: |
           ansible-playbook infra/ansible/deploy-qa.yml \
