@@ -141,6 +141,25 @@
       debug:
         var: disk_space_after.stdout_lines
 
+    - name: Expandir partición raíz al tamaño completo del volumen EBS
+      shell: growpart /dev/nvme0n1 1 || true
+      args:
+        executable: /bin/bash
+
+    - name: Expandir filesystem al tamaño completo de la partición
+      shell: resize2fs /dev/nvme0n1p1 || true
+      args:
+        executable: /bin/bash
+
+    - name: Mostrar espacio disponible tras expansión
+      shell: df -h /
+      register: disk_after_expand
+      changed_when: false
+
+    - name: Imprimir espacio disponible
+      debug:
+        var: disk_after_expand.stdout_lines
+
     - name: Asegurar que existe la red de Docker para intercomunicación
       shell: docker network create pasantias-net 2>/dev/null || true
 
