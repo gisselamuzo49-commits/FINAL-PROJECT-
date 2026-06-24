@@ -215,14 +215,10 @@ resource "aws_instance" "bastion" {
   user_data = base64encode(<<-EOF
     #!/bin/bash
     set -e
-    exec > /var/log/pasantias-bastion-init.log 2>&1
+    exec > /var/log/bastion-init.log 2>&1
 
     apt-get update -y
-    apt-get install -y curl unzip jq ansible git
-
-    snap install amazon-ssm-agent --classic || true
-    systemctl enable snap.amazon-ssm-agent.amazon-ssm-agent.service || true
-    systemctl start snap.amazon-ssm-agent.amazon-ssm-agent.service || true
+    apt-get install -y curl jq
 
     mkdir -p /home/ubuntu/actions-runner
     cd /home/ubuntu/actions-runner
