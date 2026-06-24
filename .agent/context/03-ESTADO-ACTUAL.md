@@ -521,3 +521,4 @@ Se restauró el pipeline de QA (`deploy-qa.yml`) al esquema secuencial original 
 
 Trigger: Deploy QA ProxyCommand restored (2026-06-24)
 Trigger: Deploy QA workflow restaurado (2026-06-24)
+Trigger: Restrict internships publication to roles in frontend (2026-06-24)
