@@ -15,7 +15,7 @@ _Última actualización: 2026-06-23 (Sesión Lab 53 - noche)_
 
 ### Solución aplicada
 - Se configuró Mosquitto local (self-hosted) con autenticación deshabilitando el acceso anónimo y utilizando un archivo de contraseñas montado desde `/opt/mosquitto/passwd` (copiado desde `infra/mosquitto/passwd`).
-- Se parametrizó la contraseña mediante `mqtt_password` en la sección de variables de Ansible con el default `changeme`.
+- Se parametrizó la contraseña mediante `mqtt_password` en la sección de variables de Ansible con el default `changeme`. Asimismo, se inyectó como variable extra (`-e "mqtt_password=${{ secrets.MQTT_PASSWORD }}"`) en el workflow de CI/CD de QA (`.github/workflows/deploy-qa.yml`).
 - Se corrigió `notification-service` para usar el broker local de Mosquitto con usuario `mqttuser` y contraseña parametrizada.
 - Se añadieron las 6 URLs faltantes (`HOURS_SERVICE_URL`, `EVALUATION_SERVICE_URL`, `NOTIFICATION_SERVICE_URL`, `DOCUMENT_SERVICE_URL`, `REPORT_SERVICE_URL`, `AI_SERVICE_URL`) al docker run de `gateway-service`.
 - Se parametrizaron las imágenes de los 6 nuevos servicios con etiqueta `:qa` utilizando variables globales en el playbook de Ansible (`docker_image_hours`, `docker_image_evaluation`, etc.) eliminando todas las referencias a `:latest`.

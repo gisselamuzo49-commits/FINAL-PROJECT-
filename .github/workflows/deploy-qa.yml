@@ -425,6 +425,7 @@ jobs:
             -i /tmp/qa_inventory.ini \
             -e "jwt_secret=${{ secrets.JWT_SECRET }}" \
             -e "pg_password=${{ secrets.PG_PASSWORD }}" \
+            -e "mqtt_password=${{ secrets.MQTT_PASSWORD }}" \
             -e "neo4j_password=${{ secrets.NEO4J_PASSWORD }}" \
             -e "qa_public_ip=${{ secrets.QA_PUBLIC_IP }}" \
             -e "aws_access_key_id=${{ secrets.AWS_ACCESS_KEY_ID }}" \
