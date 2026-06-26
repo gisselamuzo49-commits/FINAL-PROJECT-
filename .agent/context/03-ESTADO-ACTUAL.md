@@ -3,9 +3,36 @@
 > **Este archivo se actualiza al final de cada sesión de trabajo.** Es el primer lugar
 > donde el agente debe mirar para saber "¿dónde quedamos?".
 
-_Última actualización: 2026-06-24 (Sesión Lab 54 - tarde)_
+_Última actualización: 2026-06-26 (Sesión Swagger/OpenAPI)_
 
-## ✅ COMPLETADO HOY — Infraestructura PROD Lab 54 (24/Jun tarde)
+## ✅ COMPLETADO HOY — Swagger/OpenAPI en todos los microservicios (26/Jun)
+
+Se habilitó documentación interactiva de APIs con Swagger/OpenAPI en los 11 microservicios
+del sistema, cumpliendo el requisito #21 de la rúbrica. Rama: `feature/swagger-openapi`.
+
+### Servicios Spring Boot — nuevos (springdoc-openapi-starter-webmvc-ui 2.8.5)
+- `auth-service` (8080): `@Tag("Autenticación")`, `@Operation` en `/register` y `/login`.
+- `internship-service` (8081): `@Tag("Pasantías")` + `@Tag("Postulaciones")`, `@Operation`
+  en CRUD de ofertas y postulaciones (InternshipController + PostulacionController).
+- `user-service` (8083): `@Tag("Usuarios")`, `@Operation` en CRUD + `/email/{email}`.
+- `linkage-service` (8084): `@Tag("Vinculación")`, `@Operation` en CRUD de proyectos.
+- `report-service` (8089): `@Tag("Reportes")`, `@Operation` en reporte por estudiante y
+  global. Path de api-docs estandarizado de `/api-docs` a `/v3/api-docs`.
+
+### Servicios que ya lo tenían (sin cambios)
+- `hours-service` (8085), `evaluation-service` (8086), `notification-service` (8087),
+  `document-service` (8088): ya tenían springdoc 2.8.5 + anotaciones desde sus ramas
+  feature originales.
+
+### ai-service (FastAPI)
+- Actualizado `main.py`: título = "AI Service — Sistema de Pasantías UCE",
+  descripción completa del servicio de IA, versión "1.0.0". Swagger automático en `/docs`.
+
+### Configuración estandarizada en todos los servicios Spring Boot
+- `springdoc.api-docs.path=/v3/api-docs`
+- `springdoc.swagger-ui.path=/swagger-ui.html`
+
+## ✅ COMPLETADO — Infraestructura PROD Lab 54 (24/Jun tarde)
 
 ### Mosquitto Local Broker (Autohospedado)
 - Creada la rama `feature/mosquitto-local-broker` para independizar el sistema de HiveMQ Cloud.

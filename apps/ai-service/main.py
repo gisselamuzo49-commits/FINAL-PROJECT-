@@ -5,7 +5,11 @@ from models.recommender import TFIDFRecommender
 from models.risk_predictor import RiskPredictor
 from workers.rabbitmq_worker import RabbitMQClient
 
-app = FastAPI(title="AI Service")
+app = FastAPI(
+    title="AI Service — Sistema de Pasantías UCE",
+    description="Microservicio de Inteligencia Artificial para la Gestión de Pasantías y Vinculación con la Sociedad (NLP con TF-IDF, predicción de riesgo con Random Forest, cola asíncrona con RabbitMQ).",
+    version="1.0.0",
+)
 
 # Initialize models and clients
 recommender = TFIDFRecommender()

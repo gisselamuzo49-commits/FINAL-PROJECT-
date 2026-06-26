@@ -6,12 +6,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 import java.util.HashMap;
 import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
+@Tag(name = "Autenticación", description = "Endpoints para registro e inicio de sesión de usuarios")
 public class AuthController {
 
     @Autowired
@@ -23,6 +26,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
+    @Operation(summary = "Registrar un nuevo usuario", description = "Crea una cuenta para un Estudiante, Tutor o Coordinador y devuelve su JWT correspondiente.")
     public ResponseEntity<Map<String, String>> register(@RequestBody Map<String, String> body) {
         String token = authService.registerUser(
             body.get("nombre"),
@@ -34,6 +38,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
+    @Operation(summary = "Iniciar sesión", description = "Autentica al usuario por email y contraseña y devuelve su token JWT.")
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
         String token = authService.loginUser(loginRequest.getEmail(), loginRequest.getPassword());
         if (token == null) {
