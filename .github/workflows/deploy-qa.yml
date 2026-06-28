@@ -215,6 +215,8 @@ jobs:
           tags: gdmuzo/frontend-web:qa
           build-args: |
             VITE_GATEWAY_PORT=8082
+            VITE_SUPABASE_URL=${{ secrets.SUPABASE_URL }}
+            VITE_SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY }}
 
   build-hours:
     runs-on: ubuntu-latest
