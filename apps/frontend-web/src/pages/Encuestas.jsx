@@ -33,6 +33,11 @@ function Encuestas() {
 
   // Fetch surveys from Supabase
   const fetchEncuestas = async () => {
+    if (!supabase) {
+      setError('El servicio de encuestas (Supabase) no está configurado en este entorno.');
+      setLoadingList(false);
+      return;
+    }
     setLoadingList(true);
     try {
       const { data, error: fetchErr } = await supabase
@@ -52,6 +57,11 @@ function Encuestas() {
   };
 
   useEffect(() => {
+    if (!supabase) {
+      setError('El servicio de encuestas (Supabase) no está configurado en este entorno.');
+      setLoadingList(false);
+      return;
+    }
     if (estudianteId) {
       fetchEncuestas();
     }
@@ -60,6 +70,10 @@ function Encuestas() {
   // Submit Survey
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!supabase) {
+      setError('El servicio de encuestas (Supabase) no está configurado en este entorno.');
+      return;
+    }
     setLoading(true);
     setError(null);
     setSuccessMsg(null);
@@ -131,10 +145,11 @@ function Encuestas() {
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label htmlFor="empresa" className="block text-sm font-medium text-gray-300 mb-2">
                 Empresa / Institución
               </label>
               <input
+                id="empresa"
                 type="text"
                 value={empresa}
                 onChange={(e) => setEmpresa(e.target.value)}
@@ -166,10 +181,11 @@ function Encuestas() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label htmlFor="comentario" className="block text-sm font-medium text-gray-300 mb-2">
                 Comentarios o Sugerencias
               </label>
               <textarea
+                id="comentario"
                 value={comentario}
                 onChange={(e) => setComentario(e.target.value)}
                 placeholder="Cuéntanos tu experiencia y sugerencias..."
