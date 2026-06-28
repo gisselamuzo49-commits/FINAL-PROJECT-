@@ -15,6 +15,7 @@ import Documents from './pages/Documents';
 import Notifications from './pages/Notifications';
 import Recommendations from './pages/Recommendations';
 import Reports from './pages/Reports';
+import Encuestas from './pages/Encuestas';
 
 const router = createBrowserRouter([
   {
@@ -80,6 +81,10 @@ const router = createBrowserRouter([
       {
         path: 'reports',
         element: <Reports />
+      },
+      {
+        path: 'encuestas',
+        element: <Encuestas />
       }
     ]
   },

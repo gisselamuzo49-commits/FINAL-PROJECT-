@@ -3,9 +3,25 @@
 > **Este archivo se actualiza al final de cada sesión de trabajo.** Es el primer lugar
 > donde el agente debe mirar para saber "¿dónde quedamos?".
 
-_Última actualización: 2026-06-28 (Sesión Integración document-service con n8n)_
+_Última actualización: 2026-06-28 (Sesión Parametrización Supabase)_
 
-## ✅ COMPLETADO HOY — Integración de document-service con n8n y Terraform PROD (28/Jun)
+## ✅ COMPLETADO HOY — Parametrización de Credenciales de Supabase (28/Jun)
+
+Se eliminaron las credenciales hardcodeadas de Supabase en el frontend para mayor seguridad:
+- **supabaseClient.js**: Modificado para consumir las variables `import.meta.env.VITE_SUPABASE_URL` y `import.meta.env.VITE_SUPABASE_ANON_KEY`.
+- **Ansible (`deploy-qa.yml` y `deploy-prod.yml`)**: Añadidas las variables de entorno `VITE_SUPABASE_URL` y `VITE_SUPABASE_ANON_KEY` al docker run de `frontend-web`.
+- **GitHub Actions (`deploy-qa.yml` y `deploy-prod.yml`)**: Inyectados los secrets correspondientes en el comando de ejecución de Ansible.
+
+## ✅ COMPLETADO HOY — Módulo de Encuestas con Supabase (28/Jun)
+
+Se implementó con éxito el módulo de **Encuestas de Satisfacción post-práctica** (requisito #6 PAAS) conectándolo con Supabase en el frontend:
+- **Dependencias**: Agregado `@supabase/supabase-js` al `package.json` del frontend.
+- **Cliente Supabase**: Creado `src/lib/supabaseClient.js` configurado con las credenciales de la base de datos de Supabase.
+- **Componente Encuestas**: Creado `src/pages/Encuestas.jsx` con el formulario de satisfacción (empresa, calificación por estrellas, comentarios), inserción directa en Supabase usando datos del JWT en `localStorage`, y consulta de encuestas históricas del estudiante.
+- **Rutas**: Añadida la ruta `/encuestas` en `src/AppRouter.jsx`.
+- **Barra lateral (Sidebar)**: Agregado el enlace de navegación para el rol `ESTUDIANTE` en `src/components/dashboard/Sidebar.jsx`.
+
+## ✅ COMPLETADO — Integración de document-service con n8n y Terraform PROD (28/Jun)
 
 Se consolidó la integración de la automatización de workflows con n8n:
 - **document-service**: Configurada la variable de entorno `N8N_WEBHOOK_URL` en los playbooks de Ansible de QA (`deploy-qa.yml`) y PROD (`deploy-prod.yml`), apuntando al webhook `http://{{ ansible_host }}:5678/webhook/document-generated`.

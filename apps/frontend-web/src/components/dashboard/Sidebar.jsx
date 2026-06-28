@@ -162,6 +162,14 @@ function Sidebar({ user = {}, onLogout, isOpen, onClose }) {
           </NavLink>
         )}
 
+        {/* Encuestas (Supabase) */}
+        {isEstudiante && (
+          <NavLink to="/encuestas" className={navLinkClass}>
+            <span className="mr-3 text-base">📋</span>
+            <span>Encuestas</span>
+          </NavLink>
+        )}
+
         {/* Recomendaciones */}
         {(isEstudiante || isCoordinador) && (
           <NavLink to="/recommendations" className={navLinkClass}>
