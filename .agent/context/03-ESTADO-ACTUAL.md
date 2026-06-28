@@ -3,7 +3,14 @@
 > **Este archivo se actualiza al final de cada sesión de trabajo.** Es el primer lugar
 > donde el agente debe mirar para saber "¿dónde quedamos?".
 
-_Última actualización: 2026-06-28 (Sesión Fix Cleanup Ansible QA)_
+_Última actualización: 2026-06-28 (Sesión Build-Time Supabase Vite)_
+
+## ✅ COMPLETADO HOY — Variables de Supabase en Compilación de Vite (28/Jun)
+
+Se corrigió la inyección de variables de Supabase para cumplir con el comportamiento de Vite (build-time):
+- **apps/frontend-web/Dockerfile**: Declarados los `ARG` y `ENV` de `VITE_SUPABASE_URL` y `VITE_SUPABASE_ANON_KEY` para que sean leídos y embebidos durante el empaquetado de Vite.
+- **GitHub Workflows (`deploy-qa.yml` y `deploy-prod.yml`)**: Añadidas ambas variables como `build-args` durante la construcción de la imagen del frontend en GitHub Actions.
+- **Ansible Playbooks (`deploy-qa.yml` y `deploy-prod.yml`)**: Removidas las variables del comando `docker run` del frontend, ya que son estáticas y no tienen efecto en runtime.
 
 ## ✅ COMPLETADO HOY — Corrección de Cleanup y Variables Supabase en QA (28/Jun)
 
