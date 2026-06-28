@@ -437,6 +437,11 @@
         docker run -d --name ai-service
         --network pasantias-net
         --restart always
+        --health-cmd="curl -f http://localhost:8090/health || exit 1"
+        --health-interval=30s
+        --health-timeout=10s
+        --health-retries=3
+        --health-start-period=40s
         -p 8090:8090
         -e RABBITMQ_HOST=rabbitmq
         -e RABBITMQ_PORT=5672

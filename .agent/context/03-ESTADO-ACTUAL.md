@@ -3,9 +3,16 @@
 > **Este archivo se actualiza al final de cada sesión de trabajo.** Es el primer lugar
 > donde el agente debe mirar para saber "¿dónde quedamos?".
 
-_Última actualización: 2026-06-28 (Sesión Actualización README)_
+_Última actualización: 2026-06-28 (Sesión Healthcheck AI Service)_
 
-## ✅ COMPLETADO HOY — Documentación Técnica del Sistema (README.md en Inglés) (28/Jun)
+## ✅ COMPLETADO HOY — Healthcheck de ai-service en Docker y Ansible (28/Jun)
+
+Se configuró el monitoreo del estado de salud (HEALTHCHECK) para el microservicio `ai-service` (FastAPI, puerto 8090):
+- **Dockerfile**: Se añadió la directiva `HEALTHCHECK` consultando `/health` cada 30 segundos.
+- **Ansible QA (`deploy-qa.yml`)**: Se añadieron parámetros de healthcheck al comando de `docker run` para `ai-service`.
+- **Ansible PROD (`deploy-prod.yml`)**: Se replicaron las configuraciones de healthcheck para el entorno productivo.
+
+## ✅ COMPLETADO — Documentación Técnica del Sistema (README.md en Inglés) (28/Jun)
 
 Se reestructuró y actualizó completamente el `README.md` principal en inglés para reflejar de forma exacta el estado del sistema:
 - Badges de CI/CD para pipelines de QA y PROD.
