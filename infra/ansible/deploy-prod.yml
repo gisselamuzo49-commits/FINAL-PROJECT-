@@ -414,6 +414,7 @@
         -e AWS_ACCESS_KEY_ID={{ aws_access_key_id }}
         -e AWS_SECRET_ACCESS_KEY={{ aws_secret_access_key }}
         -e AWS_SESSION_TOKEN={{ aws_session_token }}
+        -e N8N_WEBHOOK_URL=http://{{ ansible_host }}:5678/webhook/document-generated
         gdmuzo/document-service:latest
 
     - name: Levantar report-service

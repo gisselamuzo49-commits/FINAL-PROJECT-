@@ -3,9 +3,15 @@
 > **Este archivo se actualiza al final de cada sesión de trabajo.** Es el primer lugar
 > donde el agente debe mirar para saber "¿dónde quedamos?".
 
-_Última actualización: 2026-06-28 (Sesión n8n Autohospedado)_
+_Última actualización: 2026-06-28 (Sesión Integración document-service con n8n)_
 
-## ✅ COMPLETADO HOY — n8n Autohospedado en EC2 de QA (28/Jun)
+## ✅ COMPLETADO HOY — Integración de document-service con n8n y Terraform PROD (28/Jun)
+
+Se consolidó la integración de la automatización de workflows con n8n:
+- **document-service**: Configurada la variable de entorno `N8N_WEBHOOK_URL` en los playbooks de Ansible de QA (`deploy-qa.yml`) y PROD (`deploy-prod.yml`), apuntando al webhook `http://{{ ansible_host }}:5678/webhook/document-generated`.
+- **Terraform PROD (`infra/prod/main.tf`)**: Abierto el puerto `5678` en el security group de servicios privados (`sg_private`) expuesto públicamente para habilitar UI y webhooks de n8n en producción.
+
+## ✅ COMPLETADO — n8n Autohospedado en EC2 de QA (28/Jun)
 
 Se configuró el despliegue automático del motor de automatización de workflows **n8n** en su versión autohospedada:
 - **Ansible QA (`deploy-qa.yml`)**:

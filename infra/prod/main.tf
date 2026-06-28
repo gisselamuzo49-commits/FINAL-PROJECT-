@@ -259,6 +259,14 @@ resource "aws_security_group" "sg_private" {
     protocol        = "tcp"
     security_groups = [aws_security_group.sg_elb.id]
   }
+  # Acceso público a la UI y webhooks de n8n
+  ingress {
+    description = "n8n UI and Webhooks"
+    from_port   = 5678
+    to_port     = 5678
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
   egress {
     from_port   = 0
     to_port     = 0

@@ -411,6 +411,9 @@
         -e NEO4J_AUTH=neo4j/{{ neo4j_password }}
         neo4j:5-community
 
+    - name: Crear volumen n8n
+      shell: docker volume create n8n_data 2>/dev/null || true
+
     - name: Levantar n8n
       shell: >
         docker run -d --name n8n
@@ -497,6 +500,7 @@
         -e AWS_ACCESS_KEY_ID={{ aws_access_key_id }}
         -e AWS_SECRET_ACCESS_KEY={{ aws_secret_access_key }}
         -e AWS_SESSION_TOKEN={{ aws_session_token }}
+        -e N8N_WEBHOOK_URL=http://{{ ansible_host }}:5678/webhook/document-generated
         -e JAVA_TOOL_OPTIONS="-Xmx256m -Xms128m"
         gdmuzo/document-service:latest
 
