@@ -23,7 +23,7 @@
     - name: Detener y remover contenedores existentes (liberar puertos e imágenes asociadas)
       shell: |
         docker stop auth-service internship-service user-service linkage-service gateway-service frontend-web postgres-db redis neo4j zookeeper kafka mongodb rabbitmq hours-service evaluation-service notification-service document-service report-service ai-service mosquitto n8n 2>/dev/null || true
-        docker rm   auth-service internship-service user-service linkage-service gateway-service frontend-web postgres-db redis neo4j zookeeper kafka mongodb rabbitmq hours-service evaluation-service notification-service document-service report-service ai-service mosquitto n8n 2>/dev/null || true
+        docker rm auth-service internship-service user-service linkage-service gateway-service frontend-web postgres-db redis neo4j zookeeper kafka mongodb rabbitmq hours-service evaluation-service notification-service document-service report-service ai-service mosquitto n8n 2>/dev/null || true
 
     - name: Prune unused Docker images, containers and networks
       shell: docker system prune -af || true

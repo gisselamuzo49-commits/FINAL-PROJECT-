@@ -3,7 +3,12 @@
 > **Este archivo se actualiza al final de cada sesión de trabajo.** Es el primer lugar
 > donde el agente debe mirar para saber "¿dónde quedamos?".
 
-_Última actualización: 2026-06-28 (Sesión Cleanup Ansible QA)_
+_Última actualización: 2026-06-28 (Sesión Fix Cleanup Ansible QA)_
+
+## ✅ COMPLETADO HOY — Corrección de Cleanup y Variables Supabase en QA (28/Jun)
+
+Se solventaron problemas del pipeline de CI/CD:
+- **Ansible QA (`deploy-qa.yml`)**: Corregido y alineado exactamente el cleanup de contenedores (`mosquitto` y `n8n`) en `docker stop` y `docker rm` para evitar colisiones por puertos o nombres duplicados. Asegurada la inyección de variables de entorno de Supabase en la imagen del frontend.
 
 ## ✅ COMPLETADO HOY — Cleanup de n8n y mosquitto en Ansible QA (28/Jun)
 
