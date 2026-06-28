@@ -3,7 +3,15 @@
 > **Este archivo se actualiza al final de cada sesión de trabajo.** Es el primer lugar
 > donde el agente debe mirar para saber "¿dónde quedamos?".
 
-_Última actualización: 2026-06-28 (Sesión Parametrización Supabase)_
+_Última actualización: 2026-06-28 (Sesión Docker-Compose Local)_
+
+## ✅ COMPLETADO HOY — Docker-Compose Unificado y .env.example (28/Jun)
+
+Se implementaron herramientas para facilitar la inicialización y el desarrollo del sistema en entornos locales:
+- **docker-compose.yml**: Creado en la raíz del proyecto para levantar todos los contenedores de infraestructura local de forma unificada (PostgreSQL con múltiples bases de datos autoinicializadas, MongoDB, Redis, Neo4j, Kafka + Zookeeper, RabbitMQ, Mosquitto con volumen de configuración local, y n8n autohospedado).
+- **infra/postgres-init/init-multiple-dbs.sh**: Creado el script de inicialización automática de las 9 bases de datos relacionales locales para Postgres.
+- **.env.example**: Creado en la raíz del proyecto incluyendo todas las variables de entorno de infraestructura, gRPC, MQTT y AWS S3 requeridas por los microservicios.
+- **.gitignore**: Se verificó la correcta exclusión del archivo de producción/entorno `.env` manteniendo visible el `.env.example`.
 
 ## ✅ COMPLETADO HOY — Parametrización de Credenciales de Supabase (28/Jun)
 
