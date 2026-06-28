@@ -3,9 +3,20 @@
 > **Este archivo se actualiza al final de cada sesión de trabajo.** Es el primer lugar
 > donde el agente debe mirar para saber "¿dónde quedamos?".
 
-_Última actualización: 2026-06-26 (Sesión Swagger/OpenAPI)_
+_Última actualización: 2026-06-28 (Sesión Actualización README)_
 
-## ✅ COMPLETADO HOY — Swagger/OpenAPI en todos los microservicios (26/Jun)
+## ✅ COMPLETADO HOY — Documentación Técnica del Sistema (README.md en Inglés) (28/Jun)
+
+Se reestructuró y actualizó completamente el `README.md` principal en inglés para reflejar de forma exacta el estado del sistema:
+- Badges de CI/CD para pipelines de QA y PROD.
+- Registro completo de los 11 microservicios activos con sus tecnologías específicas.
+- Consolidación del modelo de persistencia políglota (PostgreSQL, MongoDB, Redis, Neo4j).
+- Actualización de las URLs y dominios de acceso para los entornos de QA y PROD.
+- Detalles sobre las arquitecturas de comunicación inter-servicio (REST, gRPC, Kafka, RabbitMQ, MQTT/Mosquitto, Webhooks).
+- Corrección de la stack del frontend indicando React (PWA) en lugar de Vue.js.
+- Actualización de los datos de autoría académica y tutoría.
+
+## ✅ COMPLETADO — Swagger/OpenAPI en todos los microservicios (26/Jun)
 
 Se habilitó documentación interactiva de APIs con Swagger/OpenAPI en los 11 microservicios
 del sistema, cumpliendo el requisito #21 de la rúbrica. Rama: `feature/swagger-openapi`.
