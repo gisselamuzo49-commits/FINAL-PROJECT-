@@ -242,6 +242,11 @@
       async: 60
       poll: 10
 
+    - name: Pull n8n image
+      shell: docker pull n8nio/n8n:latest
+      async: 60
+      poll: 10
+
     # ── Levantar contenedores ────────────
     - name: Eliminar volumen de postgres para reinicializar schema
       shell: |
@@ -405,6 +410,20 @@
         -p 7687:7687
         -e NEO4J_AUTH=neo4j/{{ neo4j_password }}
         neo4j:5-community
+
+    - name: Levantar n8n
+      shell: >
+        docker run -d --name n8n
+        --network pasantias-net
+        --restart always
+        -p 5678:5678
+        -e N8N_HOST=0.0.0.0
+        -e N8N_PORT=5678
+        -e N8N_PROTOCOL=http
+        -e NODE_ENV=production
+        -e WEBHOOK_URL=http://{{ ansible_host }}:5678/
+        -v n8n_data:/home/node/.n8n
+        n8nio/n8n:latest
 
     - name: Levantar hours-service
       shell: >

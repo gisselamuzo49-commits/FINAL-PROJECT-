@@ -3,9 +3,16 @@
 > **Este archivo se actualiza al final de cada sesión de trabajo.** Es el primer lugar
 > donde el agente debe mirar para saber "¿dónde quedamos?".
 
-_Última actualización: 2026-06-28 (Sesión Healthcheck AI Service)_
+_Última actualización: 2026-06-28 (Sesión n8n Autohospedado)_
 
-## ✅ COMPLETADO HOY — Healthcheck de ai-service en Docker y Ansible (28/Jun)
+## ✅ COMPLETADO HOY — n8n Autohospedado en EC2 de QA (28/Jun)
+
+Se configuró el despliegue automático del motor de automatización de workflows **n8n** en su versión autohospedada:
+- **Ansible QA (`deploy-qa.yml`)**:
+  - Añadido el pull de la imagen oficial `n8nio/n8n:latest`.
+  - Añadido el levantamiento del contenedor `n8n` en la red `pasantias-net`, exponiendo el puerto `5678`, configurando el webhook apuntando al host de Ansible, y persistiendo los datos en el volumen `n8n_data`.
+
+## ✅ COMPLETADO — Healthcheck de ai-service en Docker y Ansible (28/Jun)
 
 Se configuró el monitoreo del estado de salud (HEALTHCHECK) para el microservicio `ai-service` (FastAPI, puerto 8090):
 - **Dockerfile**: Se añadió la directiva `HEALTHCHECK` consultando `/health` cada 30 segundos.
