@@ -1,124 +1,114 @@
+version: '3.8'
+
 services:
   postgres-db:
     image: postgres:15-alpine
-    container_name: postgres-db-local
+    container_name: postgres-db
     ports:
       - "5432:5432"
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=postgres
-      - POSTGRES_MULTIPLE_DATABASES=auth_db,internship_db,user_db,linkage_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+      POSTGRES_MULTIPLE_DATABASES: auth_db,internship_db,user_db,linkage_db,hours_db,evaluation_db,notification_db,document_db,report_db
     volumes:
-      - postgres-data-volume:/var/lib/postgresql/data
-      - ./postgres-init:/docker-entrypoint-initdb.d
-    restart: always
+      - postgres_data:/var/lib/postgresql/data
+      - ./infra/postgres-init:/docker-entrypoint-initdb.d
+    networks:
+      - pasantias-net
 
-  auth-service:
-    build:
-      context: ./apps/auth-service
-      dockerfile: Dockerfile
-    container_name: auth-service-local
+  mongodb:
+    image: mongo:7
+    container_name: mongodb
     ports:
-      - "8080:8080"
+      - "27017:27017"
+    networks:
+      - pasantias-net
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+    networks:
+      - pasantias-net
+
+  neo4j:
+    image: neo4j:5-community
+    container_name: neo4j
+    ports:
+      - "7474:7474"
+      - "7687:7687"
     environment:
-      - JWT_SECRET=v9y$B&E)H@McQfTjWmZq4t7w!z%C*F-JaNdRgUkXp2r5u8x/A?D(G+KbPeShVmYq
-      - DB_HOST=postgres-db
-      - DB_PORT=5432
-      - DB_NAME=auth_db
-      - DB_USER=postgres
-      - DB_PASSWORD=postgres
-    depends_on:
-      - postgres-db
-    restart: always
+      NEO4J_AUTH: neo4j/password123
+    networks:
+      - pasantias-net
 
-  internship-service:
-    build:
-      context: ./apps/internship-service
-      dockerfile: Dockerfile
-    container_name: internship-service-local
-    ports:
-      - "8081:8081"
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.6.0
+    container_name: zookeeper
     environment:
-      - DB_HOST=postgres-db
-      - DB_PORT=5432
-      - DB_NAME=internship_db
-      - DB_USER=postgres
-      - DB_PASSWORD=postgres
-    depends_on:
-      - postgres-db
-    restart: always
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    networks:
+      - pasantias-net
 
-  user-service:
-    build:
-      context: ./apps/user-service
-      dockerfile: Dockerfile
-    container_name: user-service-local
+  kafka:
+    image: confluentinc/cp-kafka:7.6.0
+    container_name: kafka
     ports:
-      - "8083:8083"
+      - "9092:9092"
     environment:
-      - DB_HOST=postgres-db
-      - DB_PORT=5432
-      - DB_NAME=user_db
-      - DB_USER=postgres
-      - DB_PASSWORD=postgres
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
     depends_on:
-      - postgres-db
-    restart: always
+      - zookeeper
+    networks:
+      - pasantias-net
 
-  linkage-service:
-    build:
-      context: ./apps/linkage-service
-      dockerfile: Dockerfile
-    container_name: linkage-service-local
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: rabbitmq
     ports:
-      - "8084:8084"
+      - "5672:5672"
+      - "15672:15672"
     environment:
-      - DB_HOST=postgres-db
-      - DB_PORT=5432
-      - DB_NAME=linkage_db
-      - DB_USER=postgres
-      - DB_PASSWORD=postgres
-    depends_on:
-      - postgres-db
-    restart: always
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    networks:
+      - pasantias-net
 
-  gateway-service:
-    build:
-      context: ./apps/gateway-service
-      dockerfile: Dockerfile
-    container_name: gateway-service-local
+  mosquitto:
+    image: eclipse-mosquitto:2.0
+    container_name: mosquitto
     ports:
-      - "8082:8082"
+      - "1883:1883"
+    volumes:
+      - ./infra/mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
+    networks:
+      - pasantias-net
+
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: n8n
+    ports:
+      - "5678:5678"
     environment:
-      - AUTH_SERVICE_URL=http://auth-service-local:8080
-      - INTERNSHIP_SERVICE_URL=http://internship-service-local:8081
-      - USER_SERVICE_URL=http://user-service-local:8083
-      - LINKAGE_SERVICE_URL=http://linkage-service-local:8084
-      - JWT_SECRET=v9y$B&E)H@McQfTjWmZq4t7w!z%C*F-JaNdRgUkXp2r5u8x/A?D(G+KbPeShVmYq
-    depends_on:
-      - auth-service
-      - internship-service
-      - user-service
-      - linkage-service
-    restart: always
-
-  frontend-web:
-    build:
-      context: ./apps/frontend-web
-      dockerfile: Dockerfile
-      args:
-        - VITE_AUTH_PORT=8080
-        - VITE_INTERNSHIP_PORT=8081
-        - VITE_USER_PORT=8083
-        - VITE_LINKAGE_PORT=8084
-        - VITE_GATEWAY_PORT=8082
-    container_name: frontend-web-local
-    ports:
-      - "80:80"
-    depends_on:
-      - gateway-service
-    restart: always
+      N8N_HOST: 0.0.0.0
+      N8N_PORT: 5678
+      N8N_PROTOCOL: http
+      NODE_ENV: production
+    volumes:
+      - n8n_data:/home/node/.n8n
+    networks:
+      - pasantias-net
 
 volumes:
-  postgres-data-volume:
+  postgres_data:
+  n8n_data:
+
+networks:
+  pasantias-net:
+    driver: bridge
