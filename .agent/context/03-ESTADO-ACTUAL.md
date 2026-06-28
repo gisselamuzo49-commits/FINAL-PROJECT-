@@ -3,7 +3,12 @@
 > **Este archivo se actualiza al final de cada sesión de trabajo.** Es el primer lugar
 > donde el agente debe mirar para saber "¿dónde quedamos?".
 
-_Última actualización: 2026-06-28 (Sesión Docker-Compose Local)_
+_Última actualización: 2026-06-28 (Sesión Cleanup Ansible QA)_
+
+## ✅ COMPLETADO HOY — Cleanup de n8n y mosquitto en Ansible QA (28/Jun)
+
+Se actualizaron las tareas de limpieza en el servidor de QA:
+- **Ansible QA (`deploy-qa.yml`)**: Añadidos `n8n` y `mosquitto` al primer paso de detención y remoción de contenedores existentes (`docker stop` y `docker rm`) para garantizar la liberación de puertos y recursos en redes/volúmenes locales antes de redesplegar.
 
 ## ✅ COMPLETADO HOY — Docker-Compose Unificado y .env.example (28/Jun)
 
