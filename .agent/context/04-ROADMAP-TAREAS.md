@@ -68,10 +68,9 @@ que reemplaza la planificación genérica original.
   un flujo real (ej. notificación por correo cuando se aprueba una práctica).
 - [x] `report-service` (8089): consumidor Kafka + endpoint SOAP + Mongo (Completado y protegido con Circuit Breaker programático de Resilience4j para llamadas REST a `document-service`, 13/13 tests passing).
 - [x] Swagger/OpenAPI (`springdoc-openapi-starter-webmvc-ui`) en los 11 microservicios. ✅ Completado — `auth-service`, `internship-service`, `user-service`, `linkage-service`, `report-service` añadidos; `ai-service` (FastAPI `/docs`) actualizado con título y descripción.
-- [ ] PAAS secundario **Supabase** — módulo "Encuestas de satisfacción / feedback
+- [x] PAAS secundario **Supabase** — módulo "Encuestas de satisfacción / feedback
   post-práctica" (tabla en Supabase + integración desde frontend, decisión cerrada en
-  `03-ESTADO-ACTUAL.md`). Sin dependencias de otros servicios, puede hacerse cualquier
-  semana si sobra tiempo — colocado aquí por defecto.
+  `03-ESTADO-ACTUAL.md`). Completado en rama `feature/supabase-encuestas`.
 
 ### Semana 4 — IA + primer deploy completo a QA
 - [ ] `ai-service` (8090, FastAPI): spaCy, TF-IDF + similitud de coseno, Random Forest
