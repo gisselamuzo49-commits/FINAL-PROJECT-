@@ -374,6 +374,8 @@ jobs:
             -e "aws_secret_access_key=${{ secrets.AWS_SECRET_ACCESS_KEY }}" \
             -e "aws_session_token=${{ secrets.AWS_SESSION_TOKEN }}" \
             -e "dockerhub_username=${{ secrets.DOCKERHUB_USERNAME }}" \
-            -e "dockerhub_token=${{ secrets.DOCKERHUB_TOKEN }}"
+            -e "dockerhub_token=${{ secrets.DOCKERHUB_TOKEN }}" \
+            -e "supabase_url=${{ secrets.SUPABASE_URL }}" \
+            -e "supabase_anon_key=${{ secrets.SUPABASE_ANON_KEY }}"
         env:
           ANSIBLE_CONFIG: /tmp/ansible.cfg

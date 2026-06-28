@@ -562,6 +562,8 @@
           --network pasantias-net \
           --restart always \
           -p 80:80 \
+          -e VITE_SUPABASE_URL={{ supabase_url }} \
+          -e VITE_SUPABASE_ANON_KEY={{ supabase_anon_key }} \
           {{ docker_image_frontend }}
 
     # ── Verificación ─────────────────────
