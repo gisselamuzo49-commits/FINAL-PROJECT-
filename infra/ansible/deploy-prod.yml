@@ -22,8 +22,8 @@
 
     - name: Detener y remover contenedores existentes
       shell: |
-        docker stop auth-service internship-service user-service linkage-service gateway-service frontend-web postgres-db redis neo4j zookeeper kafka mongodb rabbitmq hours-service evaluation-service notification-service document-service report-service ai-service 2>/dev/null || true
-        docker rm   auth-service internship-service user-service linkage-service gateway-service frontend-web postgres-db redis neo4j zookeeper kafka mongodb rabbitmq hours-service evaluation-service notification-service document-service report-service ai-service 2>/dev/null || true
+        docker stop auth-service internship-service user-service linkage-service gateway-service frontend-web postgres-db redis neo4j zookeeper kafka mongodb rabbitmq hours-service evaluation-service notification-service document-service report-service ai-service mosquitto 2>/dev/null || true
+        docker rm   auth-service internship-service user-service linkage-service gateway-service frontend-web postgres-db redis neo4j zookeeper kafka mongodb rabbitmq hours-service evaluation-service notification-service document-service report-service ai-service mosquitto 2>/dev/null || true
 
     - name: Prune unused Docker images, containers and networks
       shell: docker system prune -af || true
@@ -48,6 +48,28 @@
       shell: |
         echo "{{ dockerhub_token }}" | docker login --username "{{ dockerhub_username }}" --password-stdin
       no_log: true
+
+    - name: Crear directorio de configuracion para Mosquitto
+      file:
+        path: /opt/mosquitto
+        state: directory
+        mode: "0755"
+
+    - name: Crear archivo mosquitto.conf
+      copy:
+        dest: /opt/mosquitto/mosquitto.conf
+        content: |
+          listener 1883
+          allow_anonymous false
+          password_file /mosquitto/config/passwd
+        mode: "0644"
+
+    - name: Crear archivo passwd de Mosquitto
+      copy:
+        dest: /opt/mosquitto/passwd
+        content: |
+          notifuser:$7$1000$Zc6Qk2Ubevt5hnmzbgPUcbc+2EvRDl6JNXksU29ldzze1AIsTkTS7Y+02hVG396rrzU1iutZmrAHUiRPFMXKsw==$jeMgp8UyhHcLjlp9cDGGUvpyUsccIM0hKCWASCqlWhSRybSRfG/5sDzqiI1dnoP1RcyX5ooY6dyxTHGqha8quA==
+        mode: "0644"
 
     - name: Asegurar que existe la red de Docker para intercomunicación
       shell: docker network create pasantias-net 2>/dev/null || true
@@ -160,6 +182,9 @@
     - name: Pull ai-service image
       shell: docker pull gdmuzo/ai-service:latest
 
+    - name: Pull mosquitto image
+      shell: docker pull eclipse-mosquitto:2.0
+
     # ── Levantar contenedores ────────────
     - name: Eliminar volumen de postgres para reinicializar schema
       shell: |
@@ -255,6 +280,17 @@
           --restart always \
           -p 6379:6379 \
           redis:7-alpine
+
+    - name: Levantar mosquitto
+      shell: |
+        docker run -d \
+          --name mosquitto \
+          --network pasantias-net \
+          --restart always \
+          -p 1883:1883 \
+          -v /opt/mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf \
+          -v /opt/mosquitto/passwd:/mosquitto/config/passwd \
+          eclipse-mosquitto:2.0
 
     - name: Levantar neo4j
       shell: >
@@ -355,10 +391,10 @@
         -e DB_USER=postgres
         -e DB_PASSWORD=postgres
         -e KAFKA_BOOTSTRAP_SERVERS=kafka:9092
-        -e MQTT_HOST=58567514d2724107bcd88d74e13a8bd8.s1.eu.hivemq.cloud
-        -e MQTT_PORT=8883
-        -e MQTT_USER=mqttuser
-        -e MQTT_PASSWORD=Mqtt2026@
+        -e MQTT_HOST=mosquitto
+        -e MQTT_PORT=1883
+        -e MQTT_USER=notifuser
+        -e MQTT_PASSWORD=MqttN0t1f2026Uce
         gdmuzo/notification-service:latest
 
     - name: Levantar document-service
@@ -378,6 +414,7 @@
         -e AWS_ACCESS_KEY_ID={{ aws_access_key_id }}
         -e AWS_SECRET_ACCESS_KEY={{ aws_secret_access_key }}
         -e AWS_SESSION_TOKEN={{ aws_session_token }}
+        -e N8N_WEBHOOK_URL=http://{{ ansible_host }}:5678/webhook/document-generated
         gdmuzo/document-service:latest
 
     - name: Levantar report-service
@@ -401,6 +438,11 @@
         docker run -d --name ai-service
         --network pasantias-net
         --restart always
+        --health-cmd="curl -f http://localhost:8090/health || exit 1"
+        --health-interval=30s
+        --health-timeout=10s
+        --health-retries=3
+        --health-start-period=40s
         -p 8090:8090
         -e RABBITMQ_HOST=rabbitmq
         -e RABBITMQ_PORT=5672

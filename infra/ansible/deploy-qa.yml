@@ -22,8 +22,8 @@
 
     - name: Detener y remover contenedores existentes (liberar puertos e imágenes asociadas)
       shell: |
-        docker stop auth-service internship-service user-service linkage-service gateway-service frontend-web postgres-db redis zookeeper kafka mongodb rabbitmq hours-service evaluation-service notification-service document-service report-service ai-service neo4j 2>/dev/null || true
-        docker rm   auth-service internship-service user-service linkage-service gateway-service frontend-web postgres-db redis zookeeper kafka mongodb rabbitmq hours-service evaluation-service notification-service document-service report-service ai-service neo4j 2>/dev/null || true
+        docker stop auth-service internship-service user-service linkage-service gateway-service frontend-web postgres-db redis neo4j zookeeper kafka mongodb rabbitmq hours-service evaluation-service notification-service document-service report-service ai-service mosquitto n8n 2>/dev/null || true
+        docker rm auth-service internship-service user-service linkage-service gateway-service frontend-web postgres-db redis neo4j zookeeper kafka mongodb rabbitmq hours-service evaluation-service notification-service document-service report-service ai-service mosquitto n8n 2>/dev/null || true
 
     - name: Prune unused Docker images, containers and networks
       shell: docker system prune -af || true
@@ -48,6 +48,28 @@
       shell: |
         echo "{{ dockerhub_token }}" | docker login --username "{{ dockerhub_username }}" --password-stdin
       no_log: true
+
+    - name: Crear directorio de configuracion para Mosquitto
+      file:
+        path: /opt/mosquitto
+        state: directory
+        mode: "0755"
+
+    - name: Crear archivo mosquitto.conf
+      copy:
+        dest: /opt/mosquitto/mosquitto.conf
+        content: |
+          listener 1883
+          allow_anonymous false
+          password_file /mosquitto/config/passwd
+        mode: "0644"
+
+    - name: Crear archivo passwd de Mosquitto
+      copy:
+        dest: /opt/mosquitto/passwd
+        content: |
+          notifuser:$7$1000$Zc6Qk2Ubevt5hnmzbgPUcbc+2EvRDl6JNXksU29ldzze1AIsTkTS7Y+02hVG396rrzU1iutZmrAHUiRPFMXKsw==$jeMgp8UyhHcLjlp9cDGGUvpyUsccIM0hKCWASCqlWhSRybSRfG/5sDzqiI1dnoP1RcyX5ooY6dyxTHGqha8quA==
+        mode: "0644"
 
     - name: Crear directorio para scripts de inicialización de Postgres
       file:
@@ -124,7 +146,7 @@
     # ── Pull de imágenes ─────────────────
     - name: Pull postgres image
       shell: docker pull {{ postgres_image }}
-      async: 60
+      async: 300
       poll: 10
 
     - name: Pull redis image
@@ -132,87 +154,97 @@
 
     - name: Pull auth-service image
       shell: docker pull {{ docker_image_auth }}
-      async: 60
+      async: 300
       poll: 10
 
     - name: Pull internship-service image
       shell: docker pull {{ docker_image_internship }}
-      async: 60
+      async: 300
       poll: 10
 
     - name: Pull user-service image
       shell: docker pull {{ docker_image_user }}
-      async: 60
+      async: 300
       poll: 10
 
     - name: Pull linkage-service image
       shell: docker pull {{ docker_image_linkage }}
-      async: 60
+      async: 300
       poll: 10
 
     - name: Pull gateway-service image
       shell: docker pull {{ docker_image_gateway }}
-      async: 60
+      async: 300
       poll: 10
 
     - name: Pull frontend-web image
       shell: docker pull {{ docker_image_frontend }}
-      async: 60
+      async: 300
       poll: 10
 
     - name: Pull zookeeper image
       shell: docker pull confluentinc/cp-zookeeper:7.6.0
-      async: 60
+      async: 300
       poll: 10
 
     - name: Pull kafka image
       shell: docker pull confluentinc/cp-kafka:7.6.0
-      async: 60
+      async: 300
       poll: 10
 
     - name: Pull mongodb image
       shell: docker pull mongo:7
-      async: 60
+      async: 300
       poll: 10
 
     - name: Pull rabbitmq image
       shell: docker pull rabbitmq:3-management-alpine
-      async: 60
+      async: 300
       poll: 10
 
     - name: Pull hours-service image
       shell: docker pull gdmuzo/hours-service:latest
-      async: 60
+      async: 300
       poll: 10
 
     - name: Pull evaluation-service image
       shell: docker pull gdmuzo/evaluation-service:latest
-      async: 60
+      async: 300
       poll: 10
 
     - name: Pull notification-service image
       shell: docker pull gdmuzo/notification-service:latest
-      async: 60
+      async: 300
       poll: 10
 
     - name: Pull document-service image
       shell: docker pull gdmuzo/document-service:latest
-      async: 60
+      async: 300
       poll: 10
 
     - name: Pull report-service image
       shell: docker pull gdmuzo/report-service:latest
-      async: 60
+      async: 300
       poll: 10
 
     - name: Pull ai-service image
       shell: docker pull gdmuzo/ai-service:latest
-      async: 60
+      async: 300
       poll: 10
 
     - name: Pull neo4j image
       shell: docker pull neo4j:5-community
-      async: 60
+      async: 300
+      poll: 10
+
+    - name: Pull mosquitto image
+      shell: docker pull eclipse-mosquitto:2.0
+      async: 300
+      poll: 10
+
+    - name: Pull n8n image
+      shell: docker pull n8nio/n8n:latest
+      async: 300
       poll: 10
 
     # ── Levantar contenedores ────────────
@@ -315,6 +347,17 @@
           -p 6379:6379 \
           redis:7-alpine
 
+    - name: Levantar mosquitto
+      shell: |
+        docker run -d \
+          --name mosquitto \
+          --network pasantias-net \
+          --restart always \
+          -p 1883:1883 \
+          -v /opt/mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf \
+          -v /opt/mosquitto/passwd:/mosquitto/config/passwd \
+          eclipse-mosquitto:2.0
+
     - name: Levantar zookeeper
       shell: >
         docker run -d --name zookeeper
@@ -368,6 +411,23 @@
         -e NEO4J_AUTH=neo4j/{{ neo4j_password }}
         neo4j:5-community
 
+    - name: Crear volumen n8n
+      shell: docker volume create n8n_data 2>/dev/null || true
+
+    - name: Levantar n8n
+      shell: >
+        docker run -d --name n8n
+        --network pasantias-net
+        --restart always
+        -p 5678:5678
+        -e N8N_HOST=0.0.0.0
+        -e N8N_PORT=5678
+        -e N8N_PROTOCOL=http
+        -e NODE_ENV=production
+        -e WEBHOOK_URL=http://{{ ansible_host }}:5678/
+        -v n8n_data:/home/node/.n8n
+        n8nio/n8n:latest
+
     - name: Levantar hours-service
       shell: >
         docker run -d --name hours-service
@@ -416,10 +476,10 @@
         -e DB_USER=postgres
         -e DB_PASSWORD=postgres
         -e KAFKA_BOOTSTRAP_SERVERS=kafka:9092
-        -e MQTT_HOST=58567514d2724107bcd88d74e13a8bd8.s1.eu.hivemq.cloud
-        -e MQTT_PORT=8883
-        -e MQTT_USER=mqttuser
-        -e MQTT_PASSWORD=Mqtt2026@
+        -e MQTT_HOST=mosquitto
+        -e MQTT_PORT=1883
+        -e MQTT_USER=notifuser
+        -e MQTT_PASSWORD=MqttN0t1f2026Uce
         -e JAVA_TOOL_OPTIONS="-Xmx256m -Xms128m"
         gdmuzo/notification-service:latest
 
@@ -440,6 +500,7 @@
         -e AWS_ACCESS_KEY_ID={{ aws_access_key_id }}
         -e AWS_SECRET_ACCESS_KEY={{ aws_secret_access_key }}
         -e AWS_SESSION_TOKEN={{ aws_session_token }}
+        -e N8N_WEBHOOK_URL=http://{{ ansible_host }}:5678/webhook/document-generated
         -e JAVA_TOOL_OPTIONS="-Xmx256m -Xms128m"
         gdmuzo/document-service:latest
 
@@ -465,6 +526,11 @@
         docker run -d --name ai-service
         --network pasantias-net
         --restart always
+        --health-cmd="curl -f http://localhost:8090/health || exit 1"
+        --health-interval=30s
+        --health-timeout=10s
+        --health-retries=3
+        --health-start-period=40s
         -p 8090:8090
         -e RABBITMQ_HOST=rabbitmq
         -e RABBITMQ_PORT=5672

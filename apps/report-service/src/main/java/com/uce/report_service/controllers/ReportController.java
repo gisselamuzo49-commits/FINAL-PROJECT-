@@ -10,11 +10,14 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/reports")
+@Tag(name = "Reportes", description = "Consolidado de reportes de horas de estudiantes y estadísticas globales")
 public class ReportController {
 
     @Autowired
@@ -23,7 +26,11 @@ public class ReportController {
     @Autowired
     private ReporteGlobalRepository mongoRepository;
 
+    @Autowired
+    private com.uce.report_service.influxdb.MetricsService metricsService;
+
     @GetMapping("/student/{estudianteId}")
+    @Operation(summary = "Obtener reporte por estudiante", description = "Retorna el reporte consolidado de horas registradas, validadas y rechazadas de un estudiante específico.")
     public ResponseEntity<ReporteEstudiante> getStudentReport(@PathVariable String estudianteId) {
         if (estudianteId == null || estudianteId.trim().isEmpty()) {
             return ResponseEntity.badRequest().build();
@@ -34,9 +41,18 @@ public class ReportController {
     }
 
     @GetMapping("/global")
+    @Operation(summary = "Obtener reporte global", description = "Retorna las estadísticas globales consolidadas de todos los estudiantes, almacenadas en MongoDB.")
     public ResponseEntity<ReporteGlobal> getGlobalReport() {
         Optional<ReporteGlobal> globalReport = mongoRepository.findById("global");
         return globalReport.map(ResponseEntity::ok)
                            .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/metrics/stats")
+    @Operation(summary = "Obtener estadísticas de métricas de series temporales", description = "Retorna la información de conexión del repositorio de series temporales (InfluxDB).")
+    public ResponseEntity<String> getMetricsStats() {
+        return ResponseEntity.ok()
+            .header("Content-Type", "application/json")
+            .body(metricsService.getDatabaseInfo());
     }
 }

@@ -3,7 +3,151 @@
 > **Este archivo se actualiza al final de cada sesión de trabajo.** Es el primer lugar
 > donde el agente debe mirar para saber "¿dónde quedamos?".
 
-_Última actualización: 2026-06-24 (Sesión Lab 53 - mañana)_
+_Última actualización: 2026-06-28 (Flujos de Postulaciones, Horas, Evaluaciones y Reportes - Rama feature/GAME-140-postulaciones-frontend)_
+
+## ✅ COMPLETADO HOY — Flujos Completos del Frontend (28/Jun)
+
+Se implementó la suite completa de interacción y asignación de vinculación en el frontend para estudiantes y docentes:
+- **Flujo de Postulaciones (`Internships.jsx`)**: Botón "Postularse" para estudiantes en vacantes abiertas, deshabilitado si ya fue enviado ("Ya postulado"). Panel "Postulaciones Recibidas" para docentes con acciones de aceptación/rechazo. Pruebas en `Internships.test.jsx` (4/4 passed).
+- **Flujo de Aprobación de Horas (`Hours.jsx`)**: Buscador de estudiantes por `estudianteId` para tutores/coordinadores. Permite la visualización de registros con estado `PENDIENTE` y acciones de aprobación/rechazo mediante el endpoint `/api/hours/{id}/validar`. Pruebas en `Hours.test.jsx` (4/4 passed).
+- **Flujo de Asignación de Evaluaciones (`Evaluations.jsx`)**: Formulario "Registrar Evaluación" para tutores/coordinadores. Permite calificar del 0 al 10 e inyectar comentarios, enviándolos al endpoint `/api/evaluations` con validaciones de rango en cliente. Pruebas en `Evaluations.test.jsx` (5/5 passed).
+- **Reportes (`Reports.jsx`)**: Conectado el botón "Generar Reporte" a los endpoints reales (`/api/reports/student/{id}` para estudiantes, `/api/reports/global` para docentes). Se agregó la sección "Métricas de Series Temporales (InfluxDB)" consumiendo `GET /api/reports/metrics/stats`, visible únicamente para personal docente. Pruebas actualizadas en `Reports.test.jsx` (4/4 passed).
+- **Pruebas Unitarias Globales**: 36 pruebas unitarias de la SPA del frontend ejecutándose de forma exitosa (`BUILD SUCCESS`).
+
+## ✅ COMPLETADO RECIENTEMENTE — Implementación de Bases de Datos Políglotas (28/Jun)
+
+Se implementaron localmente 6 bases de datos adicionales para habilitar el modelo de base de datos políglota, con sus respectivos tests unitarios passing:
+- **SQLite en `ai-service`**: Usado como caché local de predicciones de riesgo de estudiantes (`risk_score`, `recommendation`).
+- **DynamoDB en `gateway-service`**: Para registro de tokens JWT revocados (blacklist) con TTL automático. Robustecido para evitar fallos de inicialización en entornos sin credenciales AWS.
+- **InfluxDB en `report-service`**: Para métricas de series temporales de horas de vinculación registradas.
+- **Elasticsearch en `internship-service`**: Para búsqueda de texto completo en ofertas de pasantía preprofesionales.
+- **Cassandra en `notification-service`**: Para bitácora de eventos de notificaciones de alta velocidad.
+- **etcd en `gateway-service`**: Para configuración distribuida y dinámica del gateway.
+
+## ⚠️ REVERTIDO HOY — Configuración de Docker Buildx en Pipeline QA (28/Jun)
+
+Se revirtió la adición de Docker Buildx en los jobs de compilación:
+- **Incidente de Rate Limit**: Tras aplicar el commit `7602939`, el pipeline de QA falló debido a problemas de límites de descarga (Rate Limit) de Docker Hub en el entorno del runner.
+- **Reversión del Cambio**: Se ejecutó `git revert 7602939 --no-edit` para retornar `.github/workflows/deploy-qa.yml` a su estado anterior estable y permitir que continúen los despliegues de forma normal.
+
+## ✅ COMPLETADO HOY — Variables de Supabase en Compilación de Vite (28/Jun)
+
+Se corrigió la inyección de variables de Supabase para cumplir con el comportamiento de Vite (build-time):
+- **apps/frontend-web/Dockerfile**: Declarados los `ARG` y `ENV` de `VITE_SUPABASE_URL` y `VITE_SUPABASE_ANON_KEY` para que sean leídos y embebidos durante el empaquetado de Vite.
+- **GitHub Workflows (`deploy-qa.yml` y `deploy-prod.yml`)**: Añadidas ambas variables como `build-args` durante la construcción de la imagen del frontend en GitHub Actions.
+- **Ansible Playbooks (`deploy-qa.yml` y `deploy-prod.yml`)**: Removidas las variables del comando `docker run` del frontend, ya que son estáticas y no tienen efecto en runtime.
+
+## ✅ COMPLETADO HOY — Corrección de Cleanup y Variables Supabase en QA (28/Jun)
+
+Se solventaron problemas del pipeline de CI/CD:
+- **Ansible QA (`deploy-qa.yml`)**: Corregido y alineado exactamente el cleanup de contenedores (`mosquitto` y `n8n`) en `docker stop` y `docker rm` para evitar colisiones por puertos o nombres duplicados. Asegurada la inyección de variables de entorno de Supabase en la imagen del frontend.
+
+## ✅ COMPLETADO HOY — Cleanup de n8n y mosquitto en Ansible QA (28/Jun)
+
+Se actualizaron las tareas de limpieza en el servidor de QA:
+- **Ansible QA (`deploy-qa.yml`)**: Añadidos `n8n` y `mosquitto` al primer paso de detención y remoción de contenedores existentes (`docker stop` y `docker rm`) para garantizar la liberación de puertos y recursos en redes/volúmenes locales antes de redesplegar.
+
+## ✅ COMPLETADO HOY — Docker-Compose Unificado y .env.example (28/Jun)
+
+Se implementaron herramientas para facilitar la inicialización y el desarrollo del sistema en entornos locales:
+- **docker-compose.yml**: Creado en la raíz del proyecto para levantar todos los contenedores de infraestructura local de forma unificada (PostgreSQL con múltiples bases de datos autoinicializadas, MongoDB, Redis, Neo4j, Kafka + Zookeeper, RabbitMQ, Mosquitto con volumen de configuración local, y n8n autohospedado).
+- **infra/postgres-init/init-multiple-dbs.sh**: Creado el script de inicialización automática de las 9 bases de datos relacionales locales para Postgres.
+- **.env.example**: Creado en la raíz del proyecto incluyendo todas las variables de entorno de infraestructura, gRPC, MQTT y AWS S3 requeridas por los microservicios.
+- **.gitignore**: Se verificó la correcta exclusión del archivo de producción/entorno `.env` manteniendo visible el `.env.example`.
+
+## ✅ COMPLETADO HOY — Parametrización de Credenciales de Supabase (28/Jun)
+
+Se eliminaron las credenciales hardcodeadas de Supabase en el frontend para mayor seguridad:
+- **supabaseClient.js**: Modificado para consumir las variables `import.meta.env.VITE_SUPABASE_URL` y `import.meta.env.VITE_SUPABASE_ANON_KEY`.
+- **Ansible (`deploy-qa.yml` y `deploy-prod.yml`)**: Añadidas las variables de entorno `VITE_SUPABASE_URL` y `VITE_SUPABASE_ANON_KEY` al docker run de `frontend-web`.
+- **GitHub Actions (`deploy-qa.yml` y `deploy-prod.yml`)**: Inyectados los secrets correspondientes en el comando de ejecución de Ansible.
+
+## ✅ COMPLETADO HOY — Módulo de Encuestas con Supabase (28/Jun)
+
+Se implementó con éxito el módulo de **Encuestas de Satisfacción post-práctica** (requisito #6 PAAS) conectándolo con Supabase en el frontend:
+- **Dependencias**: Agregado `@supabase/supabase-js` al `package.json` del frontend.
+- **Cliente Supabase**: Creado `src/lib/supabaseClient.js` configurado con las credenciales de la base de datos de Supabase.
+- **Componente Encuestas**: Creado `src/pages/Encuestas.jsx` con el formulario de satisfacción (empresa, calificación por estrellas, comentarios), inserción directa en Supabase usando datos del JWT en `localStorage`, y consulta de encuestas históricas del estudiante.
+- **Rutas**: Añadida la ruta `/encuestas` en `src/AppRouter.jsx`.
+- **Barra lateral (Sidebar)**: Agregado el enlace de navegación para el rol `ESTUDIANTE` en `src/components/dashboard/Sidebar.jsx`.
+
+## ✅ COMPLETADO — Integración de document-service con n8n y Terraform PROD (28/Jun)
+
+Se consolidó la integración de la automatización de workflows con n8n:
+- **document-service**: Configurada la variable de entorno `N8N_WEBHOOK_URL` en los playbooks de Ansible de QA (`deploy-qa.yml`) y PROD (`deploy-prod.yml`), apuntando al webhook `http://{{ ansible_host }}:5678/webhook/document-generated`.
+- **Terraform PROD (`infra/prod/main.tf`)**: Abierto el puerto `5678` en el security group de servicios privados (`sg_private`) expuesto públicamente para habilitar UI y webhooks de n8n en producción.
+
+## ✅ COMPLETADO — n8n Autohospedado en EC2 de QA (28/Jun)
+
+Se configuró el despliegue automático del motor de automatización de workflows **n8n** en su versión autohospedada:
+- **Ansible QA (`deploy-qa.yml`)**:
+  - Añadido el pull de la imagen oficial `n8nio/n8n:latest`.
+  - Añadido el levantamiento del contenedor `n8n` en la red `pasantias-net`, exponiendo el puerto `5678`, configurando el webhook apuntando al host de Ansible, y persistiendo los datos en el volumen `n8n_data`.
+
+## ✅ COMPLETADO — Healthcheck de ai-service en Docker y Ansible (28/Jun)
+
+Se configuró el monitoreo del estado de salud (HEALTHCHECK) para el microservicio `ai-service` (FastAPI, puerto 8090):
+- **Dockerfile**: Se añadió la directiva `HEALTHCHECK` consultando `/health` cada 30 segundos.
+- **Ansible QA (`deploy-qa.yml`)**: Se añadieron parámetros de healthcheck al comando de `docker run` para `ai-service`.
+- **Ansible PROD (`deploy-prod.yml`)**: Se replicaron las configuraciones de healthcheck para el entorno productivo.
+
+## ✅ COMPLETADO — Documentación Técnica del Sistema (README.md en Inglés) (28/Jun)
+
+Se reestructuró y actualizó completamente el `README.md` principal en inglés para reflejar de forma exacta el estado del sistema:
+- Badges de CI/CD para pipelines de QA y PROD.
+- Registro completo de los 11 microservicios activos con sus tecnologías específicas.
+- Consolidación del modelo de persistencia políglota (PostgreSQL, MongoDB, Redis, Neo4j).
+- Actualización de las URLs y dominios de acceso para los entornos de QA y PROD.
+- Detalles sobre las arquitecturas de comunicación inter-servicio (REST, gRPC, Kafka, RabbitMQ, MQTT/Mosquitto, Webhooks).
+- Corrección de la stack del frontend indicando React (PWA) en lugar de Vue.js.
+- Actualización de los datos de autoría académica y tutoría.
+
+## ✅ COMPLETADO — Swagger/OpenAPI en todos los microservicios (26/Jun)
+
+Se habilitó documentación interactiva de APIs con Swagger/OpenAPI en los 11 microservicios
+del sistema, cumpliendo el requisito #21 de la rúbrica. Rama: `feature/swagger-openapi`.
+
+### Servicios Spring Boot — nuevos (springdoc-openapi-starter-webmvc-ui 2.8.5)
+- `auth-service` (8080): `@Tag("Autenticación")`, `@Operation` en `/register` y `/login`.
+- `internship-service` (8081): `@Tag("Pasantías")` + `@Tag("Postulaciones")`, `@Operation`
+  en CRUD de ofertas y postulaciones (InternshipController + PostulacionController).
+- `user-service` (8083): `@Tag("Usuarios")`, `@Operation` en CRUD + `/email/{email}`.
+- `linkage-service` (8084): `@Tag("Vinculación")`, `@Operation` en CRUD de proyectos.
+- `report-service` (8089): `@Tag("Reportes")`, `@Operation` en reporte por estudiante y
+  global. Path de api-docs estandarizado de `/api-docs` a `/v3/api-docs`.
+
+### Servicios que ya lo tenían (sin cambios)
+- `hours-service` (8085), `evaluation-service` (8086), `notification-service` (8087),
+  `document-service` (8088): ya tenían springdoc 2.8.5 + anotaciones desde sus ramas
+  feature originales.
+
+### ai-service (FastAPI)
+- Actualizado `main.py`: título = "AI Service — Sistema de Pasantías UCE",
+  descripción completa del servicio de IA, versión "1.0.0". Swagger automático en `/docs`.
+
+### Configuración estandarizada en todos los servicios Spring Boot
+- `springdoc.api-docs.path=/v3/api-docs`
+- `springdoc.swagger-ui.path=/swagger-ui.html`
+
+## ✅ COMPLETADO — Infraestructura PROD Lab 54 (24/Jun tarde)
+
+### Mosquitto Local Broker (Autohospedado)
+- Creada la rama `feature/mosquitto-local-broker` para independizar el sistema de HiveMQ Cloud.
+- Modificados `infra/ansible/deploy-qa.yml` y `infra/ansible/deploy-prod.yml` para aprovisionar automáticamente un contenedor `mosquitto` con autenticación básica (`notifuser` / password hash en `passwd`) sobre la red interna `pasantias-net`.
+- Redirigido `notification-service` para conectarse al host `mosquitto` en el puerto `1883` con credenciales `notifuser`/`MqttN0t1f2026Uce` (removiendo HiveMQ por completo).
+
+### IPs y Recursos actuales de PROD (Lab 54)
+- **Bastion EIP (fija)**: `34.235.174.136`
+- **PROD ALB DNS**: `pasantias-prod-elb-1617123986.us-east-1.elb.amazonaws.com`
+- **prod_auth_jobs IP privada**: `10.0.3.93`
+- **S3 Bucket Documentos**: `pasantias-documents-prod`
+- **S3 Backend tfstate**: `estado-pasantias-gisse-2026-prod` (actualizado en `infra/prod/main.tf` para resolver la colisión global de nombres de bucket)
+
+### Secrets de GitHub para PROD (Actualizar si aplica)
+- `PROD_BASTION_IP` = `34.235.174.136`
+- `PROD_AUTH_JOBS_IP` = `10.0.3.93` (IP privada para Ansible vía Bastion)
+- `PROD_SSH_KEY` = Llave privada SSH para producción (`infra/prod/PROD`)
+
 
 ## ✅ COMPLETADO — Ajuste de Configuración SSH de Ansible para QA (24/Jun mañana)
 
@@ -183,7 +327,7 @@ GitHub Secrets.- Deploy vía Ansible re-ejecutado, pipeline verde. Verificado en
 
 Excel de Cloudflare llenado:
 - **QA IP1** → `32.193.25.6`
-- **PRODUCCION IP** → `pasantias-prod-elb-115885246.us-east-1.elb.amazonaws.com`
+- **PRODUCCION IP** → `pasantias-prod-elb-1617123986.us-east-1.elb.amazonaws.com`
 
 Cuando la cátedra asigne los subdominios `*.distribuidauce.org`, actualizar
 `01-REQUERIMIENTOS-MAESTROS.md` requisito #5 a "✅" y documentar los dominios en

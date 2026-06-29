@@ -10,7 +10,7 @@ terraform {
     }
   }
   backend "s3" {
-    bucket = "estado-pasantias-gisse-2026"
+    bucket = "estado-pasantias-gisse-2026-prod"
     key    = "prod/terraform.tfstate"
     region = "us-east-1"
   }
@@ -258,6 +258,14 @@ resource "aws_security_group" "sg_private" {
     to_port         = 8084
     protocol        = "tcp"
     security_groups = [aws_security_group.sg_elb.id]
+  }
+  # Acceso público a la UI y webhooks de n8n
+  ingress {
+    description = "n8n UI and Webhooks"
+    from_port   = 5678
+    to_port     = 5678
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
   }
   egress {
     from_port   = 0
