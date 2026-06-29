@@ -3,13 +3,13 @@
 > **Este archivo se actualiza al final de cada sesión de trabajo.** Es el primer lugar
 > donde el agente debe mirar para saber "¿dónde quedamos?".
 
-_Última actualización: 2026-06-28 (Sesión Docker Buildx en QA Pipeline)_
+_Última actualización: 2026-06-28 (Reversión Docker Buildx en QA Pipeline)_
 
-## ✅ COMPLETADO HOY — Configuración de Docker Buildx en Pipeline QA (28/Jun)
+## ⚠️ REVERTIDO HOY — Configuración de Docker Buildx en Pipeline QA (28/Jun)
 
-Se solucionaron los errores de descarga (docker pull) de imágenes base en el pipeline de GitHub Actions de QA:
-- **Docker Buildx en Jobs de Construcción**: Agregado el paso `- uses: docker/setup-buildx-action@v3` en los 12 jobs de compilación (`build-auth`, `build-internship`, `build-user`, `build-linkage`, `build-gateway`, `build-frontend`, `build-hours`, `build-evaluation`, `build-notification`, `build-document`, `build-report`, `build-ai`) justo antes del login de Docker Hub.
-- **Autenticación Heredada**: Esto asegura que el compilador de Buildx esté inicializado y herede correctamente las credenciales de sesión provistas por `docker/login-action@v3`, evitando límites de descarga anónima (Rate Limits) al descargar imágenes base de Docker Hub.
+Se revirtió la adición de Docker Buildx en los jobs de compilación:
+- **Incidente de Rate Limit**: Tras aplicar el commit `7602939`, el pipeline de QA falló debido a problemas de límites de descarga (Rate Limit) de Docker Hub en el entorno del runner.
+- **Reversión del Cambio**: Se ejecutó `git revert 7602939 --no-edit` para retornar `.github/workflows/deploy-qa.yml` a su estado anterior estable y permitir que continúen los despliegues de forma normal.
 
 ## ✅ COMPLETADO HOY — Variables de Supabase en Compilación de Vite (28/Jun)
 
