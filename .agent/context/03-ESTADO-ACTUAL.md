@@ -3,9 +3,18 @@
 > **Este archivo se actualiza al final de cada sesión de trabajo.** Es el primer lugar
 > donde el agente debe mirar para saber "¿dónde quedamos?".
 
-_Última actualización: 2026-06-28 (Bases de Datos Políglotas - Rama feature/GAME-139-polyglot-databases)_
+_Última actualización: 2026-06-28 (Flujos de Postulaciones, Horas, Evaluaciones y Reportes - Rama feature/GAME-140-postulaciones-frontend)_
 
-## ✅ COMPLETADO HOY — Implementación de Bases de Datos Políglotas (28/Jun)
+## ✅ COMPLETADO HOY — Flujos Completos del Frontend (28/Jun)
+
+Se implementó la suite completa de interacción y asignación de vinculación en el frontend para estudiantes y docentes:
+- **Flujo de Postulaciones (`Internships.jsx`)**: Botón "Postularse" para estudiantes en vacantes abiertas, deshabilitado si ya fue enviado ("Ya postulado"). Panel "Postulaciones Recibidas" para docentes con acciones de aceptación/rechazo. Pruebas en `Internships.test.jsx` (4/4 passed).
+- **Flujo de Aprobación de Horas (`Hours.jsx`)**: Buscador de estudiantes por `estudianteId` para tutores/coordinadores. Permite la visualización de registros con estado `PENDIENTE` y acciones de aprobación/rechazo mediante el endpoint `/api/hours/{id}/validar`. Pruebas en `Hours.test.jsx` (4/4 passed).
+- **Flujo de Asignación de Evaluaciones (`Evaluations.jsx`)**: Formulario "Registrar Evaluación" para tutores/coordinadores. Permite calificar del 0 al 10 e inyectar comentarios, enviándolos al endpoint `/api/evaluations` con validaciones de rango en cliente. Pruebas en `Evaluations.test.jsx` (5/5 passed).
+- **Reportes (`Reports.jsx`)**: Conectado el botón "Generar Reporte" a los endpoints reales (`/api/reports/student/{id}` para estudiantes, `/api/reports/global` para docentes). Se agregó la sección "Métricas de Series Temporales (InfluxDB)" consumiendo `GET /api/reports/metrics/stats`, visible únicamente para personal docente. Pruebas actualizadas en `Reports.test.jsx` (4/4 passed).
+- **Pruebas Unitarias Globales**: 36 pruebas unitarias de la SPA del frontend ejecutándose de forma exitosa (`BUILD SUCCESS`).
+
+## ✅ COMPLETADO RECIENTEMENTE — Implementación de Bases de Datos Políglotas (28/Jun)
 
 Se implementaron localmente 6 bases de datos adicionales para habilitar el modelo de base de datos políglota, con sus respectivos tests unitarios passing:
 - **SQLite en `ai-service`**: Usado como caché local de predicciones de riesgo de estudiantes (`risk_score`, `recommendation`).

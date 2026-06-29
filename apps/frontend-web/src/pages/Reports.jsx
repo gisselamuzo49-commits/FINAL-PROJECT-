@@ -29,6 +29,15 @@ function Reports() {
   const [reportType, setReportType] = useState("horas");
   const [bannerMessage, setBannerMessage] = useState(null);
 
+  // --- States para Reporte Generado ---
+  const [generatedReport, setGeneratedReport] = useState(null);
+  const [loadingGenerated, setLoadingGenerated] = useState(false);
+
+  // --- States para Métricas InfluxDB ---
+  const [metricsInfo, setMetricsInfo] = useState(null);
+  const [loadingMetrics, setLoadingMetrics] = useState(false);
+  const [errorMetrics, setErrorMetrics] = useState(null);
+
   // --- API Fetch ---
   const cargarReporteEstudiante = () => {
     if (!estudianteId) return;
@@ -71,21 +80,64 @@ function Reports() {
       });
   };
 
+  const cargarMetricas = () => {
+    if (!isAcademicStaff) return;
+    setLoadingMetrics(true);
+    setErrorMetrics(null);
+    fetch(`${API}/api/reports/metrics/stats`, { headers: getHeaders() })
+      .then(response => {
+        if (response.status === 401) { logout(); throw new Error("Sesión expirada"); }
+        if (!response.ok) throw new Error("Error al cargar métricas");
+        return response.json();
+      })
+      .then(data => {
+        setMetricsInfo(data);
+        setLoadingMetrics(false);
+      })
+      .catch(error => {
+        setErrorMetrics(error.message);
+        setLoadingMetrics(false);
+      });
+  };
+
+  const handleGenerateReport = (e) => {
+    e.preventDefault();
+    setLoadingGenerated(true);
+    setBannerMessage(null);
+    setGeneratedReport(null);
+
+    const endpoint = isAcademicStaff
+      ? `${API}/api/reports/global`
+      : `${API}/api/reports/student/${estudianteId}`;
+
+    fetch(endpoint, { headers: getHeaders() })
+      .then(response => {
+        if (response.status === 401) { logout(); throw new Error("Sesión expirada"); }
+        if (response.status === 404) return null;
+        if (!response.ok) throw new Error("Error al generar reporte");
+        return response.json();
+      })
+      .then(data => {
+        setGeneratedReport({ type: reportType, data });
+        setBannerMessage({ text: "Reporte generado exitosamente", type: "success" });
+        setLoadingGenerated(false);
+      })
+      .catch(error => {
+        setBannerMessage({ text: "Error: " + error.message, type: "error" });
+        setLoadingGenerated(false);
+      });
+  };
+
   useEffect(() => {
     if (estudianteId) {
       cargarReporteEstudiante();
     }
     if (isAcademicStaff) {
       cargarReporteGlobal();
+      cargarMetricas();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [estudianteId]);
-
-  const handleGenerateReport = (e) => {
-    e.preventDefault();
-    setBannerMessage({ text: "Generación de reportes en desarrollo", type: "info" });
-    setTimeout(() => setBannerMessage(null), 4000);
-  };
 
   const formatFecha = (dateStr) => {
     if (!dateStr) return '—';
@@ -98,6 +150,13 @@ function Reports() {
     } catch {
       return dateStr;
     }
+  };
+
+  const reportTypeLabels = {
+    horas: "Consolidado de Horas",
+    evaluaciones: "Resumen de Evaluaciones",
+    "pasantías": "Ofertas de Pasantías",
+    "vinculación": "Proyectos de Vinculación"
   };
 
   return (
@@ -121,8 +180,14 @@ function Reports() {
       </div>
 
       {bannerMessage && (
-        <div className="bg-blue-50 text-blue-700 text-sm p-4 rounded-xl font-medium border border-blue-200 shadow-sm animate-fade-in">
-          ℹ️ {bannerMessage.text}
+        <div className={`text-sm p-4 rounded-xl font-medium border shadow-sm animate-fade-in ${
+          bannerMessage.type === "success"
+            ? "bg-green-50 text-green-700 border-green-200"
+            : bannerMessage.type === "error"
+              ? "bg-red-50 text-red-700 border-red-200"
+              : "bg-blue-50 text-blue-700 border-blue-200"
+        }`}>
+          {bannerMessage.type === "success" ? "✅" : bannerMessage.type === "error" ? "⚠️" : "ℹ️"} {bannerMessage.text}
         </div>
       )}
 
@@ -148,12 +213,45 @@ function Reports() {
           </div>
           <button
             type="submit"
-            className="bg-[var(--color-purple)] hover:bg-[var(--color-purple-hover)] text-white text-sm font-semibold rounded-lg py-2.5 px-6 transition shadow-sm w-full sm:w-auto shrink-0 h-[42px]"
+            disabled={loadingGenerated}
+            className="bg-[var(--color-purple)] hover:bg-[var(--color-purple-hover)] disabled:bg-gray-300 text-white text-sm font-semibold rounded-lg py-2.5 px-6 transition shadow-sm w-full sm:w-auto shrink-0 h-[42px]"
           >
-            Generar Reporte
+            {loadingGenerated ? 'Generando...' : 'Generar Reporte'}
           </button>
         </form>
       </div>
+
+      {/* Generated Report Results */}
+      {generatedReport && generatedReport.data && (
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+          <h3 className="text-base font-bold text-gray-800 border-b border-gray-100 pb-3 mb-4 flex items-center">
+            <span className="mr-2">📄</span> Resultado: {reportTypeLabels[generatedReport.type] || generatedReport.type}
+          </h3>
+
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-sm text-gray-600 border-collapse">
+              <thead>
+                <tr className="border-b border-gray-100 text-xs font-semibold text-gray-400 uppercase">
+                  <th className="py-3 px-2">Campo</th>
+                  <th className="py-3 px-2">Valor</th>
+                </tr>
+              </thead>
+              <tbody>
+                {Object.entries(generatedReport.data)
+                  .filter(([key]) => key !== 'estudiantesPorFacultad')
+                  .map(([key, value]) => (
+                  <tr key={key} className="border-b border-gray-50 hover:bg-gray-50/50 transition-colors">
+                    <td className="py-3 px-2 font-semibold text-gray-700 capitalize">{key}</td>
+                    <td className="py-3 px-2 text-gray-600 font-mono">
+                      {value !== null && value !== undefined ? String(value) : '—'}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
 
       {/* Student Specific Reports Table */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
@@ -265,6 +363,51 @@ function Reports() {
                   </div>
                 </div>
               )}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Métricas InfluxDB Section (Visible only to Coordinator/Tutor) */}
+      {isAcademicStaff && (
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+          <h3 className="text-base font-bold text-gray-800 border-b border-gray-100 pb-3 mb-4 flex items-center justify-between">
+            <span>📈 Métricas de Series Temporales (InfluxDB)</span>
+            <span className="text-xs font-bold text-orange-600 bg-orange-50 px-2 py-0.5 rounded border border-orange-200">INFLUXDB</span>
+          </h3>
+
+          {loadingMetrics ? (
+            <div className="text-gray-400 text-sm text-center py-10 animate-pulse">
+              Cargando métricas...
+            </div>
+          ) : errorMetrics ? (
+            <div className="text-sm text-red-600 bg-red-50 p-4 rounded-xl border border-red-100 text-center">
+              ⚠️ Error al cargar métricas: {errorMetrics}
+            </div>
+          ) : !metricsInfo ? (
+            <div className="text-gray-400 text-sm text-center py-10">
+              No hay datos de métricas disponibles.
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-sm text-gray-600 border-collapse">
+                <thead>
+                  <tr className="border-b border-gray-100 text-xs font-semibold text-gray-400 uppercase">
+                    <th className="py-3 px-2">Propiedad</th>
+                    <th className="py-3 px-2">Valor</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {Object.entries(metricsInfo).map(([key, value]) => (
+                    <tr key={key} className="border-b border-gray-50 hover:bg-gray-50/50 transition-colors">
+                      <td className="py-3 px-2 font-semibold text-gray-700 capitalize">{key}</td>
+                      <td className="py-3 px-2 text-gray-600 font-mono">
+                        {value !== null && value !== undefined ? String(value) : '—'}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           )}
         </div>
