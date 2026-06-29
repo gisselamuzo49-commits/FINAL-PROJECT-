@@ -381,3 +381,22 @@ jobs:
             -e "supabase_anon_key=${{ secrets.SUPABASE_ANON_KEY }}"
         env:
           ANSIBLE_CONFIG: /tmp/ansible.cfg
+
+  # ── Load Testing con k6 ───────────────────────────────────────
+  load-test:
+    name: K6 Load Testing
+    needs: deploy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Esperar que los servicios estén listos
+        run: sleep 30
+
+      - name: Run k6 load test
+        uses: grafana/k6-action@v0.3.1
+        env:
+          TARGET_HOST: ${{ secrets.QA_AUTH_JOBS_IP }}
+        with:
+          filename: tests/load/k6-all-services.js
+          flags: --vus 20 --duration 30s
