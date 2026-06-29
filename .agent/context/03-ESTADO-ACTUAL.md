@@ -3,7 +3,17 @@
 > **Este archivo se actualiza al final de cada sesión de trabajo.** Es el primer lugar
 > donde el agente debe mirar para saber "¿dónde quedamos?".
 
-_Última actualización: 2026-06-28 (Reversión Docker Buildx en QA Pipeline)_
+_Última actualización: 2026-06-28 (Bases de Datos Políglotas - Rama feature/GAME-139-polyglot-databases)_
+
+## ✅ COMPLETADO HOY — Implementación de Bases de Datos Políglotas (28/Jun)
+
+Se implementaron localmente 6 bases de datos adicionales para habilitar el modelo de base de datos políglota, con sus respectivos tests unitarios passing:
+- **SQLite en `ai-service`**: Usado como caché local de predicciones de riesgo de estudiantes (`risk_score`, `recommendation`).
+- **DynamoDB en `gateway-service`**: Para registro de tokens JWT revocados (blacklist) con TTL automático. Robustecido para evitar fallos de inicialización en entornos sin credenciales AWS.
+- **InfluxDB en `report-service`**: Para métricas de series temporales de horas de vinculación registradas.
+- **Elasticsearch en `internship-service`**: Para búsqueda de texto completo en ofertas de pasantía preprofesionales.
+- **Cassandra en `notification-service`**: Para bitácora de eventos de notificaciones de alta velocidad.
+- **etcd en `gateway-service`**: Para configuración distribuida y dinámica del gateway.
 
 ## ⚠️ REVERTIDO HOY — Configuración de Docker Buildx en Pipeline QA (28/Jun)
 

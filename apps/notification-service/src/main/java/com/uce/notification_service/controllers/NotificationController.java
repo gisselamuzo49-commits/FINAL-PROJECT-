@@ -34,4 +34,14 @@ public class NotificationController {
         return updated.map(ResponseEntity::ok)
                       .orElseGet(() -> ResponseEntity.notFound().build());
     }
+
+    @Autowired
+    private com.uce.notification_service.cassandra.CassandraEventService cassandraEventService;
+
+    @GetMapping("/cassandra/stats")
+    public ResponseEntity<String> getCassandraStats() {
+        return ResponseEntity.ok()
+            .header("Content-Type", "application/json")
+            .body(cassandraEventService.getDatabaseInfo());
+    }
 }

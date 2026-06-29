@@ -30,4 +30,15 @@ public class InternshipController {
     public List<Internship> getAll() {
         return internshipService.getAllInternships();
     }
+
+    @Autowired
+    private com.uce.internship_service.elasticsearch.OfertaSearchService searchService;
+
+    @GetMapping("/search/stats")
+    @Operation(summary = "Obtener estadísticas de búsquedas", description = "Retorna la información de conexión al motor de búsqueda indexada (Elasticsearch).")
+    public org.springframework.http.ResponseEntity<String> getSearchStats() {
+        return org.springframework.http.ResponseEntity.ok()
+            .header("Content-Type", "application/json")
+            .body(searchService.getDatabaseInfo());
+    }
 }

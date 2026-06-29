@@ -26,6 +26,9 @@ public class ReportController {
     @Autowired
     private ReporteGlobalRepository mongoRepository;
 
+    @Autowired
+    private com.uce.report_service.influxdb.MetricsService metricsService;
+
     @GetMapping("/student/{estudianteId}")
     @Operation(summary = "Obtener reporte por estudiante", description = "Retorna el reporte consolidado de horas registradas, validadas y rechazadas de un estudiante específico.")
     public ResponseEntity<ReporteEstudiante> getStudentReport(@PathVariable String estudianteId) {
@@ -43,5 +46,13 @@ public class ReportController {
         Optional<ReporteGlobal> globalReport = mongoRepository.findById("global");
         return globalReport.map(ResponseEntity::ok)
                            .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/metrics/stats")
+    @Operation(summary = "Obtener estadísticas de métricas de series temporales", description = "Retorna la información de conexión del repositorio de series temporales (InfluxDB).")
+    public ResponseEntity<String> getMetricsStats() {
+        return ResponseEntity.ok()
+            .header("Content-Type", "application/json")
+            .body(metricsService.getDatabaseInfo());
     }
 }

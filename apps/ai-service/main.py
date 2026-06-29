@@ -4,12 +4,17 @@ from typing import List, Dict, Any
 from models.recommender import TFIDFRecommender
 from models.risk_predictor import RiskPredictor
 from workers.rabbitmq_worker import RabbitMQClient
+from database.sqlite_cache import init_db, get_cached_prediction, save_prediction
 
 app = FastAPI(
     title="AI Service — Sistema de Pasantías UCE",
     description="Microservicio de Inteligencia Artificial para la Gestión de Pasantías y Vinculación con la Sociedad (NLP con TF-IDF, predicción de riesgo con Random Forest, cola asíncrona con RabbitMQ).",
     version="1.0.0",
 )
+
+@app.on_event("startup")
+def startup_event():
+    init_db()
 
 # Initialize models and clients
 recommender = TFIDFRecommender()
@@ -70,12 +75,21 @@ def recommend(req: RecommendRequest):
 
 @app.post("/api/ai/risk", response_model=RiskResponse)
 def risk(req: RiskRequest):
+    cached = get_cached_prediction(req.estudianteId)
+    if cached:
+        return RiskResponse(
+            estudianteId=req.estudianteId,
+            riesgo=cached[1],
+            probabilidad=cached[0]
+        )
+
     res = risk_predictor.predict(
         horas_validadas=req.horasValidadas,
         horas_pendientes=req.horasPendientes,
         horas_rechazadas=req.horasRechazadas,
         dias_sin_actividad=req.diasSinActividad
     )
+    save_prediction(req.estudianteId, res["probabilidad"], res["riesgo"])
     return RiskResponse(
         estudianteId=req.estudianteId,
         riesgo=res["riesgo"],
@@ -89,3 +103,20 @@ def publish_task(req: TaskRequest):
         return {"queued": True}
     else:
         return {"queued": False, "reason": "RabbitMQ unavailable"}
+
+@app.get("/api/ai/cache/stats")
+def cache_stats():
+    import sqlite3
+    from database.sqlite_cache import DB_PATH
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        cursor.execute("SELECT COUNT(*) FROM prediction_cache")
+        count = cursor.fetchone()[0]
+        conn.close()
+    except Exception:
+        count = 0
+    return {
+        "total_cached_predictions": count,
+        "database": "SQLite"
+    }

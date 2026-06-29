@@ -135,3 +135,7 @@ spring:
 security:
   jwt:
     secret: ${JWT_SECRET:v9y$B&E)H@McQfTjWmZq4t7w!z%C*F-JaNdRgUkXp2r5u8x/A?D(G+KbPeShVmYq}
+
+# Configuración de etcd (Configuración Distribuida)
+etcd:
+  endpoints: ${ETCD_ENDPOINTS:http://etcd:2379}
