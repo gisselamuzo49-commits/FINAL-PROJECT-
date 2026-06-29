@@ -3,6 +3,7 @@ package com.uce.internship_service.controllers;
 import com.uce.internship_service.models.Internship;
 import com.uce.internship_service.services.InternshipService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -16,6 +17,11 @@ public class InternshipController {
 
     @Autowired
     private InternshipService internshipService;
+
+    @GetMapping("/health")
+    public ResponseEntity<String> health() {
+        return ResponseEntity.ok("Internship Service is running");
+    }
 
     // Ruta para GUARDAR (POST)
     @PostMapping

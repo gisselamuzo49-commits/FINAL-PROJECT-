@@ -15,11 +15,10 @@ const BASE_URL = `http://${TARGET_HOST}`;
 
 export default function () {
   const endpoints = [
-    `${BASE_URL}/api/auth/health`,
-    `${BASE_URL}/api/internship/health`,
     `${BASE_URL}/api/users/health`,
     `${BASE_URL}/api/linkage/health`,
     `${BASE_URL}`,
+    `${BASE_URL}:8082`, // gateway directo
   ];
 
   const url = endpoints[Math.floor(Math.random() * endpoints.length)];
