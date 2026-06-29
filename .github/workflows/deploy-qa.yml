@@ -124,7 +124,6 @@ jobs:
     if: needs.detect-changes.outputs.auth == 'true'
     steps:
       - uses: actions/checkout@v4
-      - uses: docker/setup-buildx-action@v3
       - uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
@@ -141,7 +140,6 @@ jobs:
     if: needs.detect-changes.outputs.internship == 'true'
     steps:
       - uses: actions/checkout@v4
-      - uses: docker/setup-buildx-action@v3
       - uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
@@ -158,7 +156,6 @@ jobs:
     if: needs.detect-changes.outputs.user == 'true'
     steps:
       - uses: actions/checkout@v4
-      - uses: docker/setup-buildx-action@v3
       - uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
@@ -175,7 +172,6 @@ jobs:
     if: needs.detect-changes.outputs.linkage == 'true'
     steps:
       - uses: actions/checkout@v4
-      - uses: docker/setup-buildx-action@v3
       - uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
@@ -192,7 +188,6 @@ jobs:
     if: needs.detect-changes.outputs.gateway == 'true'
     steps:
       - uses: actions/checkout@v4
-      - uses: docker/setup-buildx-action@v3
       - uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
@@ -209,7 +204,6 @@ jobs:
     if: needs.detect-changes.outputs.frontend == 'true'
     steps:
       - uses: actions/checkout@v4
-      - uses: docker/setup-buildx-action@v3
       - uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
@@ -230,7 +224,6 @@ jobs:
     if: needs.detect-changes.outputs.hours == 'true'
     steps:
       - uses: actions/checkout@v4
-      - uses: docker/setup-buildx-action@v3
       - uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
@@ -247,7 +240,6 @@ jobs:
     if: needs.detect-changes.outputs.evaluation == 'true'
     steps:
       - uses: actions/checkout@v4
-      - uses: docker/setup-buildx-action@v3
       - uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
@@ -264,7 +256,6 @@ jobs:
     if: needs.detect-changes.outputs.notification == 'true'
     steps:
       - uses: actions/checkout@v4
-      - uses: docker/setup-buildx-action@v3
       - uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
@@ -281,7 +272,6 @@ jobs:
     if: needs.detect-changes.outputs.document == 'true'
     steps:
       - uses: actions/checkout@v4
-      - uses: docker/setup-buildx-action@v3
       - uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
@@ -298,7 +288,6 @@ jobs:
     if: needs.detect-changes.outputs.report == 'true'
     steps:
       - uses: actions/checkout@v4
-      - uses: docker/setup-buildx-action@v3
       - uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
@@ -315,7 +304,6 @@ jobs:
     if: needs.detect-changes.outputs.ai == 'true'
     steps:
       - uses: actions/checkout@v4
-      - uses: docker/setup-buildx-action@v3
       - uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
