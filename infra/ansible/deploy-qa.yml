@@ -244,7 +244,7 @@
 
     - name: Pull n8n image
       shell: docker pull n8nio/n8n:latest
-      async: 60
+      async: 300
       poll: 10
 
     # ── Levantar contenedores ────────────
