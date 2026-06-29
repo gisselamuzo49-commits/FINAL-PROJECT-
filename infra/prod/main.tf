@@ -605,6 +605,59 @@ resource "aws_s3_bucket_acl" "documents_prod" {
 }
 
 # ─────────────────────────────────────────
+# AUTO SCALING POLICIES — CPU based
+# ─────────────────────────────────────────
+resource "aws_autoscaling_policy" "scale_up" {
+  name                   = "pasantias-prod-scale-up"
+  autoscaling_group_name = aws_autoscaling_group.prod_asg.name
+  adjustment_type        = "ChangeInCapacity"
+  scaling_adjustment     = 1
+  cooldown               = 120
+}
+
+resource "aws_cloudwatch_metric_alarm" "cpu_high" {
+  alarm_name          = "pasantias-prod-cpu-high"
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 2
+  metric_name         = "CPUUtilization"
+  namespace           = "AWS/EC2"
+  period              = 60
+  statistic           = "Average"
+  threshold           = 70
+  alarm_description   = "Scale up cuando CPU > 70% por 2 minutes"
+  alarm_actions       = [aws_autoscaling_policy.scale_up.arn]
+
+  dimensions = {
+    AutoScalingGroupName = aws_autoscaling_group.prod_asg.name
+  }
+}
+
+resource "aws_autoscaling_policy" "scale_down" {
+  name                   = "pasantias-prod-scale-down"
+  autoscaling_group_name = aws_autoscaling_group.prod_asg.name
+  adjustment_type        = "ChangeInCapacity"
+  scaling_adjustment     = -1
+  cooldown               = 300
+}
+
+resource "aws_cloudwatch_metric_alarm" "cpu_low" {
+  alarm_name          = "pasantias-prod-cpu-low"
+  comparison_operator = "LessThanThreshold"
+  evaluation_periods  = 3
+  metric_name         = "CPUUtilization"
+  namespace           = "AWS/EC2"
+  period              = 60
+  statistic           = "Average"
+  threshold           = 20
+  alarm_description   = "Scale down cuando CPU < 20% por 3 minutos"
+  alarm_actions       = [aws_autoscaling_policy.scale_down.arn]
+
+  dimensions = {
+    AutoScalingGroupName = aws_autoscaling_group.prod_asg.name
+  }
+}
+
+# ─────────────────────────────────────────
 # OUTPUTS
 # Comandos para obtener los valores:
 #   terraform apply -refresh-only
@@ -628,4 +681,12 @@ output "prod_auth_jobs_private_ip" {
 output "documents_bucket_prod" {
   description = "Nombre del bucket S3 para document-service PROD"
   value       = aws_s3_bucket.documents_prod.bucket
+}
+
+# ─────────────────────────────────────────
+# OUTPUTS — agregar al final
+# ─────────────────────────────────────────
+output "asg_name" {
+  description = "Nombre del Auto Scaling Group para verificar en AWS Console"
+  value       = aws_autoscaling_group.prod_asg.name
 }
