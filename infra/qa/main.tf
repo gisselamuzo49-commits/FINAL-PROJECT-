@@ -10,9 +10,11 @@ terraform {
     }
   }
   backend "s3" {
-    bucket = "estado-pasantias-gisse-2026"
-    key    = "qa/terraform.tfstate"
-    region = "us-east-1"
+    bucket       = "estado-pasantias-gisse-2026"
+    key          = "qa/terraform.tfstate"
+    region       = "us-east-1"
+    use_lockfile = true
+    encrypt      = true
   }
 }
 
@@ -159,6 +161,14 @@ resource "aws_security_group" "sg_private" {
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
     description = "Gateway API"
+  }
+  # Acceso público a la UI y webhooks de n8n
+  ingress {
+    from_port   = 5678
+    to_port     = 5678
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+    description = "n8n UI and Webhooks"
   }
   egress {
     from_port   = 0

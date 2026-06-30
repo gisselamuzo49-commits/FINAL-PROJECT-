@@ -10,9 +10,11 @@ terraform {
     }
   }
   backend "s3" {
-    bucket = "estado-pasantias-gisse-2026-prod"
-    key    = "prod/terraform.tfstate"
-    region = "us-east-1"
+    bucket       = "estado-pasantias-gisse-2026-prod"
+    key          = "prod/terraform.tfstate"
+    region       = "us-east-1"
+    use_lockfile = true
+    encrypt      = true
   }
 }
 
