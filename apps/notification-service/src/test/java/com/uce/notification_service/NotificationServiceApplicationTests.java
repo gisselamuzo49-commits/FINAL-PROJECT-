@@ -17,8 +17,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
         "spring.datasource.password=",
         "spring.jpa.database-platform=org.hibernate.dialect.H2Dialect",
         "spring.jpa.hibernate.ddl-auto=create-drop",
-        // Desactivamos auto-configuración de Kafka para que no intente conectarse al broker real
-        "spring.autoconfigure.exclude=org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration"
+        // Desactivamos auto-configuración de Kafka y Cassandra para que no intente conectarse a brokers reales
+        "spring.autoconfigure.exclude=org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration,org.springframework.boot.autoconfigure.cassandra.CassandraAutoConfiguration,org.springframework.boot.data.cassandra.autoconfigure.DataCassandraAutoConfiguration,org.springframework.boot.data.cassandra.autoconfigure.CassandraRepositoriesAutoConfiguration,org.springframework.boot.autoconfigure.data.cassandra.CassandraDataAutoConfiguration,org.springframework.boot.autoconfigure.data.cassandra.CassandraRepositoriesAutoConfiguration"
     }
 )
 class NotificationServiceApplicationTests {
@@ -29,6 +29,12 @@ class NotificationServiceApplicationTests {
     @MockitoBean
     @SuppressWarnings("rawtypes")
     private KafkaTemplate kafkaTemplate;
+
+    @MockitoBean
+    private com.uce.notification_service.cassandra.CassandraEventService cassandraEventService;
+
+    @MockitoBean
+    private com.uce.notification_service.cassandra.NotificationEventRepository notificationEventRepository;
 
     @Test
     void contextLoads() {

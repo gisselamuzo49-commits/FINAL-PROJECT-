@@ -53,6 +53,12 @@ class NotificationIntegrationTests {
     @MockitoBean
     private MqttClientManager mqttClientManager;
 
+    @MockitoBean
+    private com.uce.notification_service.cassandra.CassandraEventService cassandraEventService;
+
+    @MockitoBean
+    private com.uce.notification_service.cassandra.NotificationEventRepository notificationEventRepository;
+
     private final RestTemplate restTemplate = new RestTemplate(new org.springframework.http.client.JdkClientHttpRequestFactory());
 
     @DynamicPropertySource
