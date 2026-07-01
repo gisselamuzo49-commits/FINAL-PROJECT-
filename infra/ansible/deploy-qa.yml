@@ -274,7 +274,7 @@
       poll: 10
 
     - name: Pull etcd image
-      shell: docker pull bitnami/etcd:latest
+      shell: docker pull bitnami/etcd:3.5
       async: 300
       poll: 10
 
@@ -553,7 +553,7 @@
            -e ALLOW_NONE_AUTHENTICATION=yes \
            -e ETCD_ADVERTISE_CLIENT_URLS=http://etcd:2379 \
            -e ETCD_LISTEN_CLIENT_URLS=http://0.0.0.0:2379 \
-           bitnami/etcd:latest)
+           bitnami/etcd:3.5)
 
     - name: Levantar hours-service
       shell: >
