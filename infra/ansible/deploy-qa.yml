@@ -274,7 +274,7 @@
       poll: 10
 
     - name: Pull etcd image
-      shell: docker pull bitnami/etcd:3.5
+      shell: docker pull gcr.io/etcd-development/etcd:v3.5.0
       async: 300
       poll: 10
 
@@ -551,9 +551,17 @@
            --restart always \
            -p 2379:2379 \
            -e ALLOW_NONE_AUTHENTICATION=yes \
-           -e ETCD_ADVERTISE_CLIENT_URLS=http://etcd:2379 \
-           -e ETCD_LISTEN_CLIENT_URLS=http://0.0.0.0:2379 \
-           bitnami/etcd:3.5)
+           gcr.io/etcd-development/etcd:v3.5.0 \
+           /usr/local/bin/etcd \
+           --name s1 \
+           --data-dir /etcd-data \
+           --listen-client-urls http://0.0.0.0:2379 \
+           --advertise-client-urls http://etcd:2379 \
+           --listen-peer-urls http://0.0.0.0:2380 \
+           --initial-advertise-peer-urls http://etcd:2380 \
+           --initial-cluster s1=http://etcd:2380 \
+           --initial-cluster-state new \
+           --log-level info)
 
     - name: Levantar hours-service
       shell: >
