@@ -25,6 +25,11 @@ public class AuthController {
         return "¡Hola desde el Backend de Pasantías (Spring Boot)!";
     }
 
+    @GetMapping("/health")
+    public ResponseEntity<String> health() {
+        return ResponseEntity.ok("Auth Service is running");
+    }
+
     @PostMapping("/register")
     @Operation(summary = "Registrar un nuevo usuario", description = "Crea una cuenta para un Estudiante, Tutor o Coordinador y devuelve su JWT correspondiente.")
     public ResponseEntity<Map<String, String>> register(@RequestBody Map<String, String> body) {

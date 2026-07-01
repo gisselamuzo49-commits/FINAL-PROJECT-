@@ -78,6 +78,9 @@
         docker volume create neo4j_data 2>/dev/null || true
         docker volume create redis_data 2>/dev/null || true
         docker volume create n8n_data 2>/dev/null || true
+        docker volume create cassandra_data 2>/dev/null || true
+        docker volume create elasticsearch_data 2>/dev/null || true
+        docker volume create influxdb_data 2>/dev/null || true
 
     - name: Asegurar que existe la red de Docker para intercomunicación
       shell: docker network create pasantias-net 2>/dev/null || true
@@ -192,6 +195,26 @@
 
     - name: Pull mosquitto image
       shell: docker pull eclipse-mosquitto:2.0
+
+    - name: Pull cassandra image
+      shell: docker pull cassandra:4.1
+      async: 300
+      poll: 10
+
+    - name: Pull elasticsearch image
+      shell: docker pull elasticsearch:8.12.0
+      async: 300
+      poll: 10
+
+    - name: Pull influxdb image
+      shell: docker pull influxdb:2.7
+      async: 300
+      poll: 10
+
+    - name: Pull etcd image
+      shell: docker pull gcr.io/etcd-development/etcd:v3.5.0
+      async: 300
+      poll: 10
 
     # ── Levantar contenedores ────────────
     - name: Levantar postgres-db
@@ -388,6 +411,75 @@
         -e RABBITMQ_DEFAULT_USER=guest
         -e RABBITMQ_DEFAULT_PASS=guest
         rabbitmq:3-management-alpine)
+
+    - name: Asegurar que cassandra está corriendo
+      shell: |
+        docker ps --filter "name=cassandra" --filter "status=running" | grep -q cassandra || \
+        (docker rm -f cassandra 2>/dev/null || true; \
+         docker run -d \
+           --name cassandra \
+           --network pasantias-net \
+           --restart always \
+           -p 9042:9042 \
+           -e MAX_HEAP_SIZE=256M \
+           -e HEAP_NEWSIZE=128M \
+           -v cassandra_data:/var/lib/cassandra \
+           cassandra:4.1)
+
+    - name: Asegurar que elasticsearch está corriendo
+      shell: |
+        docker ps --filter "name=elasticsearch" --filter "status=running" | grep -q elasticsearch || \
+        (docker rm -f elasticsearch 2>/dev/null || true; \
+         docker run -d \
+           --name elasticsearch \
+           --network pasantias-net \
+           --restart always \
+           -p 9200:9200 \
+           -e discovery.type=single-node \
+           -e ES_JAVA_OPTS="-Xms256m -Xmx256m" \
+           -e xpack.security.enabled=false \
+           -v elasticsearch_data:/usr/share/elasticsearch/data \
+           elasticsearch:8.12.0)
+
+    - name: Asegurar que influxdb está corriendo
+      shell: |
+        docker ps --filter "name=influxdb" --filter "status=running" | grep -q influxdb || \
+        (docker rm -f influxdb 2>/dev/null || true; \
+         docker run -d \
+           --name influxdb \
+           --network pasantias-net \
+           --restart always \
+           -p 8096:8086 \
+           -e DOCKER_INFLUXDB_INIT_MODE=setup \
+           -e DOCKER_INFLUXDB_INIT_USERNAME=admin \
+           -e DOCKER_INFLUXDB_INIT_PASSWORD=pasantias123 \
+           -e DOCKER_INFLUXDB_INIT_ORG=pasantias-uce \
+           -e DOCKER_INFLUXDB_INIT_BUCKET=horas-metricas \
+           -e DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=pasantias-token \
+           -v influxdb_data:/var/lib/influxdb2 \
+           influxdb:2.7)
+
+    - name: Asegurar que etcd está corriendo
+      shell: |
+        docker ps --filter "name=etcd" --filter "status=running" | grep -q etcd || \
+        (docker rm -f etcd 2>/dev/null || true; \
+         docker run -d \
+           --name etcd \
+           --network pasantias-net \
+           --restart always \
+           -p 2379:2379 \
+           -e ALLOW_NONE_AUTHENTICATION=yes \
+           gcr.io/etcd-development/etcd:v3.5.0 \
+           /usr/local/bin/etcd \
+           --name s1 \
+           --data-dir /etcd-data \
+           --listen-client-urls http://0.0.0.0:2379 \
+           --advertise-client-urls http://etcd:2379 \
+           --listen-peer-urls http://0.0.0.0:2380 \
+           --initial-advertise-peer-urls http://etcd:2380 \
+           --initial-cluster s1=http://etcd:2380 \
+           --initial-cluster-state new \
+           --log-level info)
 
     - name: Levantar hours-service
       shell: >
