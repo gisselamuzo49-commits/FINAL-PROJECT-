@@ -82,6 +82,7 @@ que reemplaza la planificación genérica original.
 - [x] Configurar Self-Hosted Runner en el Bastion de QA y parametrizar dinámicamente IPs (Lab 53). ✅
 - [x] Implementar protección de rutas por rol en frontend (RoleProtectedRoute) y backend (@PreAuthorize). ✅
 - [x] Implementar patrón Circuit Breaker con Resilience4j en los 5 microservicios restantes (auth, gateway, internship, linkage, user) con pruebas de validación en verde. ✅
+- [x] Implementar notificaciones en tiempo real utilizando WebSockets en notification-service y el frontend. ✅ (02/Jul)
 
 
 ### Semana 5 — Sesión de diseño + Terraform modular + infraestructura PROD

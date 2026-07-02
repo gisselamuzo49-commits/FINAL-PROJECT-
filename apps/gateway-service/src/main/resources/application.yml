@@ -110,6 +110,13 @@ spring:
               filters:
                 - name: JwtAuthenticationFilter
 
+            - id: notification-ws
+              uri: ${NOTIFICATION_SERVICE_URL:http://notification-service:8087}
+              predicates:
+                - Path=/ws/**
+              filters:
+                - name: JwtAuthenticationFilter
+
             - id: document-service
               uri: ${DOCUMENT_SERVICE_URL:http://document-service:8088}
               predicates:

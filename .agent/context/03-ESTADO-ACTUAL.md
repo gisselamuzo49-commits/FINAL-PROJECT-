@@ -3,7 +3,16 @@
 > **Este archivo se actualiza al final de cada sesión de trabajo.** Es el primer lugar
 > donde el agente debe mirar para saber "¿dónde quedamos?".
 
-_Última actualización: 2026-07-02 (Backups PostgreSQL y Circuit Breakers - Rama feature/GAME-152-backups-onpremise)_
+_Última actualización: 2026-07-02 (Notificaciones en Tiempo Real con WebSockets - Rama feature/GAME-158-websockets)_
+
+## ✅ COMPLETADO HOY — WebSockets en notification-service y Frontend (02/Jul)
+
+Se implementó notificaciones en tiempo real utilizando WebSockets STOMP y WebSocket nativo:
+- **Dependencias y Configuración:** Agregada la dependencia `spring-boot-starter-websocket` en `notification-service/pom.xml` y creado `WebSocketConfig.java` para registrar el endpoint `/ws` y habilitar broker STOMP simple (`/topic`, `/queue`).
+- **Lógica de Envío:** Modificado `NotificationService.java` para inyectar `SimpMessagingTemplate` y despachar notificaciones entrantes vía `convertAndSendToUser` al recibir eventos.
+- **Ruta en Gateway:** Configurada la ruta `/ws/**` en `gateway-service/application.yml` para enrutar conexiones WebSocket.
+- **Sincronización Frontend:** Añadida lógica en `Notifications.jsx` para conectarse dinámicamente vía WebSocket nativo de JS al Gateway y recargar el listado al recibir notificaciones.
+- **Pruebas de Calidad:** Creado y verificado el test `NotificationWebSocketTest.java` logrando **BUILD SUCCESS**.
 
 ## ✅ COMPLETADO HOY — Backups PostgreSQL Automáticos On-Premise (02/Jul)
 
