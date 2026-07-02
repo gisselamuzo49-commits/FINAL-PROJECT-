@@ -8,6 +8,9 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import java.util.Collections;
+
 @Service
 public class LinkageService {
 
@@ -18,8 +21,13 @@ public class LinkageService {
         return linkageProjectRepository.save(project);
     }
 
+    @CircuitBreaker(name = "default", fallbackMethod = "getLinkageFallback")
     public List<LinkageProject> getAllProjects() {
         return linkageProjectRepository.findAll();
+    }
+
+    public List<LinkageProject> getLinkageFallback(Throwable t) {
+        return Collections.emptyList();
     }
 
     public Optional<LinkageProject> getProjectById(Long id) {

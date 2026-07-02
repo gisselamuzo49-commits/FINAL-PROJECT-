@@ -30,6 +30,7 @@ spring:
                 maxAge: 3600
           default-filters:
             - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials, RETAIN_FIRST
+            - CircuitBreaker=name=default,fallbackUri=forward:/fallback
           # --- RUTAS: Enrutamiento a los microservicios internos ---
           # Las URIs usan variables de entorno para funcionar tanto en local (localhost)
           # como en Docker (nombres de servicio de docker-compose).

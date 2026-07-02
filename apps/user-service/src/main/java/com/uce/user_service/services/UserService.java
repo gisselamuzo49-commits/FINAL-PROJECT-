@@ -8,6 +8,9 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import java.util.Collections;
+
 @Service
 public class UserService {
 
@@ -18,8 +21,13 @@ public class UserService {
         return userProfileRepository.save(profile);
     }
 
+    @CircuitBreaker(name = "default", fallbackMethod = "getProfilesFallback")
     public List<UserProfile> getAllProfiles() {
         return userProfileRepository.findAll();
+    }
+
+    public List<UserProfile> getProfilesFallback(Throwable t) {
+        return Collections.emptyList();
     }
 
     public UserProfile getProfileById(Long id) {

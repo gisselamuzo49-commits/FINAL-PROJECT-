@@ -7,6 +7,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import java.util.Collections;
+
 @Service
 public class InternshipService {
 
@@ -19,7 +22,12 @@ public class InternshipService {
     }
 
     // Función para obtener todas las ofertas disponibles
+    @CircuitBreaker(name = "default", fallbackMethod = "getInternshipsFallback")
     public List<Internship> getAllInternships() {
         return internshipRepository.findAll();
+    }
+
+    public List<Internship> getInternshipsFallback(Throwable t) {
+        return Collections.emptyList();
     }
 }

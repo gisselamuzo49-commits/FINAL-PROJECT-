@@ -51,6 +51,11 @@ public class AuthController {
             error.put("error", "Credenciales inválidas");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
         }
+        if ("FALLBACK_SERVICE_UNAVAILABLE".equals(token)) {
+            Map<String, String> error = new HashMap<>();
+            error.put("error", "Servicio temporalmente no disponible");
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(error);
+        }
 
         Map<String, String> response = new HashMap<>();
         response.put("token", token);
