@@ -709,7 +709,9 @@
         var: container_status.stdout_lines
 
     - name: Crear directorio de backups
-      shell: mkdir -p /opt/backups/postgres
+      shell: |
+        mkdir -p /opt/backups/postgres
+        mkdir -p /opt/backup
       
     - name: Copiar script de backup
       copy:
