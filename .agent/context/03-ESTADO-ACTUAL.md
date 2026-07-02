@@ -9,7 +9,7 @@ _Última actualización: 2026-07-02 (Backups PostgreSQL y Circuit Breakers - Ram
 
 Se configuró el respaldo automatizado de las 9 bases de datos PostgreSQL del sistema:
 - **backup_postgres.sh:** Creación del script local en `infra/scripts/backup_postgres.sh` que realiza respaldos comprimidos de las 9 bases de datos mediante `docker exec pg_dump`, limpia respaldos con más de 7 días y escribe logs en `/var/log/backup_postgres.log`.
-- **Ansible Playbooks (QA y PROD):** Añadidas 4 tareas al final de `deploy-qa.yml` y `deploy-prod.yml` para aprovisionar las carpetas de respaldo, copiar el script de backup, registrar la tarea cron diaria a las 2:00 AM bajo el usuario `ubuntu`, y preparar la carpeta de respaldo delegada en el Bastion host (on-premise simulado).
+- **Ansible Playbooks (QA y PROD):** Añadidas 4 tareas al final de `deploy-qa.yml` y `deploy-prod.yml` para aprovisionar las carpetas de respaldo (creando `/opt/backups/postgres` y `/opt/backup` antes de copiar el script), registrar la tarea cron diaria a las 2:00 AM bajo el usuario `ubuntu`, y preparar la carpeta de respaldo delegada en el Bastion host (on-premise simulado).
 - **Validación Sintáctica:** Verificada con éxito la sintaxis YAML de los playbooks `deploy-qa.yml` y `deploy-prod.yml` usando Python.
 
 ## ✅ COMPLETADO HOY — Circuit Breaker con Resilience4j en 5 microservicios (02/Jul)
