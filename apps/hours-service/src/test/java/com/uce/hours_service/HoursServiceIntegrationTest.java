@@ -132,6 +132,8 @@ class HoursServiceIntegrationTest {
         // ── Step 3: PATCH /api/hours/{id}/validar → validates in PostgreSQL ──
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("X-Auth-User", "tutor-1");
+        headers.set("X-Auth-Roles", "TUTOR");
         HttpEntity<String> patchEntity = new HttpEntity<>(
                 "{\"tutorId\":\"tutor-1\",\"aprobado\":true}", headers);
 

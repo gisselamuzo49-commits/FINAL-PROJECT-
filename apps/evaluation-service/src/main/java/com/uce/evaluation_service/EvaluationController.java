@@ -11,6 +11,8 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.security.access.prepost.PreAuthorize;
+
 @RestController
 @RequestMapping("/api/evaluations")
 public class EvaluationController {
@@ -19,6 +21,7 @@ public class EvaluationController {
     private EvaluationService evaluationService;
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('TUTOR', 'COORDINADOR')")
     public ResponseEntity<?> createEvaluation(@RequestBody EvaluacionFinal evaluation) {
         if (evaluation.getEstudianteId() == null || evaluation.getEstudianteId().trim().isEmpty()) {
             return ResponseEntity.badRequest().body("El ID del estudiante es obligatorio.");

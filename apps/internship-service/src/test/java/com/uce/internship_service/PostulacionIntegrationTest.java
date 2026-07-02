@@ -138,10 +138,14 @@ class PostulacionIntegrationTest {
 
         // 7. Modificar estado (PATCH /api/internships/applications/{postulacionId}/status)
         StatusUpdateRequest patchReq = new StatusUpdateRequest("ACEPTADA");
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("X-Auth-User", "tutor-1");
+        headers.set("X-Auth-Roles", "TUTOR");
         ResponseEntity<Map> patchRes = restTemplate.exchange(
                 baseUrl + "/applications/" + postulacionId + "/status",
                 HttpMethod.PATCH,
-                new HttpEntity<>(patchReq),
+                new HttpEntity<>(patchReq, headers),
                 Map.class
         );
         assertEquals(HttpStatus.OK, patchRes.getStatusCode());
@@ -155,7 +159,7 @@ class PostulacionIntegrationTest {
             restTemplate.exchange(
                     baseUrl + "/applications/" + postulacionId + "/status",
                     HttpMethod.PATCH,
-                    new HttpEntity<>(badPatchReq),
+                    new HttpEntity<>(badPatchReq, headers),
                     Map.class
             );
             fail("Debería lanzar HttpClientErrorException.BadRequest");

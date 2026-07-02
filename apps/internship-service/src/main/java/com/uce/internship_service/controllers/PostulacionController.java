@@ -10,6 +10,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 import java.util.List;
 
+import org.springframework.security.access.prepost.PreAuthorize;
+
 @RestController
 @RequestMapping("/api/internships")
 @Tag(name = "Postulaciones", description = "Gestión de solicitudes y postulaciones de estudiantes a ofertas")
@@ -42,6 +44,7 @@ public class PostulacionController {
 
     @PatchMapping("/applications/{postulacionId}/status")
     @Operation(summary = "Actualizar estado de postulación", description = "Actualiza el estado de una postulación (ej. ACEPTADA, RECHAZADA) por parte de un tutor o coordinador.")
+    @PreAuthorize("hasAnyRole('TUTOR', 'COORDINADOR')")
     public StudentApplicationDto updateStatus(
             @PathVariable Long postulacionId,
             @RequestBody StatusUpdateRequest request) {
