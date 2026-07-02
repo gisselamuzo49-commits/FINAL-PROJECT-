@@ -1,9 +1,8 @@
 name: Create Release
-
 on:
   push:
-    tags:
-      - 'v[0-9]+.[0-9]+.[0-9]+'
+    branches:
+      - master
 
 permissions:
   contents: write
@@ -17,8 +16,33 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Create GitHub Release with auto-generated notes
+      - name: Get next version
+        id: version
+        run: |
+          LATEST_TAG=$(git tag -l "v*" | sort -V | tail -n1)
+          if [ -z "$LATEST_TAG" ]; then
+            NEXT_VERSION="v0.1.0"
+          else
+            MAJOR=$(echo $LATEST_TAG | cut -d. -f1 | tr -d 'v')
+            MINOR=$(echo $LATEST_TAG | cut -d. -f2)
+            PATCH=$(echo $LATEST_TAG | cut -d. -f3)
+            NEXT_PATCH=$((PATCH + 1))
+            NEXT_VERSION="v${MAJOR}.${MINOR}.${NEXT_PATCH}"
+          fi
+          echo "version=$NEXT_VERSION" >> $GITHUB_OUTPUT
+          echo "Next version: $NEXT_VERSION"
+
+      - name: Create tag
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag -a ${{ steps.version.outputs.version }} \
+            -m "Release ${{ steps.version.outputs.version }}"
+          git push origin ${{ steps.version.outputs.version }}
+
+      - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ steps.version.outputs.version }}
           generate_release_notes: true
           make_latest: true
