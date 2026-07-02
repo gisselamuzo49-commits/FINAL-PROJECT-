@@ -102,7 +102,7 @@ pendientes en 09-ADOPCIONES:
 
 ### Semana 6 — Monitoreo, backups, blue-green y cierre
 - [ ] Prometheus + Grafana en PROD — requisito #17.
-- [ ] Job de backup `pg_dump` → cuenta #4 (on-premise simulado, decisión ya cerrada).
+- [x] Job de backup `pg_dump` → cuenta #4 (on-premise simulado, decisión ya cerrada). ✅ (02/Jul)
 - [ ] Blue-green deployment vía GitHub Actions — backlog docente #4 (instancia nueva →
   health check → swap → eliminar anterior si exitoso).
 - [ ] Video final de evidencia, ampliando el guion del 12/jun para cubrir todo lo

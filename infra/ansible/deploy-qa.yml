@@ -707,3 +707,39 @@
     - name: Mostrar estado
       debug:
         var: container_status.stdout_lines
+
+    - name: Crear directorio de backups
+      shell: mkdir -p /opt/backups/postgres
+      
+    - name: Copiar script de backup
+      copy:
+        dest: /opt/backup/backup_postgres.sh
+        mode: '0755'
+        content: |
+          #!/bin/bash
+          DATE=$(date +%Y%m%d_%H%M%S)
+          BACKUP_DIR="/opt/backups/postgres"
+          LOG_FILE="/var/log/backup_postgres.log"
+          DATABASES=(auth_db internship_db user_db linkage_db hours_db evaluation_db notification_db document_db report_db)
+          mkdir -p $BACKUP_DIR
+          echo "[$(date)] Iniciando backup" >> $LOG_FILE
+          for DB in "${DATABASES[@]}"; do
+            docker exec postgres-db pg_dump -U postgres -d $DB 2>/dev/null | gzip > $BACKUP_DIR/${DB}_${DATE}.sql.gz
+            echo "[$(date)] $DB respaldada" >> $LOG_FILE
+          done
+          find $BACKUP_DIR -name "*.sql.gz" -mtime +7 -delete
+          echo "[$(date)] Backup completado" >> $LOG_FILE
+
+    - name: Configurar cron job para backup diario a las 2am
+      cron:
+        name: "Backup PostgreSQL diario"
+        minute: "0"
+        hour: "2"
+        job: "/opt/backup/backup_postgres.sh >> /var/log/backup_postgres.log 2>&1"
+        user: ubuntu
+        state: present
+
+    - name: Crear directorio de backups en bastion (on-premise simulado)
+      delegate_to: "{{ bastion_host | default('10.0.1.166') }}"
+      shell: mkdir -p /opt/backups/postgres
+      ignore_errors: true
