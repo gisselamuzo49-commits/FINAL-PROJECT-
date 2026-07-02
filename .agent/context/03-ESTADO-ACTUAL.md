@@ -3,7 +3,34 @@
 > **Este archivo se actualiza al final de cada sesión de trabajo.** Es el primer lugar
 > donde el agente debe mirar para saber "¿dónde quedamos?".
 
-_Última actualización: 2026-06-28 (Flujos de Postulaciones, Horas, Evaluaciones y Reportes - Rama feature/GAME-140-postulaciones-frontend)_
+_Última actualización: 2026-07-02 (Circuit Breakers con Resilience4j en 5 microservicios - Rama feature/GAME-150-circuit-breaker)_
+
+## ✅ COMPLETADO HOY — Circuit Breaker con Resilience4j en 5 microservicios (02/Jul)
+
+Se completó de forma exitosa la tolerancia a fallos en los microservicios core restantes que carecían de esta protección:
+- **Dependencias y AOP:** Agregadas las dependencias de `io.github.resilience4j:resilience4j-spring-boot3:2.2.0` y `org.springframework.boot:spring-boot-starter-aop:3.4.1` en `auth-service`, `internship-service`, `linkage-service` y `user-service`.
+- **Propiedades de Circuit Breaker:** Configurado por defecto el umbral de fallo (50%), tamaño de la ventana deslizante (10 llamadas), duración en estado abierto (30s) y llamadas permitidas en semi-abierto (3 llamadas) en `application.properties`/`application.yml`.
+- **Lógica Core y Fallbacks:**
+  * **auth-service:** Anotado `AuthService.loginUser` para interceptar fallos y retornar `"FALLBACK_SERVICE_UNAVAILABLE"`, respondiendo en `AuthController` con HTTP `503 Service Unavailable`.
+  * **internship-service:** Anotado `InternshipService.getAllInternships` con fallback retornando lista vacía.
+  * **linkage-service:** Anotado `LinkageService.getAllProjects` con fallback retornando lista vacía.
+  * **user-service:** Anotado `UserService.getAllProfiles` con fallback retornando lista vacía.
+  * **gateway-service:** Añadida la dependencia de `spring-cloud-starter-circuitbreaker-reactor-resilience4j`. Configurado el filtro por defecto `CircuitBreaker=name=default,fallbackUri=forward:/fallback` en `application.yml` y expuesta la ruta de escape `/fallback` vía `GatewayFallbackController` con respuesta HTTP `503 Service Unavailable`.
+- **Suite de Pruebas Unitarias:** Creadas y validadas con éxito pruebas de circuit breaker (`AuthServiceCircuitBreakerTest`, `InternshipServiceCircuitBreakerTest`, `LinkageServiceCircuitBreakerTest`, `UserServiceCircuitBreakerTest` y `GatewayCircuitBreakerTest`) logrando **BUILD SUCCESS** en los 5 microservicios.
+
+## ✅ COMPLETADO HOY — Protección de Rutas por Rol (02/Jul)
+
+Se implementó el control de acceso en frontend y protección mediante anotaciones en backend:
+- **RoleProtectedRoute.jsx:** Componente frontend en `apps/frontend-web/src/components/auth/` que valida la existencia del token JWT en `localStorage` y comprueba que el rol contenido en el payload (`rol`/`role`) pertenezca a los roles autorizados para esa ruta.
+- **Rutas Protegidas:** Se actualizó `AppRouter.jsx` para proteger `/users` (TUTOR, COORDINADOR, ADMIN) y `/reports` (ESTUDIANTE, TUTOR, COORDINADOR, ADMIN).
+- **Anotaciones Backend:** Se aplicó `@PreAuthorize("hasAnyRole('TUTOR', 'COORDINADOR', 'ADMIN')")` en controladores de `hours-service`, `evaluation-service` e `internship-service`.
+- **Pruebas y Linter:** Resueltos lints del linter ESLint en frontend y suite de pruebas unitarias al 100% pasando de forma limpia en el repositorio local.
+
+## ✅ COMPLETADO HOY — Fusión y Tagging de la Rama QA (02/Jul)
+
+Se completó con éxito la promoción de código a master:
+- Merge de la rama `QA` a `master` completado de forma exitosa.
+- Creado y subido el tag de release `v0.1.0` con la descripción `"Release v0.1.0 - Sistema Inteligente de Gestión de Pasantías y Vinculación UCE"`.
 
 ## ✅ COMPLETADO HOY — Flujos Completos del Frontend (28/Jun)
 

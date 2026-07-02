@@ -14,6 +14,7 @@ import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.Optional;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 
 @Service
 public class AuthService {
@@ -40,6 +41,7 @@ public class AuthService {
         return generateToken(user);
     }
 
+    @CircuitBreaker(name = "default", fallbackMethod = "loginUserFallback")
     public String loginUser(String email, String password) {
         Optional<User> userOpt = userRepository.findByEmail(email);
         if (userOpt.isEmpty()) {
@@ -67,5 +69,9 @@ public class AuthService {
                 .expiration(new Date(System.currentTimeMillis() + 86400000)) // Expira en 1 día
                 .signWith(key)
                 .compact();
+    }
+
+    public String loginUserFallback(String email, String password, Throwable t) {
+        return "FALLBACK_SERVICE_UNAVAILABLE";
     }
 }
