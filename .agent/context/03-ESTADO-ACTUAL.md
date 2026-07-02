@@ -3,7 +3,15 @@
 > **Este archivo se actualiza al final de cada sesión de trabajo.** Es el primer lugar
 > donde el agente debe mirar para saber "¿dónde quedamos?".
 
-_Última actualización: 2026-07-02 (Backups PostgreSQL y Circuit Breakers - Rama feature/GAME-152-backups-onpremise)_
+_Última actualización: 2026-07-02 (Logging Estructurado JSON en 11 Microservicios - Rama feature/GAME-156-structured-logging)_
+
+## ✅ COMPLETADO HOY — Logging Estructurado JSON en 11 Microservicios (02/Jul)
+
+Se estandarizó la telemetría y auditoría de trazas en formato JSON structured logging:
+- **Spring Boot (10 servicios):** Añadido `net.logstash.logback:logstash-logback-encoder:7.4` a todos los `pom.xml`, y aprovisionado el archivo de configuración global `logback-spring.xml` (logs en `/var/log/pasantias/${appName}.log` con política de rotación y límite de 1GB).
+- **AI Service (Python/FastAPI):** Incorporado `JsonFormatter` heredado de `logging.Formatter` al arranque del microservicio en `main.py` para estructurar la consola estándar en JSON.
+- **Auditoría e Inyección de Traza:** Agregados logs de nivel `INFO` en los controladores y filtros clave (`AuthController`, `InternshipController`, `UserController`, `JwtAuthenticationFilter`).
+- **Pruebas de Integridad:** Ejecutadas y pasadas al 100% de éxito todas las pruebas unitarias e instrumentales de `auth-service`, `user-service` y `linkage-service`.
 
 ## ✅ COMPLETADO HOY — Backups PostgreSQL Automáticos On-Premise (02/Jul)
 

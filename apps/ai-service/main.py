@@ -5,6 +5,27 @@ from models.recommender import TFIDFRecommender
 from models.risk_predictor import RiskPredictor
 from workers.rabbitmq_worker import RabbitMQClient
 from database.sqlite_cache import init_db, get_cached_prediction, save_prediction
+import logging
+import json
+from datetime import datetime
+
+class JsonFormatter(logging.Formatter):
+    def format(self, record):
+        log_data = {
+            "timestamp": datetime.utcnow().isoformat(),
+            "level": record.levelname,
+            "service": "ai-service",
+            "message": record.getMessage(),
+            "module": record.module
+        }
+        if record.exc_info:
+            log_data["exception"] = self.formatException(record.exc_info)
+        return json.dumps(log_data)
+
+handler = logging.StreamHandler()
+handler.setFormatter(JsonFormatter())
+logging.basicConfig(level=logging.INFO, handlers=[handler])
+logger = logging.getLogger("ai-service")
 
 app = FastAPI(
     title="AI Service — Sistema de Pasantías UCE",
