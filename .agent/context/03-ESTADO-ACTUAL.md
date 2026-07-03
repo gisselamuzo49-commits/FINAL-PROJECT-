@@ -21,6 +21,13 @@ Se corrigió el error en el pipeline del microservicio de IA (`ai-service`) prov
 - **test_sqlite_cache.py:** Se refactorizó la suite de pruebas del cache para usar la fixture `db_conn` que inicializa una base de datos fresca en memoria por cada test y redirige las llamadas de `sqlite3.connect` mediante monkeypatching para garantizar total aislamiento de pruebas.
 - **Verificación Local:** Se ejecutaron con éxito todas las pruebas tanto del cache (`test_sqlite_cache.py`) como de los endpoints principales de riesgo y recomendación (`test_main.py`), obteniendo un total de 9 tests exitosos.
 
+## ✅ COMPLETADO HOY — Configuración y Ruteo de Pruebas de Carga K6 (02/Jul)
+
+Se corrigió el fallo de red del job de pruebas de carga en el pipeline de GitHub Actions:
+- **deploy-qa.yml (load-test job):** Se modificó el job para ejecutarse en el `self-hosted` runner ubicado físicamente dentro de la VPC privada de AWS, permitiendo visibilidad y enrutamiento directo hacia la IP privada de las instancias EC2 (`10.0.1.238`). Además se incorporó la instalación dinámica de K6 si no se encuentra preinstalado.
+- **k6-all-services.js (Endpoints y Puertos):** Se actualizaron las rutas del script de carga para que todas las llamadas de API (`/api/users/health`, `/api/linkage/health` y `/api/internships`) apunten explícitamente a través del puerto del Gateway API (`8082`), mientras que las llamadas de interfaz web mantengan el puerto del frontend (`80`), corrigiendo fallos de enrutamiento 404/502.
+
+
 ## ✅ COMPLETADO HOY — Logging Estructurado JSON en 11 Microservicios (02/Jul)
 
 Se estandarizó la telemetría y auditoría de trazas en formato JSON structured logging:
