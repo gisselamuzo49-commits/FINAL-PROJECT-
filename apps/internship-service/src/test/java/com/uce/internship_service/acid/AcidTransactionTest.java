@@ -32,7 +32,9 @@ import static org.mockito.Mockito.*;
     "spring.datasource.username=sa",
     "spring.datasource.password=",
     "spring.jpa.database-platform=org.hibernate.dialect.H2Dialect",
-    "spring.jpa.hibernate.ddl-auto=create-drop"
+    "spring.jpa.hibernate.ddl-auto=create-drop",
+    "elasticsearch.url=http://localhost:9200",
+    "elasticsearch.index=ofertas_test"
 })
 public class AcidTransactionTest {
 
@@ -50,6 +52,9 @@ public class AcidTransactionTest {
 
     @MockitoBean
     private KafkaTemplate<String, String> kafkaTemplate;
+
+    @MockitoBean
+    private com.uce.internship_service.elasticsearch.OfertaSearchService ofertaSearchService;
 
     @Test
     public void testCreateApplication_Success_AllThreeStepsExecute() {
