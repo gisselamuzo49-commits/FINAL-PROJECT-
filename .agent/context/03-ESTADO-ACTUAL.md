@@ -13,6 +13,13 @@ Se resolvió el fallo de inicialización del `ApplicationContext` en el pipeline
 - **Activación del Perfil test (10 servicios):** Se agregó la propiedad `spring.profiles.active=test` a todos los archivos `application.properties` de pruebas en la carpeta `src/test/resources` (creándose si no existían). Esto garantiza que el perfil de pruebas esté activo en CI sin depender de parámetros de consola.
 - **Verificación Local:** Se ejecutaron con éxito las suites completas de pruebas de los microservicios más críticos (`auth-service` e `internship-service`), pasando todas las comprobaciones a nivel de compilación y ejecución de tests.
 
+## ✅ COMPLETADO HOY — Base de datos SQLite en memoria para Pruebas en AI Service (02/Jul)
+
+Se corrigió el error en el pipeline del microservicio de IA (`ai-service`) provocado por el intento de inicialización de la base de datos SQLite en la ruta `/app/data/ai_cache.db` (directorio inexistente y sin permisos de escritura en el runner de GitHub Actions):
+- **database/sqlite_cache.py:** Se configuró la ruta `DB_PATH` para que use `:memory:` dinámicamente si se detecta que las pruebas se están ejecutando (bajo `CI` o si `pytest` está importado en `sys.modules`).
+- **InMemoryConnectionWrapper:** Se implementó un proxy/wrapper sobre la conexión global de SQLite in-memory para evitar que las llamadas a `conn.close()` en los endpoints destruyan la base de datos a mitad de la ejecución de las pruebas multihilo (manejando con seguridad `check_same_thread=False` para el pool de hilos de FastAPI).
+- **test_sqlite_cache.py:** Se refactorizó la suite de pruebas del cache para usar la fixture `db_conn` que inicializa una base de datos fresca en memoria por cada test y redirige las llamadas de `sqlite3.connect` mediante monkeypatching para garantizar total aislamiento de pruebas.
+- **Verificación Local:** Se ejecutaron con éxito todas las pruebas tanto del cache (`test_sqlite_cache.py`) como de los endpoints principales de riesgo y recomendación (`test_main.py`), obteniendo un total de 9 tests exitosos.
 
 ## ✅ COMPLETADO HOY — Logging Estructurado JSON en 11 Microservicios (02/Jul)
 
