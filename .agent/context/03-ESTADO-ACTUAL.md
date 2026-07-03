@@ -10,6 +10,7 @@ _Última actualización: 2026-07-02 (Fix Logging en Tests - Rama QA)_
 Se resolvió el fallo de inicialización del `ApplicationContext` en el pipeline de CI debido a la falta de permisos de `root` para escribir en `/var/log/pasantias/`:
 - **logback-spring.xml (10 servicios):** Se envolvió la definición del appender `FILE` en un elemento `<springProfile name="!test">` para evitar que Logback intente instanciar, crear o escribir archivos de log durante la ejecución de pruebas.
 - **Configuración de Root Logger:** Se desagregaron los root loggers usando perfiles de Spring (`!test` y `test`) para desactivar el uso de `FILE` de forma limpia y sin generar advertencias de anidamiento ilegal en Logback.
+- **Activación del Perfil test (10 servicios):** Se agregó la propiedad `spring.profiles.active=test` a todos los archivos `application.properties` de pruebas en la carpeta `src/test/resources` (creándose si no existían). Esto garantiza que el perfil de pruebas esté activo en CI sin depender de parámetros de consola.
 - **Verificación Local:** Se ejecutaron con éxito las suites completas de pruebas de los microservicios más críticos (`auth-service` e `internship-service`), pasando todas las comprobaciones a nivel de compilación y ejecución de tests.
 
 
