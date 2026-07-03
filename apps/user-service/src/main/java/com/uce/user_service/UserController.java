@@ -8,12 +8,17 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/users")
 @Tag(name = "Usuarios", description = "Gestión de perfiles académicos de estudiantes y tutores")
 public class UserController {
+
+    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
     @Autowired
     private UserService userService;
@@ -38,6 +43,7 @@ public class UserController {
     @GetMapping("/{id}")
     @Operation(summary = "Obtener perfil por ID", description = "Retorna el perfil de usuario correspondiente al ID provisto.")
     public UserProfile getProfileById(@PathVariable Long id) {
+        logger.info("Fetching user profile: {}", id);
         return userService.getProfileById(id);
     }
 

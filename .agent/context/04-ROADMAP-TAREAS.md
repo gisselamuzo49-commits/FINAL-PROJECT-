@@ -42,8 +42,7 @@ que reemplaza la planificación genérica original.
   (5 etapas + Circuit Breaker de Resilience4j programático en cliente gRPC, 19/19 tests incl. integración end-to-end con Testcontainers). PR abierto
   hacia `QA`, sin mergear — ver `03-ESTADO-ACTUAL.md`.
 - [ ] Quick wins en paralelo (bajo costo, alto impacto en backlog docente):
-  - [ ] Logging estructurado (niveles INFO/DEBUG/WARN/ERROR) en los 5 servicios ya
-    desplegados — backlog docente #1.
+  - [x] Logging estructurado (niveles INFO/DEBUG/WARN/ERROR) en JSON para todos los 11 microservicios del sistema. ✅ (02/Jul) — backlog docente #1.
   - [ ] Workspace de Postman compartido con el docente, todas las rutas actuales —
     backlog docente #2 (parcial).
   - [x] Limpieza de disco en `infra/ansible/deploy-*.yml` (`docker system prune`,
