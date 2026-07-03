@@ -18,19 +18,28 @@ import org.springframework.web.server.ResponseStatusException;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.uce.internship_service.kafka.PostulacionEventProducer;
+
 @Service
 public class PostulacionService {
 
-    @Autowired
-    private InternshipRepository internshipRepository;
+    private final InternshipRepository internshipRepository;
+    private final EstudianteNodeRepository estudianteNodeRepository;
+    private final OfertaNodeRepository ofertaNodeRepository;
+    private final PostulacionEventProducer postulacionEventProducer;
 
     @Autowired
-    private EstudianteNodeRepository estudianteNodeRepository;
+    public PostulacionService(InternshipRepository internshipRepository,
+                              EstudianteNodeRepository estudianteNodeRepository,
+                              OfertaNodeRepository ofertaNodeRepository,
+                              PostulacionEventProducer postulacionEventProducer) {
+        this.internshipRepository = internshipRepository;
+        this.estudianteNodeRepository = estudianteNodeRepository;
+        this.ofertaNodeRepository = ofertaNodeRepository;
+        this.postulacionEventProducer = postulacionEventProducer;
+    }
 
-    @Autowired
-    private OfertaNodeRepository ofertaNodeRepository;
-
-    @Transactional("neo4jTransactionManager")
+    @Transactional
     public StudentApplicationDto createApplication(Long internshipId, String estudianteId, String mensaje) {
         // 1. Validar en PostgreSQL que la oferta existe
         Internship internship = internshipRepository.findById(internshipId)
@@ -55,6 +64,17 @@ public class PostulacionService {
         estudianteNode.addPostulacion(postulacion);
 
         estudianteNodeRepository.save(estudianteNode);
+
+        // Publicar evento en Kafka (Paso ACID)
+        try {
+            postulacionEventProducer.publishPostulacionEvent(
+                estudianteId, String.valueOf(internshipId)
+            );
+        } catch (Exception e) {
+            throw new RuntimeException(
+                "Error publicando evento de postulación - rollback", e
+            );
+        }
 
         // 6. Recuperar la proyección de la aplicación creada (que contiene el ID de la relación auto-generado)
         return estudianteNodeRepository.findApplicationsByEstudianteId(estudianteId).stream()
