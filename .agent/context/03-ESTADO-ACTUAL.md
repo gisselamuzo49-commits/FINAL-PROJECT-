@@ -3,7 +3,15 @@
 > **Este archivo se actualiza al final de cada sesión de trabajo.** Es el primer lugar
 > donde el agente debe mirar para saber "¿dónde quedamos?".
 
-_Última actualización: 2026-07-02 (Logging Estructurado JSON en 11 Microservicios - Rama feature/GAME-156-structured-logging)_
+_Última actualización: 2026-07-02 (Fix Logging en Tests - Rama QA)_
+
+## ✅ COMPLETADO HOY — Corrección de Logs Estructurados en Entornos de Test/CI (02/Jul)
+
+Se resolvió el fallo de inicialización del `ApplicationContext` en el pipeline de CI debido a la falta de permisos de `root` para escribir en `/var/log/pasantias/`:
+- **logback-spring.xml (10 servicios):** Se envolvió la definición del appender `FILE` en un elemento `<springProfile name="!test">` para evitar que Logback intente instanciar, crear o escribir archivos de log durante la ejecución de pruebas.
+- **Configuración de Root Logger:** Se desagregaron los root loggers usando perfiles de Spring (`!test` y `test`) para desactivar el uso de `FILE` de forma limpia y sin generar advertencias de anidamiento ilegal en Logback.
+- **Verificación Local:** Se ejecutaron con éxito las suites completas de pruebas de los microservicios más críticos (`auth-service` e `internship-service`), pasando todas las comprobaciones a nivel de compilación y ejecución de tests.
+
 
 ## ✅ COMPLETADO HOY — Logging Estructurado JSON en 11 Microservicios (02/Jul)
 
