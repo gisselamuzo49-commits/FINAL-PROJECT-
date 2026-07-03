@@ -13,30 +13,36 @@
         </encoder>
     </appender>
 
-    <appender name="FILE" 
-              class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>/var/log/pasantias/${appName}.log</file>
-        <rollingPolicy 
-          class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-            <fileNamePattern>
-                /var/log/pasantias/${appName}-%d{yyyy-MM-dd}.%i.log
-            </fileNamePattern>
-            <maxFileSize>10MB</maxFileSize>
-            <maxHistory>30</maxHistory>
-            <totalSizeCap>1GB</totalSizeCap>
-        </rollingPolicy>
-        <encoder 
-          class="net.logstash.logback.encoder.LogstashEncoder">
-            <customFields>
-                {"service":"${appName}"}
-            </customFields>
-        </encoder>
-    </appender>
+        <springProfile name="!test">
+        <appender name="FILE" 
+                  class="ch.qos.logback.core.rolling.RollingFileAppender">
+            <file>/var/log/pasantias/${appName}.log</file>
+            <rollingPolicy 
+              class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+                <fileNamePattern>
+                    /var/log/pasantias/${appName}-%d{yyyy-MM-dd}.%i.log
+                </fileNamePattern>
+                <maxFileSize>10MB</maxFileSize>
+                <maxHistory>30</maxHistory>
+                <totalSizeCap>1GB</totalSizeCap>
+            </rollingPolicy>
+            <encoder 
+              class="net.logstash.logback.encoder.LogstashEncoder">
+                <customFields>{"service":"${appName}"}</customFields>
+            </encoder>
+        </appender>
+        
+        <root level="INFO">
+            <appender-ref ref="CONSOLE"/>
+            <appender-ref ref="FILE"/>
+        </root>
+    </springProfile>
 
-    <root level="INFO">
-        <appender-ref ref="CONSOLE"/>
-        <appender-ref ref="FILE"/>
-    </root>
+    <springProfile name="test">
+        <root level="INFO">
+            <appender-ref ref="CONSOLE"/>
+        </root>
+    </springProfile>
 
     <logger name="com.uce" level="DEBUG"/>
 </configuration>
