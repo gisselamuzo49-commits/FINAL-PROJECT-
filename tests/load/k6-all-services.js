@@ -11,14 +11,14 @@ export const options = {
 };
 
 const TARGET_HOST = __ENV.TARGET_HOST || 'localhost';
-const BASE_URL = `http://${TARGET_HOST}`;
+const BASE_URL = `http://${TARGET_HOST}:8082`;
 
 export default function () {
   const endpoints = [
     `${BASE_URL}/api/users/health`,
     `${BASE_URL}/api/linkage/health`,
-    `${BASE_URL}`,
-    `${BASE_URL}:8082`, // gateway directo
+    `${BASE_URL}/api/internships`,
+    `http://${TARGET_HOST}`,
   ];
 
   const url = endpoints[Math.floor(Math.random() * endpoints.length)];
