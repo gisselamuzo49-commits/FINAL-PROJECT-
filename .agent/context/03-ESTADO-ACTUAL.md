@@ -7,6 +7,20 @@ _Última actualización: 2026-07-05 (Notificaciones en Tiempo Real con WebSocket
 _Última actualización: 2026-07-05 (Reducir listeners ALB PROD - Rama feature/GAME-162-alb-reducir-listeners)_
 _Última actualización: 2026-07-05 (Agregar réplica PostgreSQL PROD - Rama feature/GAME-163-postgres-replica)_
 _Última actualización: 2026-07-05 (Agregar VPC Endpoint S3 - Rama feature/GAME-164-vpc-endpoint-s3)_
+_Última actualización: 2026-07-05 (Configurar Cypress Cloud - Rama feature/GAME-165-cypress-cloud)_
+
+## ✅ COMPLETADO HOY — Integración de Cypress Cloud y Pruebas E2E (05/Jul)
+
+Se configuró el framework Cypress para la ejecución de pruebas End-to-End (E2E) integrándolo con Cypress Cloud:
+- **Instalación y Configuración:** Se añadió `cypress` a las `devDependencies` del root `package.json` y se creó `cypress.config.js` apuntando al proyecto en Cypress Cloud (`projectId: 'aatprk'`) con la URL base del entorno de QA.
+- **Soporte y Comandos Personalizados:** Se implementó en `cypress/support/commands.js` un comando personalizado `cy.login()` para automatizar la autenticación de usuarios. En `cypress/support/e2e.js` se agregó el manejador para ignorar excepciones no críticas del navegador.
+- **Suite de Pruebas E2E:** Se crearon 4 especificaciones de prueba cubriendo:
+  - `01_login.cy.js`: Autenticación para los roles Estudiante y Tutor.
+  - `02_postulaciones.cy.js`: Acceso a la sección de ofertas de pasantías.
+  - `03_horas.cy.js`: Secciones de visualización y validación de horas por rol.
+  - `04_encuestas.cy.js`: Validación de la carga del formulario de encuestas de Supabase.
+- **Pipeline de CI/CD (QA):** Se integró el job `e2e-tests` en `.github/workflows/deploy-qa.yml` para correr Cypress de forma desatendida y registrar los resultados en Cypress Cloud mediante `cypress-io/github-action@v6`.
+- **Scripts del Proyecto:** Se agregó la tarea `"cy:run"` en la raíz para ejecutar las pruebas localmente registrando los resultados en la nube.
 
 ## ✅ COMPLETADO HOY — Configuración de Gateway VPC Endpoint para S3 (05/Jul)
 
