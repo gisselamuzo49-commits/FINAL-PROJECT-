@@ -292,6 +292,17 @@ resource "aws_s3_bucket_acl" "documents_qa" {
   acl        = "private"
 }
 
+resource "aws_vpc_endpoint" "s3_qa" {
+  vpc_id       = aws_vpc.main.id
+  service_name = "com.amazonaws.us-east-1.s3"
+
+  route_table_ids = [aws_route_table.private.id]
+
+  tags = {
+    Name = "pasantias-qa-s3-endpoint"
+  }
+}
+
 # ─────────────────────────────────────────
 # OUTPUTS
 # Comandos para obtener los valores:
