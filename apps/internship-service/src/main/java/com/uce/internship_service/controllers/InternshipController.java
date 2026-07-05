@@ -9,12 +9,17 @@ import org.springframework.web.bind.annotation.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/internships")
 @Tag(name = "Pasantías", description = "Catálogo y gestión de ofertas de pasantías preprofesionales")
 public class InternshipController {
+
+    private static final Logger logger = LoggerFactory.getLogger(InternshipController.class);
 
     @Autowired
     private InternshipService internshipService;
@@ -28,6 +33,7 @@ public class InternshipController {
     @PostMapping
     @Operation(summary = "Crear una nueva oferta", description = "Publica una nueva oferta de pasantía preprofesional en el catálogo.")
     public ResponseEntity<?> create(@RequestBody Internship internship) {
+        logger.info("Creating internship offer: {}", internship.getTitle());
         if (internship.getTitle() == null || internship.getTitle().trim().isEmpty() ||
             internship.getCompany() == null || internship.getCompany().trim().isEmpty()) {
             return ResponseEntity.badRequest().body("El título y la empresa son obligatorios.");

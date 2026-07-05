@@ -9,6 +9,9 @@ import org.springframework.web.bind.annotation.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,6 +19,8 @@ import java.util.Map;
 @RequestMapping("/api/auth")
 @Tag(name = "Autenticación", description = "Endpoints para registro e inicio de sesión de usuarios")
 public class AuthController {
+
+    private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
 
     @Autowired
     private AuthService authService;
@@ -52,6 +57,7 @@ public class AuthController {
     @PostMapping("/login")
     @Operation(summary = "Iniciar sesión", description = "Autentica al usuario por email y contraseña y devuelve su token JWT.")
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
+        logger.info("Login attempt for user: {}", loginRequest.getEmail());
         try {
             String token = authService.loginUser(loginRequest.getEmail(), loginRequest.getPassword());
             if (token == null) {

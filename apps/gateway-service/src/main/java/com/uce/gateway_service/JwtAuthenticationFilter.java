@@ -18,8 +18,13 @@ import reactor.core.publisher.Mono;
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @Component
 public class JwtAuthenticationFilter extends AbstractGatewayFilterFactory<JwtAuthenticationFilter.Config> {
+
+    private static final Logger logger = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
 
     @Value("${security.jwt.secret}")
     private String jwtSecret;
@@ -32,6 +37,7 @@ public class JwtAuthenticationFilter extends AbstractGatewayFilterFactory<JwtAut
     public GatewayFilter apply(Config config) {
         return (exchange, chain) -> {
             ServerHttpRequest request = exchange.getRequest();
+            logger.info("Routing request to: {}", request.getPath().value());
 
             // 0. Permitir solicitudes CORS preflight (OPTIONS) sin validación de token
             if (org.springframework.http.HttpMethod.OPTIONS.equals(request.getMethod())) {

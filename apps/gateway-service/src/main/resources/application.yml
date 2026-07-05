@@ -1,4 +1,9 @@
 # Configuración del API Gateway
+logging:
+  level:
+    root: INFO
+    com.uce: DEBUG
+
 server:
   port: 8082
 
@@ -107,6 +112,13 @@ spring:
               uri: ${NOTIFICATION_SERVICE_URL:http://notification-service:8087}
               predicates:
                 - Path=/api/notifications/**
+              filters:
+                - name: JwtAuthenticationFilter
+
+            - id: notification-ws
+              uri: ${NOTIFICATION_SERVICE_URL:http://notification-service:8087}
+              predicates:
+                - Path=/ws/**
               filters:
                 - name: JwtAuthenticationFilter
 
