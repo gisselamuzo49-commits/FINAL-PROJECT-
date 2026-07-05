@@ -58,6 +58,15 @@ resource "aws_subnet" "private_1a" {
   tags              = { Name = "pasantias-prod-private-1a" }
 }
 
+resource "aws_subnet" "private_1b" {
+  vpc_id            = aws_vpc.main.id
+  cidr_block        = "10.0.4.0/24"
+  availability_zone = "us-east-1b"
+  tags = {
+    Name = "pasantias-prod-private-1b"
+  }
+}
+
 # ─────────────────────────────────────────
 # INTERNET GATEWAY
 # ─────────────────────────────────────────
@@ -113,6 +122,11 @@ resource "aws_route_table" "private" {
 
 resource "aws_route_table_association" "private_1a" {
   subnet_id      = aws_subnet.private_1a.id
+  route_table_id = aws_route_table.private.id
+}
+
+resource "aws_route_table_association" "private_1b" {
+  subnet_id      = aws_subnet.private_1b.id
   route_table_id = aws_route_table.private.id
 }
 
@@ -182,6 +196,13 @@ resource "aws_security_group" "sg_private" {
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["10.0.0.0/16"]
+  }
+  ingress {
+    from_port   = 5432
+    to_port     = 5432
+    protocol    = "tcp"
+    cidr_blocks = ["10.0.3.0/24", "10.0.4.0/24"]
+    description = "PostgreSQL replication between AZs"
   }
   # SSH solo desde el bastion
   ingress {
@@ -407,6 +428,33 @@ resource "aws_instance" "prod_auth_jobs" {
   }
 }
 
+resource "aws_instance" "postgres_replica" {
+  ami                    = data.aws_ami.ubuntu.id
+  instance_type          = "t3.small"
+  subnet_id              = aws_subnet.private_1b.id
+  key_name               = data.aws_key_pair.prod_key.key_name
+  vpc_security_group_ids = [aws_security_group.sg_private.id]
+
+  root_block_device {
+    volume_size           = 20
+    volume_type           = "gp3"
+    delete_on_termination = true
+  }
+
+  user_data = base64encode(<<-EOF
+    #!/bin/bash
+    apt-get update -y
+    apt-get install -y postgresql-16 postgresql-client-16
+    systemctl stop postgresql
+    EOF
+  )
+
+  tags = {
+    Name = "pasantias-prod-postgres-replica"
+    Role = "postgres-replica"
+  }
+}
+
 # ─────────────────────────────────────────
 # TARGET GROUP ATTACHMENTS
 # ─────────────────────────────────────────
@@ -497,6 +545,17 @@ resource "aws_cloudwatch_metric_alarm" "cpu_low" {
   }
 }
 
+resource "aws_vpc_endpoint" "s3_prod" {
+  vpc_id       = aws_vpc.main.id
+  service_name = "com.amazonaws.us-east-1.s3"
+
+  route_table_ids = [aws_route_table.private.id]
+
+  tags = {
+    Name = "pasantias-prod-s3-endpoint"
+  }
+}
+
 # ─────────────────────────────────────────
 # OUTPUTS
 # Comandos para obtener los valores:
@@ -529,4 +588,9 @@ output "documents_bucket_prod" {
 output "asg_name" {
   description = "Nombre del Auto Scaling Group para verificar en AWS Console"
   value       = aws_autoscaling_group.prod_asg.name
+}
+
+output "postgres_replica_ip" {
+  description = "IP privada de la réplica PostgreSQL"
+  value       = aws_instance.postgres_replica.private_ip
 }
