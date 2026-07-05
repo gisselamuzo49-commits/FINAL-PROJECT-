@@ -45,13 +45,13 @@ public class AuthService {
     public String loginUser(String email, String password) {
         Optional<User> userOpt = userRepository.findByEmail(email);
         if (userOpt.isEmpty()) {
-            return null; // Usuario no encontrado
+            throw new IllegalArgumentException("Usuario no encontrado");
         }
 
         User user = userOpt.get();
         // 3. Verificar contraseña cifrada
         if (!passwordEncoder.matches(password, user.getPassword())) {
-            return null; // Contraseña incorrecta
+            throw new IllegalArgumentException("Contraseña incorrecta");
         }
 
         // 4. Generar token JWT si es correcto
