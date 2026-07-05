@@ -5,6 +5,14 @@
 
 _Última actualización: 2026-07-05 (Notificaciones en Tiempo Real con WebSockets y Merge de QA - Rama feature/GAME-158-websockets)_
 _Última actualización: 2026-07-05 (Reducir listeners ALB PROD - Rama feature/GAME-162-alb-reducir-listeners)_
+_Última actualización: 2026-07-05 (Aplicación Móvil con Expo - Rama feature/GAME-147-mobile-expo)_
+
+## ✅ COMPLETADO HOY — Aplicación Móvil con Expo y WebView (05/Jul)
+
+Se implementó el wrapper móvil utilizando Expo / React Native WebView:
+- **Configuración de Expo:** Creado `apps/mobile/package.json`, `app.json`, `babel.config.js` y `tsconfig.json` para dar soporte a TypeScript y React Native.
+- **Vistas y Navegación:** Creado `app/_layout.tsx` y `app/index.tsx` para cargar el sistema de pasantías en un WebView nativo de alto rendimiento, y `app/offline.tsx` para el reintento de conexión con estilos corporativos.
+- **Activos del Sistema:** Copiado el logo oficial UCE como ícono y pantalla de splash en el directorio `apps/mobile/assets`.
 
 ## ✅ COMPLETADO HOY — Reducción de Listeners en ALB de Producción (05/Jul)
 
