@@ -8,6 +8,17 @@ _Última actualización: 2026-07-05 (Reducir listeners ALB PROD - Rama feature/G
 _Última actualización: 2026-07-05 (Agregar réplica PostgreSQL PROD - Rama feature/GAME-163-postgres-replica)_
 _Última actualización: 2026-07-05 (Agregar VPC Endpoint S3 - Rama feature/GAME-164-vpc-endpoint-s3)_
 _Última actualización: 2026-07-05 (Configurar Cypress Cloud - Rama feature/GAME-165-cypress-cloud)_
+_Última actualización: 2026-07-05 (CRUD de Perfil de Usuario - Rama feature/GAME-167-user-profile)_
+
+## ✅ COMPLETADO HOY — CRUD del Perfil de Usuario e Integración de IA (05/Jul)
+
+Se implementó el CRUD completo para gestionar el perfil de los usuarios académico-profesionales, integrando esta información en el recomendador de pasantías:
+- **Base de Datos y DTOs (user-service):** Se añadieron los campos `habilidades`, `cursos`, `experiencia`, `descripcion` y `facultad` en `UserProfile.java` bajo PostgreSQL y se creó `ProfileUpdateDTO.java`.
+- **Lógica y Controladores:** Se implementó `updateProfile` en `UserService.java` y se expusieron los endpoints `GET`, `PUT`, `DELETE` sobre `/api/users/profile/{id}` en `UserController.java`.
+- **Interfaz Frontend (frontend-web):** Se creó la página completa `Profile.jsx` con tres secciones principales (Información Personal, Perfil Profesional, y estadísticas en base a postulaciones, horas y evaluaciones reales) y soporte de edición y eliminación de cuenta.
+- **Ruteo y Sidebar:** Se registró la ruta `/profile` en `AppRouter.jsx` y se integró el enlace "Mi Perfil" (👤) en `Sidebar.jsx` para todos los roles.
+- **Sincronización con IA:** Se actualizaron `Home.jsx` y `Recommendations.jsx` para que consuman el perfil del estudiante real al invocar al algoritmo NLP de recomendación de pasantías.
+- **Validaciones de Pruebas:** Se creó `UserProfileControllerTest.java` (4 tests) en backend y `Profile.test.jsx` (3 tests) en frontend. Todos los tests pasaron exitosamente.
 
 ## ✅ COMPLETADO HOY — Integración de Cypress Cloud y Pruebas E2E (05/Jul)
 

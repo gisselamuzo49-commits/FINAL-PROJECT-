@@ -13,6 +13,9 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
+import com.uce.user_service.models.ProfileUpdateDTO;
+import com.uce.user_service.repositories.UserProfileRepository;
+
 @RestController
 @RequestMapping("/api/users")
 @Tag(name = "Usuarios", description = "Gestión de perfiles académicos de estudiantes y tutores")
@@ -22,6 +25,9 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private UserProfileRepository userProfileRepository;
 
     @GetMapping("/hello")
     public String sayHello() {
@@ -53,5 +59,28 @@ public class UserController {
         return userService.getProfileByEmail(email)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    // GET perfil por ID
+    @GetMapping("/profile/{id}")
+    public ResponseEntity<UserProfile> getProfile(@PathVariable Long id) {
+        return userProfileRepository.findById(id)
+            .map(ResponseEntity::ok)
+            .orElse(ResponseEntity.notFound().build());
+    }
+
+    // PUT actualizar perfil
+    @PutMapping("/profile/{id}")
+    public ResponseEntity<UserProfile> updateProfile(
+        @PathVariable Long id,
+        @RequestBody ProfileUpdateDTO dto) {
+        return ResponseEntity.ok(userService.updateProfile(id, dto));
+    }
+
+    // DELETE eliminar perfil
+    @DeleteMapping("/profile/{id}")
+    public ResponseEntity<Void> deleteProfile(@PathVariable Long id) {
+        userProfileRepository.deleteById(id);
+        return ResponseEntity.noContent().build();
     }
 }
