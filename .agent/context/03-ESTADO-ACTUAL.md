@@ -5,6 +5,8 @@
 
 _Última actualización: 2026-07-05 (Notificaciones en Tiempo Real con WebSockets y Merge de QA - Rama feature/GAME-158-websockets)_
 _Última actualización: 2026-07-05 (Reducir listeners ALB PROD - Rama feature/GAME-162-alb-reducir-listeners)_
+_Última actualización: 2026-07-05 (Agregar réplica PostgreSQL PROD - Rama feature/GAME-163-postgres-replica)_
+_Última actualización: 2026-07-05 (Agregar VPC Endpoint S3 - Rama feature/GAME-164-vpc-endpoint-s3)_
 _Última actualización: 2026-07-05 (Wrapper de Escritorio con Electron - Rama feature/GAME-146-desktop-electron)_
 
 ## ✅ COMPLETADO HOY — Aplicación de Escritorio con Electron (05/Jul)
@@ -13,6 +15,21 @@ Se implementó el wrapper de escritorio para el sistema de pasantías UCE:
 - **Configuración de Electron:** Creado `apps/desktop/package.json`, `main.js` y `preload.js` siguiendo el patrón del repositorio de referencia.
 - **Soporte Offline:** Creado `offline.html` y `offline.css` con estilos UCE para desplegar un mensaje amigable y opción de reconexión cuando se pierde internet.
 - **Activos del Sistema:** Copiado el logo oficial UCE y configurados los íconos de la aplicación en el directorio `apps/desktop/assets`.
+
+## ✅ COMPLETADO HOY — Configuración de Gateway VPC Endpoint para S3 (05/Jul)
+
+Se optimizó el tráfico hacia AWS S3 en los entornos de QA y PROD para mejorar el rendimiento, la seguridad y reducir costos de transferencia:
+- **VPC Endpoint para S3 en QA:** Se añadió el recurso `aws_vpc_endpoint.s3_qa` en `infra/qa/main.tf` apuntando al servicio de S3 en `us-east-1` y asociado a la tabla de rutas privada `aws_route_table.private`.
+- **VPC Endpoint para S3 en PROD:** Se añadió el recurso `aws_vpc_endpoint.s3_prod` en `infra/prod/main.tf` apuntando al servicio de S3 en `us-east-1` y asociado a la tabla de rutas privada `aws_route_table.private`.
+- Con esta configuración, las llamadas del microservicio `document-service` hacia el bucket de S3 viajan internamente dentro de la red global de AWS sin necesidad de transitar por el NAT Gateway.
+
+## ✅ COMPLETADO HOY — Implementación de Réplica de PostgreSQL para Alta Disponibilidad (05/Jul)
+
+Se agregaron recursos para habilitar una réplica de base de datos relacional PostgreSQL en el entorno de producción (PROD):
+- **Nueva subred privada en us-east-1b:** Se creó la subred `private_1b` (`10.0.4.0/24`) y se asoció a la tabla de rutas privada en `infra/prod/main.tf` para soportar redundancia multi-AZ.
+- **Regla de replicación de base de datos:** Se configuró una regla ingress en el grupo de seguridad privado (`sg_private`) que permite tráfico en el puerto `5432` entre la subred del nodo primario (`10.0.3.0/24`) y la del nodo réplica (`10.0.4.0/24`).
+- **Instancia de réplica EC2:** Se aprovisionó la instancia `postgres_replica` (`t3.small`) en la nueva subred con PostgreSQL 16 instalado y preparado para streaming replication.
+- **Documentación de Ansible:** Se añadió un bloque de comentarios descriptivo al final de `infra/ansible/deploy-prod.yml` que detalla los pasos manuales post-despliegue para activar la replicación de streaming entre el host primario y el de la réplica.
 
 ## ✅ COMPLETADO HOY — Reducción de Listeners en ALB de Producción (05/Jul)
 
