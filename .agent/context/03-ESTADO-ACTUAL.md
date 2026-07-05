@@ -6,6 +6,14 @@
 _Última actualización: 2026-07-05 (Notificaciones en Tiempo Real con WebSockets y Merge de QA - Rama feature/GAME-158-websockets)_
 _Última actualización: 2026-07-05 (Reducir listeners ALB PROD - Rama feature/GAME-162-alb-reducir-listeners)_
 _Última actualización: 2026-07-05 (Agregar réplica PostgreSQL PROD - Rama feature/GAME-163-postgres-replica)_
+_Última actualización: 2026-07-05 (Agregar VPC Endpoint S3 - Rama feature/GAME-164-vpc-endpoint-s3)_
+
+## ✅ COMPLETADO HOY — Configuración de Gateway VPC Endpoint para S3 (05/Jul)
+
+Se optimizó el tráfico hacia AWS S3 en los entornos de QA y PROD para mejorar el rendimiento, la seguridad y reducir costos de transferencia:
+- **VPC Endpoint para S3 en QA:** Se añadió el recurso `aws_vpc_endpoint.s3_qa` en `infra/qa/main.tf` apuntando al servicio de S3 en `us-east-1` y asociado a la tabla de rutas privada `aws_route_table.private`.
+- **VPC Endpoint para S3 en PROD:** Se añadió el recurso `aws_vpc_endpoint.s3_prod` en `infra/prod/main.tf` apuntando al servicio de S3 en `us-east-1` y asociado a la tabla de rutas privada `aws_route_table.private`.
+- Con esta configuración, las llamadas del microservicio `document-service` hacia el bucket de S3 viajan internamente dentro de la red global de AWS sin necesidad de transitar por el NAT Gateway.
 
 ## ✅ COMPLETADO HOY — Implementación de Réplica de PostgreSQL para Alta Disponibilidad (05/Jul)
 
