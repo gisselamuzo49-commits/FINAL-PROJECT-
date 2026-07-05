@@ -3,6 +3,7 @@ package com.uce.internship_service;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.Neo4jContainer;
@@ -14,6 +15,12 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @SpringBootTest
 @Testcontainers
 class InternshipServiceApplicationTests {
+
+    @MockitoBean
+    private com.uce.internship_service.kafka.PostulacionEventProducer postulacionEventProducer;
+
+    @MockitoBean
+    private com.uce.internship_service.elasticsearch.OfertaSearchService ofertaSearchService;
 
     @Container
     static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:15-alpine");

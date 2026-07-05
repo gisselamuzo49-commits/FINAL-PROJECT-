@@ -1,4 +1,9 @@
 # Configuración del API Gateway
+logging:
+  level:
+    root: INFO
+    com.uce: DEBUG
+
 server:
   port: 8082
 

@@ -20,6 +20,7 @@ import org.testcontainers.containers.Neo4jContainer;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.util.List;
 import java.util.Map;
@@ -37,6 +38,12 @@ class PostulacionIntegrationTest {
     @Container
     static Neo4jContainer<?> neo4j = new Neo4jContainer<>("neo4j:5.12.0-community")
             .withAdminPassword("password123");
+
+    @MockitoBean
+    private com.uce.internship_service.kafka.PostulacionEventProducer postulacionEventProducer;
+
+    @MockitoBean
+    private com.uce.internship_service.elasticsearch.OfertaSearchService ofertaSearchService;
 
     @LocalServerPort
     private int port;
