@@ -58,6 +58,15 @@ resource "aws_subnet" "private_1a" {
   tags              = { Name = "pasantias-prod-private-1a" }
 }
 
+resource "aws_subnet" "private_1b" {
+  vpc_id            = aws_vpc.main.id
+  cidr_block        = "10.0.4.0/24"
+  availability_zone = "us-east-1b"
+  tags = {
+    Name = "pasantias-prod-private-1b"
+  }
+}
+
 # ─────────────────────────────────────────
 # INTERNET GATEWAY
 # ─────────────────────────────────────────
@@ -116,6 +125,11 @@ resource "aws_route_table_association" "private_1a" {
   route_table_id = aws_route_table.private.id
 }
 
+resource "aws_route_table_association" "private_1b" {
+  subnet_id      = aws_subnet.private_1b.id
+  route_table_id = aws_route_table.private.id
+}
+
 # ─────────────────────────────────────────
 # SECURITY GROUPS
 # ─────────────────────────────────────────
@@ -155,37 +169,9 @@ resource "aws_security_group" "sg_elb" {
     cidr_blocks = ["0.0.0.0/0"]
   }
   ingress {
-    description = "Auth service"
-    from_port   = 8080
-    to_port     = 8080
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-  ingress {
-    description = "Internship service"
-    from_port   = 8081
-    to_port     = 8081
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-  ingress {
     description = "Gateway service"
     from_port   = 8082
     to_port     = 8082
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-  ingress {
-    description = "User service"
-    from_port   = 8083
-    to_port     = 8083
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-  ingress {
-    description = "Linkage service"
-    from_port   = 8084
-    to_port     = 8084
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
@@ -210,6 +196,13 @@ resource "aws_security_group" "sg_private" {
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["10.0.0.0/16"]
+  }
+  ingress {
+    from_port   = 5432
+    to_port     = 5432
+    protocol    = "tcp"
+    cidr_blocks = ["10.0.3.0/24", "10.0.4.0/24"]
+    description = "PostgreSQL replication between AZs"
   }
   # SSH solo desde el bastion
   ingress {
@@ -354,38 +347,6 @@ resource "aws_lb_target_group" "frontend_tg" {
   tags = { Name = "pasantias-prod-frontend-tg" }
 }
 
-resource "aws_lb_target_group" "auth_tg" {
-  name     = "pasantias-prod-auth-tg"
-  port     = 8080
-  protocol = "HTTP"
-  vpc_id   = aws_vpc.main.id
-
-  health_check {
-    path                = "/health"
-    interval            = 30
-    timeout             = 5
-    healthy_threshold   = 2
-    unhealthy_threshold = 3
-  }
-  tags = { Name = "pasantias-prod-auth-tg" }
-}
-
-resource "aws_lb_target_group" "internship_tg" {
-  name     = "pasantias-prod-internship-tg"
-  port     = 8081
-  protocol = "HTTP"
-  vpc_id   = aws_vpc.main.id
-
-  health_check {
-    path                = "/health"
-    interval            = 30
-    timeout             = 5
-    healthy_threshold   = 2
-    unhealthy_threshold = 3
-  }
-  tags = { Name = "pasantias-prod-internship-tg" }
-}
-
 resource "aws_lb_target_group" "gateway_tg" {
   name     = "pasantias-prod-gateway-tg"
   port     = 8082
@@ -402,38 +363,6 @@ resource "aws_lb_target_group" "gateway_tg" {
   tags = { Name = "pasantias-prod-gateway-tg" }
 }
 
-resource "aws_lb_target_group" "user_tg" {
-  name     = "pasantias-prod-user-tg"
-  port     = 8083
-  protocol = "HTTP"
-  vpc_id   = aws_vpc.main.id
-
-  health_check {
-    path                = "/health"
-    interval            = 30
-    timeout             = 5
-    healthy_threshold   = 2
-    unhealthy_threshold = 3
-  }
-  tags = { Name = "pasantias-prod-user-tg" }
-}
-
-resource "aws_lb_target_group" "linkage_tg" {
-  name     = "pasantias-prod-linkage-tg"
-  port     = 8084
-  protocol = "HTTP"
-  vpc_id   = aws_vpc.main.id
-
-  health_check {
-    path                = "/health"
-    interval            = 30
-    timeout             = 5
-    healthy_threshold   = 2
-    unhealthy_threshold = 3
-  }
-  tags = { Name = "pasantias-prod-linkage-tg" }
-}
-
 # ─────────────────────────────────────────
 # ELB LISTENERS
 # ─────────────────────────────────────────
@@ -448,28 +377,6 @@ resource "aws_lb_listener" "frontend_listener" {
   }
 }
 
-resource "aws_lb_listener" "auth_listener" {
-  load_balancer_arn = aws_lb.prod_elb.arn
-  port              = 8080
-  protocol          = "HTTP"
-
-  default_action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.auth_tg.arn
-  }
-}
-
-resource "aws_lb_listener" "internship_listener" {
-  load_balancer_arn = aws_lb.prod_elb.arn
-  port              = 8081
-  protocol          = "HTTP"
-
-  default_action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.internship_tg.arn
-  }
-}
-
 resource "aws_lb_listener" "gateway_listener" {
   load_balancer_arn = aws_lb.prod_elb.arn
   port              = 8082
@@ -478,28 +385,6 @@ resource "aws_lb_listener" "gateway_listener" {
   default_action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.gateway_tg.arn
-  }
-}
-
-resource "aws_lb_listener" "user_listener" {
-  load_balancer_arn = aws_lb.prod_elb.arn
-  port              = 8083
-  protocol          = "HTTP"
-
-  default_action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.user_tg.arn
-  }
-}
-
-resource "aws_lb_listener" "linkage_listener" {
-  load_balancer_arn = aws_lb.prod_elb.arn
-  port              = 8084
-  protocol          = "HTTP"
-
-  default_action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.linkage_tg.arn
   }
 }
 
@@ -543,6 +428,33 @@ resource "aws_instance" "prod_auth_jobs" {
   }
 }
 
+resource "aws_instance" "postgres_replica" {
+  ami                    = data.aws_ami.ubuntu.id
+  instance_type          = "t3.small"
+  subnet_id              = aws_subnet.private_1b.id
+  key_name               = data.aws_key_pair.prod_key.key_name
+  vpc_security_group_ids = [aws_security_group.sg_private.id]
+
+  root_block_device {
+    volume_size           = 20
+    volume_type           = "gp3"
+    delete_on_termination = true
+  }
+
+  user_data = base64encode(<<-EOF
+    #!/bin/bash
+    apt-get update -y
+    apt-get install -y postgresql-16 postgresql-client-16
+    systemctl stop postgresql
+    EOF
+  )
+
+  tags = {
+    Name = "pasantias-prod-postgres-replica"
+    Role = "postgres-replica"
+  }
+}
+
 # ─────────────────────────────────────────
 # TARGET GROUP ATTACHMENTS
 # ─────────────────────────────────────────
@@ -552,34 +464,10 @@ resource "aws_lb_target_group_attachment" "frontend_attachment" {
   port             = 80
 }
 
-resource "aws_lb_target_group_attachment" "auth_attachment" {
-  target_group_arn = aws_lb_target_group.auth_tg.arn
-  target_id        = aws_instance.prod_auth_jobs.id
-  port             = 8080
-}
-
-resource "aws_lb_target_group_attachment" "internship_attachment" {
-  target_group_arn = aws_lb_target_group.internship_tg.arn
-  target_id        = aws_instance.prod_auth_jobs.id
-  port             = 8081
-}
-
 resource "aws_lb_target_group_attachment" "gateway_attachment" {
   target_group_arn = aws_lb_target_group.gateway_tg.arn
   target_id        = aws_instance.prod_auth_jobs.id
   port             = 8082
-}
-
-resource "aws_lb_target_group_attachment" "user_attachment" {
-  target_group_arn = aws_lb_target_group.user_tg.arn
-  target_id        = aws_instance.prod_auth_jobs.id
-  port             = 8083
-}
-
-resource "aws_lb_target_group_attachment" "linkage_attachment" {
-  target_group_arn = aws_lb_target_group.linkage_tg.arn
-  target_id        = aws_instance.prod_auth_jobs.id
-  port             = 8084
 }
 
 # ─────────────────────────────────────────
@@ -657,6 +545,17 @@ resource "aws_cloudwatch_metric_alarm" "cpu_low" {
   }
 }
 
+resource "aws_vpc_endpoint" "s3_prod" {
+  vpc_id       = aws_vpc.main.id
+  service_name = "com.amazonaws.us-east-1.s3"
+
+  route_table_ids = [aws_route_table.private.id]
+
+  tags = {
+    Name = "pasantias-prod-s3-endpoint"
+  }
+}
+
 # ─────────────────────────────────────────
 # OUTPUTS
 # Comandos para obtener los valores:
@@ -689,4 +588,9 @@ output "documents_bucket_prod" {
 output "asg_name" {
   description = "Nombre del Auto Scaling Group para verificar en AWS Console"
   value       = aws_autoscaling_group.prod_asg.name
+}
+
+output "postgres_replica_ip" {
+  description = "IP privada de la réplica PostgreSQL"
+  value       = aws_instance.postgres_replica.private_ip
 }
