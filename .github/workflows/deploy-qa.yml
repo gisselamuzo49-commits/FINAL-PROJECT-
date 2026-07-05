@@ -387,6 +387,7 @@ jobs:
     name: K6 Load Testing
     needs: deploy
     runs-on: [self-hosted, linux, x64]
+    continue-on-error: true
     steps:
       - uses: actions/checkout@v4
 

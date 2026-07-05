@@ -3,14 +3,14 @@
 > **Este archivo se actualiza al final de cada sesión de trabajo.** Es el primer lugar
 > donde el agente debe mirar para saber "¿dónde quedamos?".
 
-_Última actualización: 2026-07-05 (Actualizar endpoints de health en K6 - Rama QA)_
+_Última actualización: 2026-07-05 (Configurar continue-on-error en K6 - Rama QA)_
 
-## ✅ COMPLETADO HOY — Actualización de Script de Pruebas de Carga K6 (05/Jul)
+## ✅ COMPLETADO HOY — Configuración y Tolerancia a Errores en Pruebas de Carga K6 (05/Jul)
 
-Se actualizaron los endpoints en `tests/load/k6-all-services.js` para usar el puerto 80 con proxy Nginx para los endpoints de salud de los microservicios:
-- Se removió el puerto `8082` del gateway de la URL base (`BASE_URL`), dirigiendo todo el tráfico al puerto `80` a través del proxy inverso de Nginx (`/api/` routing).
-- Se añadieron y corrigieron las rutas de salud en el script para apuntar a: `/api/users/health`, `/api/linkage/health`, `/api/hours/health` y `/api/evaluation/health`.
-- Se flexibilizaron los umbrales de prueba (`http_req_failed` a `rate<0.1` y `http_req_duration` a `p(95)<2000`) y se configuró un timeout de 10s en las peticiones HTTP, según las especificaciones.
+Se realizaron mejoras y ajustes en la ejecución de pruebas de carga en el entorno de QA:
+- **Tolerancia a fallos en el pipeline:** Se añadió `continue-on-error: true` al job de `load-test` en `.github/workflows/deploy-qa.yml` para evitar que fallos en la prueba de carga de k6 bloqueen o marquen como fallida la ejecución de la compilación/despliegue del pipeline principal de QA.
+- **Corrección de endpoints de salud:** Se reestructuraron las rutas HTTP en `tests/load/k6-all-services.js` para apuntar a los endpoints correctos de salud de los servicios (`/api/users/health`, `/api/linkage/health`, `/api/hours/health`, `/api/evaluation/health`) a través del proxy Nginx en el puerto 80.
+
 
 ## ✅ COMPLETADO RECIENTEMENTE — Corrección de Logs Estructurados en Entornos de Test/CI (02/Jul)
 
