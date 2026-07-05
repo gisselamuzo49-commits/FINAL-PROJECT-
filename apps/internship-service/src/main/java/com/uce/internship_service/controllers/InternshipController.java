@@ -3,6 +3,7 @@ package com.uce.internship_service.controllers;
 import com.uce.internship_service.models.Internship;
 import com.uce.internship_service.services.InternshipService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import io.swagger.v3.oas.annotations.Operation;
@@ -31,9 +32,14 @@ public class InternshipController {
     // Ruta para GUARDAR (POST)
     @PostMapping
     @Operation(summary = "Crear una nueva oferta", description = "Publica una nueva oferta de pasantía preprofesional en el catálogo.")
-    public Internship create(@RequestBody Internship internship) {
+    public ResponseEntity<?> create(@RequestBody Internship internship) {
         logger.info("Creating internship offer: {}", internship.getTitle());
-        return internshipService.createInternship(internship);
+        if (internship.getTitle() == null || internship.getTitle().trim().isEmpty() ||
+            internship.getCompany() == null || internship.getCompany().trim().isEmpty()) {
+            return ResponseEntity.badRequest().body("El título y la empresa son obligatorios.");
+        }
+        Internship created = internshipService.createInternship(internship);
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
     // Ruta para LEER (GET)
