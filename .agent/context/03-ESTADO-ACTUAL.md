@@ -3,7 +3,13 @@
 > **Este archivo se actualiza al final de cada sesión de trabajo.** Es el primer lugar
 > donde el agente debe mirar para saber "¿dónde quedamos?".
 
-_Última actualización: 2026-07-05 (Configurar continue-on-error en K6 - Rama QA)_
+_Última actualización: 2026-07-05 (Reducir listeners ALB PROD - Rama feature/GAME-162-alb-reducir-listeners)_
+
+## ✅ COMPLETADO HOY — Reducción de Listeners en ALB de Producción (05/Jul)
+
+Se optimizó la infraestructura de red del entorno de PROD:
+- **Reducción de Listeners:** Se redujo el Application Load Balancer (ALB) en `infra/prod/main.tf` de 6 listeners a 2, manteniendo únicamente los de `frontend` (puerto 80) y `gateway` (puerto 8082).
+- **Limpieza de Recursos:** Se eliminaron los target groups, listeners, target group attachments e ingress rules de seguridad en `sg_elb` correspondientes a los puertos directos de los microservicios (`8080`, `8081`, `8083`, `8084`). Toda la comunicación hacia ellos se canalizará a través del Gateway.
 
 ## ✅ COMPLETADO HOY — Configuración y Tolerancia a Errores en Pruebas de Carga K6 (05/Jul)
 
