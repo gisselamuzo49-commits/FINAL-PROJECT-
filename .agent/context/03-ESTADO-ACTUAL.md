@@ -5,6 +5,14 @@
 
 _Última actualización: 2026-07-05 (Notificaciones en Tiempo Real con WebSockets y Merge de QA - Rama feature/GAME-158-websockets)_
 _Última actualización: 2026-07-05 (Reducir listeners ALB PROD - Rama feature/GAME-162-alb-reducir-listeners)_
+_Última actualización: 2026-07-05 (Wrapper de Escritorio con Electron - Rama feature/GAME-146-desktop-electron)_
+
+## ✅ COMPLETADO HOY — Aplicación de Escritorio con Electron (05/Jul)
+
+Se implementó el wrapper de escritorio para el sistema de pasantías UCE:
+- **Configuración de Electron:** Creado `apps/desktop/package.json`, `main.js` y `preload.js` siguiendo el patrón del repositorio de referencia.
+- **Soporte Offline:** Creado `offline.html` y `offline.css` con estilos UCE para desplegar un mensaje amigable y opción de reconexión cuando se pierde internet.
+- **Activos del Sistema:** Copiado el logo oficial UCE y configurados los íconos de la aplicación en el directorio `apps/desktop/assets`.
 
 ## ✅ COMPLETADO HOY — Reducción de Listeners en ALB de Producción (05/Jul)
 
