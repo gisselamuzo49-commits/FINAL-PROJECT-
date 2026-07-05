@@ -657,3 +657,12 @@
       delegate_to: "{{ bastion_host | default('10.0.1.166') }}"
       shell: mkdir -p /opt/backups/postgres
       ignore_errors: true
+
+# ─────────────────────────────────────────
+# POSTGRESQL REPLICA — us-east-1b
+# La réplica se configura manualmente después del deploy:
+# 1. SSH al postgres_replica via bastion
+# 2. Configurar streaming replication desde PRIMARY
+# PRIMARY_IP: IP de prod_auth_jobs
+# REPLICA_IP: IP de postgres_replica (ver terraform output)
+# ─────────────────────────────────────────
