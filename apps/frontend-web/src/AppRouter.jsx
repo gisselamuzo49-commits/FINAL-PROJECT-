@@ -16,6 +16,7 @@ import Notifications from './pages/Notifications';
 import Recommendations from './pages/Recommendations';
 import Reports from './pages/Reports';
 import Encuestas from './pages/Encuestas';
+import Profile from './pages/Profile';
 
 import RoleProtectedRoute from './components/auth/RoleProtectedRoute';
 
@@ -43,6 +44,10 @@ const router = createBrowserRouter([
       {
         path: 'home',
         element: <Home />
+      },
+      {
+        path: 'profile',
+        element: <Profile />
       },
       {
         path: 'internships',
