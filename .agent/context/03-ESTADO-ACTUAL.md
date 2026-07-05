@@ -3,6 +3,7 @@
 > **Este archivo se actualiza al final de cada sesión de trabajo.** Es el primer lugar
 > donde el agente debe mirar para saber "¿dónde quedamos?".
 
+_Última actualización: 2026-07-05 (Notificaciones en Tiempo Real con WebSockets y Merge de QA - Rama feature/GAME-158-websockets)_
 _Última actualización: 2026-07-05 (Reducir listeners ALB PROD - Rama feature/GAME-162-alb-reducir-listeners)_
 
 ## ✅ COMPLETADO HOY — Reducción de Listeners en ALB de Producción (05/Jul)
@@ -17,6 +18,14 @@ Se realizaron mejoras y ajustes en la ejecución de pruebas de carga en el entor
 - **Tolerancia a fallos en el pipeline:** Se añadió `continue-on-error: true` al job de `load-test` en `.github/workflows/deploy-qa.yml` para evitar que fallos en la prueba de carga de k6 bloqueen o marquen como fallida la ejecución de la compilación/despliegue del pipeline principal de QA.
 - **Corrección de endpoints de salud:** Se reestructuraron las rutas HTTP en `tests/load/k6-all-services.js` para apuntar a los endpoints correctos de salud de los servicios (`/api/users/health`, `/api/linkage/health`, `/api/hours/health`, `/api/evaluation/health`) a través del proxy Nginx en el puerto 80.
 
+## ✅ COMPLETADO RECIENTEMENTE — WebSockets en notification-service y Frontend (02/Jul)
+
+Se implementó notificaciones en tiempo real utilizando WebSockets STOMP y WebSocket nativo:
+- **Dependencias y Configuración:** Agregada la dependencia `spring-boot-starter-websocket` en `notification-service/pom.xml` y creado `WebSocketConfig.java` para registrar el endpoint `/ws` y habilitar broker STOMP simple (`/topic`, `/queue`).
+- **Lógica de Envío:** Modificado `NotificationService.java` para inyectar `SimpMessagingTemplate` y despachar notificaciones entrantes vía `convertAndSendToUser` al recibir eventos.
+- **Ruta en Gateway:** Configurada la ruta `/ws/**` en `gateway-service/application.yml` para enrutar conexiones WebSocket.
+- **Sincronización Frontend:** Añadida lógica en `Notifications.jsx` para conectarse dinámicamente vía WebSocket nativo de JS al Gateway y recargar el listado al recibir notificaciones.
+- **Pruebas de Calidad:** Creado y verificado el test `NotificationWebSocketTest.java` logrando **BUILD SUCCESS**.
 
 ## ✅ COMPLETADO RECIENTEMENTE — Corrección de Logs Estructurados en Entornos de Test/CI (02/Jul)
 
@@ -26,7 +35,7 @@ Se resolvió el fallo de inicialización del `ApplicationContext` en el pipeline
 - **Activación del Perfil test (10 servicios):** Se agregó la propiedad `spring.profiles.active=test` a todos los archivos `application.properties` de pruebas en la carpeta `src/test/resources` (creándose si no existían). Esto garantiza que el perfil de pruebas esté activo en CI sin depender de parámetros de consola.
 - **Verificación Local:** Se ejecutaron con éxito las suites completas de pruebas de los microservicios más críticos (`auth-service` e `internship-service`), pasando todas las comprobaciones a nivel de compilación y ejecución de tests.
 
-## ✅ COMPLETADO HOY — Base de datos SQLite en memoria para Pruebas en AI Service (02/Jul)
+## ✅ COMPLETADO RECIENTEMENTE — Base de datos SQLite en memoria para Pruebas en AI Service (02/Jul)
 
 Se corrigió el error en el pipeline del microservicio de IA (`ai-service`) provocado por el intento de inicialización de la base de datos SQLite en la ruta `/app/data/ai_cache.db` (directorio inexistente y sin permisos de escritura en el runner de GitHub Actions):
 - **database/sqlite_cache.py:** Se configuró la ruta `DB_PATH` para que use `:memory:` dinámicamente si se detecta que las pruebas se están ejecutando (bajo `CI` o si `pytest` está importado en `sys.modules`).
@@ -34,14 +43,13 @@ Se corrigió el error en el pipeline del microservicio de IA (`ai-service`) prov
 - **test_sqlite_cache.py:** Se refactorizó la suite de pruebas del cache para usar la fixture `db_conn` que inicializa una base de datos fresca en memoria por cada test y redirige las llamadas de `sqlite3.connect` mediante monkeypatching para garantizar total aislamiento de pruebas.
 - **Verificación Local:** Se ejecutaron con éxito todas las pruebas tanto del cache (`test_sqlite_cache.py`) como de los endpoints principales de riesgo y recomendación (`test_main.py`), obteniendo un total de 9 tests exitosos.
 
-## ✅ COMPLETADO HOY — Configuración y Ruteo de Pruebas de Carga K6 (02/Jul)
+## ✅ COMPLETADO RECIENTEMENTE — Configuración y Ruteo de Pruebas de Carga K6 (02/Jul)
 
 Se corrigió el fallo de red del job de pruebas de carga en el pipeline de GitHub Actions:
 - **deploy-qa.yml (load-test job):** Se modificó el job para ejecutarse en el `self-hosted` runner ubicado físicamente dentro de la VPC privada de AWS, permitiendo visibilidad y enrutamiento directo hacia la IP privada de las instancias EC2 (`10.0.1.238`). Además se incorporó la instalación dinámica de K6 si no se encuentra preinstalado.
 - **k6-all-services.js (Endpoints y Puertos):** Se actualizaron las rutas del script de carga para que todas las llamadas de API (`/api/users/health`, `/api/linkage/health` y `/api/internships`) apunten explícitamente a través del puerto del Gateway API (`8082`), mientras que las llamadas de interfaz web mantengan el puerto del frontend (`80`), corrigiendo fallos de enrutamiento 404/502.
 
-
-## ✅ COMPLETADO HOY — Logging Estructurado JSON en 11 Microservicios (02/Jul)
+## ✅ COMPLETADO RECIENTEMENTE — Logging Estructurado JSON en 11 Microservicios (02/Jul)
 
 Se estandarizó la telemetría y auditoría de trazas en formato JSON structured logging:
 - **Spring Boot (10 servicios):** Añadido `net.logstash.logback:logstash-logback-encoder:7.4` a todos los `pom.xml`, y aprovisionado el archivo de configuración global `logback-spring.xml` (logs en `/var/log/pasantias/${appName}.log` con política de rotación y límite de 1GB).
@@ -53,7 +61,7 @@ Se estandarizó la telemetría y auditoría de trazas en formato JSON structured
 
 Se configuró el respaldo automatizado de las 9 bases de datos PostgreSQL del sistema:
 - **backup_postgres.sh:** Creación del script local en `infra/scripts/backup_postgres.sh` que realiza respaldos comprimidos de las 9 bases de datos mediante `docker exec pg_dump`, limpia respaldos con más de 7 días y escribe logs en `/var/log/backup_postgres.log`.
-- **Ansible Playbooks (QA y PROD):** Añadidas 4 tareas al final de `deploy-qa.yml` y `deploy-prod.yml` para aprovisionar las carpetas de respaldo, copiar el script de backup, registrar la tarea cron diaria a las 2:00 AM bajo el usuario `ubuntu`, y preparar la carpeta de respaldo delegada en el Bastion host (on-premise simulado).
+- **Ansible Playbooks (QA y PROD):** Añadidas 4 tareas al final de `deploy-qa.yml` y `deploy-prod.yml` para aprovisionar las carpetas de respaldo (creando `/opt/backups/postgres` y `/opt/backup` antes de copiar el script), registrar la tarea cron diaria a las 2:00 AM bajo el usuario `ubuntu`, y preparar la carpeta de respaldo delegada en el Bastion host (on-premise simulado).
 - **Validación Sintáctica:** Verificada con éxito la sintaxis YAML de los playbooks `deploy-qa.yml` y `deploy-prod.yml` usando Python.
 
 ## ✅ COMPLETADO HOY — Circuit Breaker con Resilience4j en 5 microservicios (02/Jul)

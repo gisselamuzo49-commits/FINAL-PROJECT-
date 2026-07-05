@@ -57,6 +57,42 @@ function Notifications() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [estudianteId]);
 
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+
+    let wsHost = window.location.hostname;
+    if (API.includes('://')) {
+      wsHost = API.split('://')[1];
+    }
+    const wsProto = window.location.protocol === 'https:' ? 'wss' : 'ws';
+    const ws = new WebSocket(`${wsProto}://${wsHost}/ws/websocket`);
+
+    ws.onopen = () => {
+      console.log('WebSocket conectado');
+      // STOMP CONNECT frame
+      ws.send('CONNECT\naccept-version:1.1,1.0\nheart-beat:10000,10000\n\n\0');
+    };
+
+    ws.onmessage = (event) => {
+      if (event.data.includes('MESSAGE')) {
+        // Recargar notificaciones cuando llega una nueva
+        cargarNotificaciones();
+      }
+    };
+
+    ws.onerror = (error) => {
+      console.warn('WebSocket error:', error);
+    };
+
+    return () => {
+      if (ws.readyState === WebSocket.OPEN) {
+        ws.close();
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [estudianteId]);
+
   const marcarComoLeida = (id) => {
     fetch(`${API}/api/notifications/${id}/read`, {
       method: "PATCH",

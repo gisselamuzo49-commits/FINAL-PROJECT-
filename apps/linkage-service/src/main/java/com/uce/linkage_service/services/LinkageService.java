@@ -18,6 +18,9 @@ public class LinkageService {
     private LinkageProjectRepository linkageProjectRepository;
 
     public LinkageProject createProject(LinkageProject project) {
+        if (project.getName() == null || project.getName().trim().isEmpty()) {
+            throw new IllegalArgumentException("El nombre del proyecto es obligatorio");
+        }
         return linkageProjectRepository.save(project);
     }
 
@@ -31,6 +34,11 @@ public class LinkageService {
     }
 
     public Optional<LinkageProject> getProjectById(Long id) {
-        return linkageProjectRepository.findById(id);
+        return Optional.of(linkageProjectRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Proyecto no encontrado")));
+    }
+
+    public LinkageProject updateProject(LinkageProject project) {
+        return linkageProjectRepository.save(project);
     }
 }
