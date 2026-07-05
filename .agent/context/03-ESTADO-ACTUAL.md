@@ -3,9 +3,16 @@
 > **Este archivo se actualiza al final de cada sesión de trabajo.** Es el primer lugar
 > donde el agente debe mirar para saber "¿dónde quedamos?".
 
-_Última actualización: 2026-07-02 (Fix Logging en Tests - Rama QA)_
+_Última actualización: 2026-07-05 (Actualizar endpoints de health en K6 - Rama QA)_
 
-## ✅ COMPLETADO HOY — Corrección de Logs Estructurados en Entornos de Test/CI (02/Jul)
+## ✅ COMPLETADO HOY — Actualización de Script de Pruebas de Carga K6 (05/Jul)
+
+Se actualizaron los endpoints en `tests/load/k6-all-services.js` para usar el puerto 80 con proxy Nginx para los endpoints de salud de los microservicios:
+- Se removió el puerto `8082` del gateway de la URL base (`BASE_URL`), dirigiendo todo el tráfico al puerto `80` a través del proxy inverso de Nginx (`/api/` routing).
+- Se añadieron y corrigieron las rutas de salud en el script para apuntar a: `/api/users/health`, `/api/linkage/health`, `/api/hours/health` y `/api/evaluation/health`.
+- Se flexibilizaron los umbrales de prueba (`http_req_failed` a `rate<0.1` y `http_req_duration` a `p(95)<2000`) y se configuró un timeout de 10s en las peticiones HTTP, según las especificaciones.
+
+## ✅ COMPLETADO RECIENTEMENTE — Corrección de Logs Estructurados en Entornos de Test/CI (02/Jul)
 
 Se resolvió el fallo de inicialización del `ApplicationContext` en el pipeline de CI debido a la falta de permisos de `root` para escribir en `/var/log/pasantias/`:
 - **logback-spring.xml (10 servicios):** Se envolvió la definición del appender `FILE` en un elemento `<springProfile name="!test">` para evitar que Logback intente instanciar, crear o escribir archivos de log durante la ejecución de pruebas.
