@@ -8,10 +8,12 @@
   "scripts": {
     "build": "turbo run build",
     "test": "turbo run test",
-    "lint": "turbo run lint"
+    "lint": "turbo run lint",
+    "cy:run": "cypress run --record --key 6b907c17-a291-43fe-97d7-e5e52c0b1a38"
   },
   "devDependencies": {
     "turbo": "^2.0.0",
-    "lefthook": "^1.6.0"
+    "lefthook": "^1.6.0",
+    "cypress": "^13.0.0"
   }
 }
