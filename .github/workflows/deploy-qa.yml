@@ -418,3 +418,25 @@ jobs:
             --duration 30s \
             -e TARGET_HOST=$TARGET_HOST \
             tests/load/k6-all-services.js
+
+  e2e-tests:
+    name: Cypress E2E Tests
+    needs: deploy
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Esperar que los servicios estén listos
+        run: sleep 60
+
+      - name: Run Cypress E2E Tests
+        uses: cypress-io/github-action@v6
+        with:
+          record: true
+          browser: chrome
+          headless: true
+        env:
+          CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
+          CYPRESS_PROJECT_ID: ${{ secrets.CYPRESS_PROJECT_ID }}
+          CYPRESS_BASE_URL: http://50.19.247.85

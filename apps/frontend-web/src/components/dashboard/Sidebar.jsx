@@ -56,6 +56,12 @@ function Sidebar({ user = {}, onLogout, isOpen, onClose }) {
           <span>Home</span>
         </NavLink>
 
+        {/* Mi Perfil */}
+        <NavLink to="/profile" className={navLinkClass}>
+          <span className="mr-3 text-base">👤</span>
+          <span>Mi Perfil</span>
+        </NavLink>
+
         {/* Pasantías Dropdown */}
         {(isEstudiante || isTutor || isCoordinador) && (
           <div>

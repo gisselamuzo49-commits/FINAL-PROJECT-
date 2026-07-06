@@ -112,59 +112,69 @@ function Home() {
 
   // Load AI Recommendation
   const fetchAIRecommendations = (id) => {
-    // 1. Get all available internships
-    fetch(`${API}/api/internships`, { headers: getHeaders() })
+    fetch(`${API}/api/users/profile/${id}`, { headers: getHeaders() })
       .then(res => {
         if (res.status === 401) { logout(); throw new Error("Sesión expirada"); }
-        if (!res.ok) throw new Error("Error al obtener pasantías para IA");
+        if (res.status === 404) {
+          return {
+            descripcion: 'Estudiante interesado en realizar mis prácticas preprofesionales desarrollando proyectos en mi área de estudio.',
+            habilidades: '',
+            carrera: 'Ingeniería'
+          };
+        }
+        if (!res.ok) throw new Error("Error al obtener perfil para IA");
         return res.json();
       })
-      .then(internshipsList => {
-        if (internshipsList.length === 0) {
-          setRecommendedOffer(null);
-          setLoadingAI(false);
-          return;
-        }
-
-        // 2. Build recommend payload
-        const carrera = "Ingeniería";
-        const payload = {
-          estudianteId: String(id),
-          perfil: `Estudiante de la carrera de ${carrera}. Interesado en realizar mis prácticas preprofesionales desarrollando proyectos en mi área de estudio.`,
-          ofertas: internshipsList.map(i => ({
-            id: String(i.id),
-            descripcion: `${i.title} ${i.description}`
-          }))
-        };
-
-        // 3. Post to AI recommend endpoint
-        return fetch(`${API}/api/ai/recommend`, {
-          method: "POST",
-          headers: getHeaders(),
-          body: JSON.stringify(payload)
-        })
+      .then(profileData => {
+        return fetch(`${API}/api/internships`, { headers: getHeaders() })
           .then(res => {
-            if (!res.ok) throw new Error("Error al obtener recomendaciones de IA");
+            if (!res.ok) throw new Error("Error al obtener pasantías para IA");
             return res.json();
           })
-          .then(recommendationsData => {
-            const recs = recommendationsData.recomendaciones || [];
-            if (recs.length === 0) {
+          .then(internshipsList => {
+            if (internshipsList.length === 0) {
               setRecommendedOffer(null);
               setLoadingAI(false);
               return;
             }
 
-            // Find recommendation with highest score
-            const bestRec = recs.reduce((prev, current) => (prev.score > current.score) ? prev : current);
+            const perfilTexto = `${profileData.descripcion || ''} ${profileData.habilidades || ''} ${profileData.carrera || ''}`.trim() ||
+              'Estudiante interesado en realizar mis prácticas preprofesionales desarrollando proyectos en mi área de estudio.';
             
-            // Find corresponding offer details
-            const matchedOffer = internshipsList.find(i => String(i.id) === String(bestRec.id));
-            if (matchedOffer) {
-              setRecommendedOffer(matchedOffer);
-              setRecommendedScore(bestRec.score);
-            }
-            setLoadingAI(false);
+            const payload = {
+              estudianteId: String(id),
+              perfil: perfilTexto,
+              ofertas: internshipsList.map(i => ({
+                id: String(i.id),
+                descripcion: `${i.title} ${i.description}`
+              }))
+            };
+
+            return fetch(`${API}/api/ai/recommend`, {
+              method: "POST",
+              headers: getHeaders(),
+              body: JSON.stringify(payload)
+            })
+              .then(res => {
+                if (!res.ok) throw new Error("Error al obtener recomendaciones de IA");
+                return res.json();
+              })
+              .then(recommendationsData => {
+                const recs = recommendationsData.recomendaciones || [];
+                if (recs.length === 0) {
+                  setRecommendedOffer(null);
+                  setLoadingAI(false);
+                  return;
+                }
+
+                const bestRec = recs.reduce((prev, current) => (prev.score > current.score) ? prev : current);
+                const matchedOffer = internshipsList.find(i => String(i.id) === String(bestRec.id));
+                if (matchedOffer) {
+                  setRecommendedOffer(matchedOffer);
+                  setRecommendedScore(bestRec.score);
+                }
+                setLoadingAI(false);
+              });
           });
       })
       .catch(err => {
