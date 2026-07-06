@@ -1,0 +1,33 @@
+{
+  "name": "pasantias-uce-desktop",
+  "version": "1.0.0",
+  "description": "Sistema Inteligente de Gestión de Pasantías UCE - Desktop",
+  "main": "main.js",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder"
+  },
+  "devDependencies": {
+    "electron": "^13.0.0",
+    "electron-builder": "^24.0.0"
+  },
+  "build": {
+    "appId": "com.uce.pasantias",
+    "productName": "Pasantías UCE",
+    "win": {
+      "target": "nsis",
+      "icon": "assets/icon.ico"
+    },
+    "linux": {
+      "target": "AppImage"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "offline.html",
+      "offline.css",
+      "assets/**"
+    ]
+  }
+}
