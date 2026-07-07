@@ -3,7 +3,7 @@
 > **Este archivo se actualiza al final de cada sesión de trabajo.** Es el primer lugar
 > donde el agente debe mirar para saber "¿dónde quedamos?".
 
-_Última actualización: 2026-07-06 (Ajustar selectores de login y comando cy.login en Cypress - Rama QA)_
+_Última actualización: 2026-07-06 (Actualización de dependencias de la app móvil para Expo 54 - Rama QA)_
 _Última actualización: 2026-07-05 (Notificaciones en Tiempo Real con WebSockets y Merge de QA - Rama feature/GAME-158-websockets)_
 _Última actualización: 2026-07-05 (Reducir listeners ALB PROD - Rama feature/GAME-162-alb-reducir-listeners)_
 _Última actualización: 2026-07-05 (Agregar réplica PostgreSQL PROD - Rama feature/GAME-163-postgres-replica)_
@@ -12,6 +12,13 @@ _Última actualización: 2026-07-05 (Configurar Cypress Cloud - Rama feature/GAM
 _Última actualización: 2026-07-05 (CRUD de Perfil de Usuario - Rama feature/GAME-167-user-profile)_
 _Última actualización: 2026-07-05 (Wrapper de Escritorio con Electron - Rama feature/GAME-146-desktop-electron)_
 _Última actualización: 2026-07-05 (Aplicación Móvil con Expo - Rama feature/GAME-147-mobile-expo)_
+
+## ✅ COMPLETADO HOY — Actualización de Dependencias Móviles para Expo 54 (06/Jul)
+
+Se actualizaron las dependencias de la aplicación móvil ([package.json](file:///c:/Users/gisse/sistema-pasantias-vinculacion/apps/mobile/package.json)) para solucionar el error de incompatibilidad de runtime `"Unable to determine event arguments for onModeChange"`:
+- **Ajuste de React:** Se utilizaron las versiones estables de `react@18.3.1` y `react-dom@18.3.1` (debido a que la versión `18.3.2` indicada no existe en el registro de npm).
+- **Ajuste de React Native y Expo:** Se aplicó `react-native@0.76.9`, `expo-router@~4.0.17`, `expo-splash-screen@~0.29.21`, `expo-status-bar@~2.0.1`, `react-native-webview@13.12.5` y `react-native-web@~0.19.13`.
+- **Instalación Exitosa:** Se ejecutó con éxito `npm install --legacy-peer-deps` en la carpeta `apps/mobile` para mitigar conflictos de dependencias del monorepo, instalando todos los paquetes requeridos de forma exitosa.
 
 ## ✅ COMPLETADO HOY — Corrección de Selectores y Comando en Cypress (06/Jul)
 
