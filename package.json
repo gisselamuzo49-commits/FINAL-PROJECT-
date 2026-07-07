@@ -15,5 +15,9 @@
     "turbo": "^2.0.0",
     "lefthook": "^1.6.0",
     "cypress": "^13.0.0"
+  },
+  "overrides": {
+    "react": "19.1.0",
+    "react-dom": "19.1.0"
   }
 }
