@@ -89,9 +89,9 @@ Sesión de diseño dedicada **antes** de tocar Terraform de PROD — ver decisio
 pendientes en 09-ADOPCIONES:
 - [ ] Decidir: reducir target groups del ALB de PROD de 6 a 2 (`frontend_tg`,
   `gateway_tg`) — mejora requisito #5 (superficie de ataque) y simplifica ASG.
-- [ ] Agregar bloque ASG + launch template + políticas CloudWatch — versión
+- [x] Agregar bloque ASG + launch template + políticas CloudWatch — versión
   simplificada (no requiere rediseñar el deploy actual), ver 09-ADOPCIONES sección
-  ASG.
+  ASG. (07/Jul)
 - [ ] Modularizar Terraform: `infra/modules/{vpc,security_groups,ec2}` +
   `infra/{qa,prod}/main.tf` que solo instancian — blueprint en 09-ADOPCIONES #6.
 - [ ] Migrar PostgreSQL → RDS (primary/standby multi-AZ, requisito #18, solo PROD,

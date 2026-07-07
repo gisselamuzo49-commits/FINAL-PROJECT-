@@ -3,6 +3,7 @@
 > **Este archivo se actualiza al final de cada sesión de trabajo.** Es el primer lugar
 > donde el agente debe mirar para saber "¿dónde quedamos?".
 
+_Última actualización: 2026-07-07 (Implementación de ASG y Launch Template en PROD - Rama feature/GAME-171-terraform-asg)_
 _Última actualización: 2026-07-07 (Fix del bean KafkaTemplate en internship-service - Rama feature/GAME-170-fix-kafkatemplate-internship)_
 _Última actualización: 2026-07-06 (Fix de Kafka y Cassandra en QA - Rama feature/GAME-169-fix-kafka-cassandra-qa)_
 _Última actualización: 2026-07-06 (Fix de logs en PROD - Rama feature/GAME-168-fix-logs-prod)_
@@ -17,6 +18,14 @@ _Última actualización: 2026-07-05 (Configurar Cypress Cloud - Rama feature/GAM
 _Última actualización: 2026-07-05 (CRUD de Perfil de Usuario - Rama feature/GAME-167-user-profile)_
 _Última actualización: 2026-07-05 (Wrapper de Escritorio con Electron - Rama feature/GAME-146-desktop-electron)_
 _Última actualización: 2026-07-05 (Aplicación Móvil con Expo - Rama feature/GAME-147-mobile-expo)_
+
+## ✅ COMPLETADO HOY — Implementación de ASG y Launch Template en PROD (07/Jul)
+
+Se configuraron los recursos faltantes para habilitar el grupo de Auto Scaling (ASG) en el entorno de producción (PROD):
+- **Launch Template (`prod_lt`):** Se declaró el recurso `aws_launch_template.prod_lt` en [infra/prod/main.tf](file:///c:/Users/gisse/sistema-pasantias-vinculacion/infra/prod/main.tf) especificando tipo de instancia `t3.large`, disco `gp3` de `30GB` con eliminación al terminar, la clave `PROD` y el script de inicialización (`user_data`) para instalar Docker y habilitar el servicio.
+- **Auto Scaling Group (`prod_asg`):** Se definió `aws_autoscaling_group.prod_asg` con una capacidad deseada de 1, mínima de 1 y máxima de 3. Se asignaron las subredes privadas `private_1a` y `private_1b` para redundancia multizona.
+- **Verificación sintáctica:** Se corrió `terraform validate` en la carpeta `infra/prod` confirmando exitosamente que la configuración es válida y no quedan referencias rotas a recursos inexistentes.
+
 
 ## ✅ COMPLETADO HOY — Fix de autoconfiguración de Kafka en internship-service (07/Jul)
 
