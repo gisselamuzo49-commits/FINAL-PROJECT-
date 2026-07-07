@@ -9,6 +9,9 @@ import org.springframework.web.bind.annotation.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,6 +19,8 @@ import java.util.Map;
 @RequestMapping("/api/auth")
 @Tag(name = "Autenticación", description = "Endpoints para registro e inicio de sesión de usuarios")
 public class AuthController {
+
+    private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
 
     @Autowired
     private AuthService authService;
@@ -32,30 +37,49 @@ public class AuthController {
 
     @PostMapping("/register")
     @Operation(summary = "Registrar un nuevo usuario", description = "Crea una cuenta para un Estudiante, Tutor o Coordinador y devuelve su JWT correspondiente.")
-    public ResponseEntity<Map<String, String>> register(@RequestBody Map<String, String> body) {
-        String token = authService.registerUser(
-            body.get("nombre"),
-            body.get("email"), 
-            body.get("password"),
-            body.get("rol")
-        );
-        return ResponseEntity.ok(Map.of("token", token));
+    public ResponseEntity<?> register(@RequestBody Map<String, String> body) {
+        try {
+            String token = authService.registerUser(
+                body.get("nombre"),
+                body.get("email"), 
+                body.get("password"),
+                body.get("rol")
+            );
+            return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("token", token));
+        } catch (RuntimeException e) {
+            if ("Email ya registrado".equals(e.getMessage())) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("error", e.getMessage()));
+            }
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", e.getMessage()));
+        }
     }
 
     @PostMapping("/login")
     @Operation(summary = "Iniciar sesión", description = "Autentica al usuario por email y contraseña y devuelve su token JWT.")
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
-        String token = authService.loginUser(loginRequest.getEmail(), loginRequest.getPassword());
-        if (token == null) {
+        logger.info("Login attempt for user: {}", loginRequest.getEmail());
+        try {
+            String token = authService.loginUser(loginRequest.getEmail(), loginRequest.getPassword());
+            if (token == null) {
+                Map<String, String> error = new HashMap<>();
+                error.put("error", "Credenciales inválidas");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
+            }
+            if ("FALLBACK_SERVICE_UNAVAILABLE".equals(token)) {
+                Map<String, String> error = new HashMap<>();
+                error.put("error", "Servicio temporalmente no disponible");
+                return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(error);
+            }
+
+            Map<String, String> response = new HashMap<>();
+            response.put("token", token);
+            response.put("email", loginRequest.getEmail());
+            return ResponseEntity.ok(response);
+        } catch (IllegalArgumentException e) {
             Map<String, String> error = new HashMap<>();
             error.put("error", "Credenciales inválidas");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
         }
-
-        Map<String, String> response = new HashMap<>();
-        response.put("token", token);
-        response.put("email", loginRequest.getEmail());
-        return ResponseEntity.ok(response);
     }
 
     // DTO para la petición de Login

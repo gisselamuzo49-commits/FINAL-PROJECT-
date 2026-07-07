@@ -42,8 +42,7 @@ que reemplaza la planificación genérica original.
   (5 etapas + Circuit Breaker de Resilience4j programático en cliente gRPC, 19/19 tests incl. integración end-to-end con Testcontainers). PR abierto
   hacia `QA`, sin mergear — ver `03-ESTADO-ACTUAL.md`.
 - [ ] Quick wins en paralelo (bajo costo, alto impacto en backlog docente):
-  - [ ] Logging estructurado (niveles INFO/DEBUG/WARN/ERROR) en los 5 servicios ya
-    desplegados — backlog docente #1.
+  - [x] Logging estructurado (niveles INFO/DEBUG/WARN/ERROR) en JSON para todos los 11 microservicios del sistema. ✅ (02/Jul) — backlog docente #1.
   - [ ] Workspace de Postman compartido con el docente, todas las rutas actuales —
     backlog docente #2 (parcial).
   - [x] Limpieza de disco en `infra/ansible/deploy-*.yml` (`docker system prune`,
@@ -80,6 +79,9 @@ que reemplaza la planificación genérica original.
 - [x] Corregir bugs críticos en `infra/ansible/deploy-qa.yml` (Mosquitto autotenticado, mapeo de URLs en gateway, tags :qa en servicios). ✅
 - [x] Deploy completo a QA (18 contenedores: microservicios + Kafka + RabbitMQ + MongoDB + Redis + Postgres). Instancia configurada como `t3.large` (8 GiB RAM) + Swap de 4GB + límites de JVM establecidos. ✅
 - [x] Configurar Self-Hosted Runner en el Bastion de QA y parametrizar dinámicamente IPs (Lab 53). ✅
+- [x] Implementar protección de rutas por rol en frontend (RoleProtectedRoute) y backend (@PreAuthorize). ✅
+- [x] Implementar patrón Circuit Breaker con Resilience4j en los 5 microservicios restantes (auth, gateway, internship, linkage, user) con pruebas de validación en verde. ✅
+- [x] Implementar notificaciones en tiempo real utilizando WebSockets en notification-service y el frontend. ✅ (02/Jul)
 
 
 ### Semana 5 — Sesión de diseño + Terraform modular + infraestructura PROD
@@ -100,7 +102,7 @@ pendientes en 09-ADOPCIONES:
 
 ### Semana 6 — Monitoreo, backups, blue-green y cierre
 - [ ] Prometheus + Grafana en PROD — requisito #17.
-- [ ] Job de backup `pg_dump` → cuenta #4 (on-premise simulado, decisión ya cerrada).
+- [x] Job de backup `pg_dump` → cuenta #4 (on-premise simulado, decisión ya cerrada). ✅ (02/Jul)
 - [ ] Blue-green deployment vía GitHub Actions — backlog docente #4 (instancia nueva →
   health check → swap → eliminar anterior si exitoso).
 - [ ] Video final de evidencia, ampliando el guion del 12/jun para cubrir todo lo

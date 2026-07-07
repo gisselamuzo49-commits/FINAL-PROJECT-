@@ -1,42 +1,55 @@
-import os
-import pytest
 import sqlite3
+import pytest
 import database.sqlite_cache as sqlite_cache
 
-TEST_DB_PATH = os.path.abspath("test_ai_cache.db")
+class SqliteConnectionProxy:
+    def __init__(self, conn):
+        self._conn = conn
+    
+    def __getattr__(self, name):
+        return getattr(self._conn, name)
+    
+    def close(self):
+        pass  # Evitar el cierre real en tests
+    
+    def __enter__(self):
+        return self
+    
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        pass
 
-@pytest.fixture(autouse=True)
-def setup_test_db():
-    # Guardar el path original
-    original_path = sqlite_cache.DB_PATH
-    # Redefinir al path de prueba
-    sqlite_cache.DB_PATH = TEST_DB_PATH
+# Fixture que crea BD en memoria para cada test
+@pytest.fixture
+def db_conn(monkeypatch):
+    conn = sqlite3.connect(":memory:")
+    conn.execute("""
+        CREATE TABLE prediction_cache (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            estudiante_id TEXT NOT NULL UNIQUE,
+            risk_score REAL NOT NULL,
+            recommendation TEXT,
+            created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+            updated_at TEXT DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
+    conn.commit()
     
-    # Inicializar la base de datos
-    sqlite_cache.init_db()
+    # Redirigir la conexión de sqlite3 al proxy de la conexión en memoria
+    monkeypatch.setattr(sqlite3, "connect", lambda *args, **kwargs: SqliteConnectionProxy(conn))
     
-    yield
+    yield conn
     
-    # Restaurar y limpiar el archivo de prueba
-    sqlite_cache.DB_PATH = original_path
-    if os.path.exists(TEST_DB_PATH):
-        try:
-            os.remove(TEST_DB_PATH)
-        except Exception:
-            pass
+    # Cerrar la conexión real al final del test
+    conn.close()
 
-def test_init_db_creates_table():
-    conn = sqlite3.connect(TEST_DB_PATH)
-    cursor = conn.cursor()
-    # Verificar si la tabla existe
+def test_init_db_creates_table(db_conn):
+    cursor = db_conn.cursor()
     cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='prediction_cache'")
     table_exists = cursor.fetchone()
-    conn.close()
-    
     assert table_exists is not None
     assert table_exists[0] == "prediction_cache"
 
-def test_save_and_get_cached_prediction():
+def test_save_and_get_cached_prediction(db_conn):
     estudiante_id = "EST12345"
     risk_score = 0.85
     recommendation = "ALTO"
@@ -51,7 +64,7 @@ def test_save_and_get_cached_prediction():
     assert cached[0] == risk_score
     assert cached[1] == recommendation
 
-def test_save_prediction_overwrite():
+def test_save_prediction_overwrite(db_conn):
     estudiante_id = "EST12345"
     
     # Guardar primera vez

@@ -16,6 +16,9 @@ import Notifications from './pages/Notifications';
 import Recommendations from './pages/Recommendations';
 import Reports from './pages/Reports';
 import Encuestas from './pages/Encuestas';
+import Profile from './pages/Profile';
+
+import RoleProtectedRoute from './components/auth/RoleProtectedRoute';
 
 const router = createBrowserRouter([
   {
@@ -43,6 +46,10 @@ const router = createBrowserRouter([
         element: <Home />
       },
       {
+        path: 'profile',
+        element: <Profile />
+      },
+      {
         path: 'internships',
         element: <Internships />
       },
@@ -56,7 +63,11 @@ const router = createBrowserRouter([
       },
       {
         path: 'users',
-        element: <Users />
+        element: (
+          <RoleProtectedRoute allowedRoles={['TUTOR', 'COORDINADOR', 'ADMIN']}>
+            <Users />
+          </RoleProtectedRoute>
+        )
       },
       {
         path: 'hours',
@@ -80,7 +91,11 @@ const router = createBrowserRouter([
       },
       {
         path: 'reports',
-        element: <Reports />
+        element: (
+          <RoleProtectedRoute allowedRoles={['ESTUDIANTE', 'TUTOR', 'COORDINADOR', 'ADMIN']}>
+            <Reports />
+          </RoleProtectedRoute>
+        )
       },
       {
         path: 'encuestas',

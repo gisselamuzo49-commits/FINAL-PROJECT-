@@ -48,8 +48,24 @@ function Recommendations() {
 
   useEffect(() => {
     cargarPasantias();
+    if (estudianteId) {
+      fetch(`${API}/api/users/profile/${estudianteId}`, { headers: getHeaders() })
+        .then(res => {
+          if (res.ok) return res.json();
+          return null;
+        })
+        .then(profileData => {
+          if (profileData) {
+            const initialText = `${profileData.habilidades || ''} ${profileData.descripcion || ''}`.trim();
+            if (initialText) {
+              setPerfilTexto(initialText);
+            }
+          }
+        })
+        .catch(() => {});
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [estudianteId]);
 
 
 

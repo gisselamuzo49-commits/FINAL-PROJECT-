@@ -8,6 +8,9 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import java.util.Collections;
+
 @Service
 public class LinkageService {
 
@@ -15,14 +18,27 @@ public class LinkageService {
     private LinkageProjectRepository linkageProjectRepository;
 
     public LinkageProject createProject(LinkageProject project) {
+        if (project.getName() == null || project.getName().trim().isEmpty()) {
+            throw new IllegalArgumentException("El nombre del proyecto es obligatorio");
+        }
         return linkageProjectRepository.save(project);
     }
 
+    @CircuitBreaker(name = "default", fallbackMethod = "getLinkageFallback")
     public List<LinkageProject> getAllProjects() {
         return linkageProjectRepository.findAll();
     }
 
+    public List<LinkageProject> getLinkageFallback(Throwable t) {
+        return Collections.emptyList();
+    }
+
     public Optional<LinkageProject> getProjectById(Long id) {
-        return linkageProjectRepository.findById(id);
+        return Optional.of(linkageProjectRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Proyecto no encontrado")));
+    }
+
+    public LinkageProject updateProject(LinkageProject project) {
+        return linkageProjectRepository.save(project);
     }
 }

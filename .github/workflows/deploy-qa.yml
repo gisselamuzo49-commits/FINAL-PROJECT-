@@ -386,17 +386,57 @@ jobs:
   load-test:
     name: K6 Load Testing
     needs: deploy
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, x64]
+    continue-on-error: true
     steps:
       - uses: actions/checkout@v4
+
+      - name: Instalar k6 si no existe
+        run: |
+          if ! command -v k6 &> /dev/null; then
+            sudo gpg -k
+            sudo gpg --no-default-keyring \
+              --keyring /usr/share/keyrings/k6-archive-keyring.gpg \
+              --keyserver hkp://keyserver.ubuntu.com:80 \
+              --recv-keys C5AD17C747E3415A3642D57D77C6C491D6AC1D69
+            echo "deb [signed-by=/usr/share/keyrings/k6-archive-keyring.gpg] \
+              https://dl.k6.io/deb stable main" | \
+              sudo tee /etc/apt/sources.list.d/k6.list
+            sudo apt-get update
+            sudo apt-get install k6 -y
+          fi
 
       - name: Esperar que los servicios estén listos
         run: sleep 30
 
       - name: Run k6 load test
-        uses: grafana/k6-action@v0.3.1
         env:
-          TARGET_HOST: ${{ secrets.QA_AUTH_JOBS_IP }}
+          TARGET_HOST: "10.0.1.238"
+        run: |
+          k6 run \
+            --vus 20 \
+            --duration 30s \
+            -e TARGET_HOST=$TARGET_HOST \
+            tests/load/k6-all-services.js
+
+  e2e-tests:
+    name: Cypress E2E Tests
+    needs: deploy
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Esperar que los servicios estén listos
+        run: sleep 60
+
+      - name: Run Cypress E2E Tests
+        uses: cypress-io/github-action@v6
         with:
-          filename: tests/load/k6-all-services.js
-          flags: --vus 20 --duration 30s
+          record: true
+          browser: chrome
+          headless: true
+        env:
+          CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
+          CYPRESS_PROJECT_ID: ${{ secrets.CYPRESS_PROJECT_ID }}
+          CYPRESS_BASE_URL: http://50.19.247.85

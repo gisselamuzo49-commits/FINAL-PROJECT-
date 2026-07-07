@@ -154,6 +154,9 @@
     - name: Asegurar que existe la red de Docker para intercomunicación
       shell: docker network create pasantias-net 2>/dev/null || true
 
+    - name: Crear directorio de logs
+      shell: mkdir -p /var/log/pasantias && chmod 777 /var/log/pasantias
+
     # ── Pull de imágenes ─────────────────
     - name: Pull postgres image
       shell: docker pull {{ postgres_image }}
@@ -315,6 +318,7 @@
           --network pasantias-net \
           --restart always \
           -p 8080:8080 \
+          -v /var/log/pasantias:/var/log/pasantias \
           -e DB_HOST=postgres-db \
           -e DB_PORT=5432 \
           -e DB_NAME=auth_db \
@@ -331,6 +335,7 @@
           --network pasantias-net \
           --restart always \
           -p 8081:8081 \
+          -v /var/log/pasantias:/var/log/pasantias \
           -e DB_HOST=postgres-db \
           -e DB_PORT=5432 \
           -e DB_NAME=internship_db \
@@ -349,6 +354,7 @@
           --network pasantias-net \
           --restart always \
           -p 8083:8083 \
+          -v /var/log/pasantias:/var/log/pasantias \
           -e DB_HOST=postgres-db \
           -e DB_PORT=5432 \
           -e DB_NAME=user_db \
@@ -364,6 +370,7 @@
           --network pasantias-net \
           --restart always \
           -p 8084:8084 \
+          -v /var/log/pasantias:/var/log/pasantias \
           -e DB_HOST=postgres-db \
           -e DB_PORT=5432 \
           -e DB_NAME=linkage_db \
@@ -569,6 +576,7 @@
         --network pasantias-net
         --restart always
         -p 8085:8085
+        -v /var/log/pasantias:/var/log/pasantias
         -e DB_HOST=postgres-db
         -e DB_PORT=5432
         -e DB_NAME=hours_db
@@ -588,6 +596,7 @@
         --network pasantias-net
         --restart always
         -p 8086:8086
+        -v /var/log/pasantias:/var/log/pasantias
         -e DB_HOST=postgres-db
         -e DB_PORT=5432
         -e DB_NAME=evaluation_db
@@ -605,6 +614,7 @@
         --network pasantias-net
         --restart always
         -p 8087:8087
+        -v /var/log/pasantias:/var/log/pasantias
         -e DB_HOST=postgres-db
         -e DB_PORT=5432
         -e DB_NAME=notification_db
@@ -624,6 +634,7 @@
         --network pasantias-net
         --restart always
         -p 8088:8088
+        -v /var/log/pasantias:/var/log/pasantias
         -e DB_HOST=postgres-db
         -e DB_PORT=5432
         -e DB_NAME=document_db
@@ -645,6 +656,7 @@
         --network pasantias-net
         --restart always
         -p 8089:8089
+        -v /var/log/pasantias:/var/log/pasantias
         -e DB_HOST=postgres-db
         -e DB_PORT=5432
         -e DB_NAME=report_db
@@ -680,6 +692,7 @@
           --network pasantias-net \
           --restart always \
           -p 8082:8082 \
+          -v /var/log/pasantias:/var/log/pasantias \
           -e AUTH_SERVICE_URL=http://auth-service:8080 \
           -e INTERNSHIP_SERVICE_URL=http://internship-service:8081 \
           -e USER_SERVICE_URL=http://user-service:8083 \
@@ -707,3 +720,41 @@
     - name: Mostrar estado
       debug:
         var: container_status.stdout_lines
+
+    - name: Crear directorio de backups
+      shell: |
+        mkdir -p /opt/backups/postgres
+        mkdir -p /opt/backup
+      
+    - name: Copiar script de backup
+      copy:
+        dest: /opt/backup/backup_postgres.sh
+        mode: '0755'
+        content: |
+          #!/bin/bash
+          DATE=$(date +%Y%m%d_%H%M%S)
+          BACKUP_DIR="/opt/backups/postgres"
+          LOG_FILE="/var/log/backup_postgres.log"
+          DATABASES=(auth_db internship_db user_db linkage_db hours_db evaluation_db notification_db document_db report_db)
+          mkdir -p $BACKUP_DIR
+          echo "[$(date)] Iniciando backup" >> $LOG_FILE
+          for DB in "${DATABASES[@]}"; do
+            docker exec postgres-db pg_dump -U postgres -d $DB 2>/dev/null | gzip > $BACKUP_DIR/${DB}_${DATE}.sql.gz
+            echo "[$(date)] $DB respaldada" >> $LOG_FILE
+          done
+          find $BACKUP_DIR -name "*.sql.gz" -mtime +7 -delete
+          echo "[$(date)] Backup completado" >> $LOG_FILE
+
+    - name: Configurar cron job para backup diario a las 2am
+      cron:
+        name: "Backup PostgreSQL diario"
+        minute: "0"
+        hour: "2"
+        job: "/opt/backup/backup_postgres.sh >> /var/log/backup_postgres.log 2>&1"
+        user: ubuntu
+        state: present
+
+    - name: Crear directorio de backups en bastion (on-premise simulado)
+      delegate_to: "{{ bastion_host | default('10.0.1.166') }}"
+      shell: mkdir -p /opt/backups/postgres
+      ignore_errors: true

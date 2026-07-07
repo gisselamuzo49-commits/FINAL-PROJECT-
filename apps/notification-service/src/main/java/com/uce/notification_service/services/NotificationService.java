@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,6 +25,9 @@ public class NotificationService {
 
     @Autowired
     private MqttClientManager mqttClientManager;
+
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
 
     private final ObjectMapper objectMapper;
 
@@ -44,6 +48,17 @@ public class NotificationService {
             mqttClientManager.publish(topic, payload);
         } catch (Exception e) {
             logger.error("Error al serializar notificación para publicación MQTT: {}", e.getMessage());
+        }
+
+        // Publicar a WebSocket (STOMP)
+        try {
+            messagingTemplate.convertAndSendToUser(
+                saved.getEstudianteId(),
+                "/queue/notifications",
+                saved
+            );
+        } catch (Exception e) {
+            logger.error("Error al enviar notificación por WebSocket: {}", e.getMessage());
         }
 
         return saved;

@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
 
+import org.springframework.security.access.prepost.PreAuthorize;
+
 @RestController
 @RequestMapping("/api/hours")
 public class HoursController {
@@ -19,8 +21,8 @@ public class HoursController {
     @GetMapping("/student/{estudianteId}")
     public ResponseEntity<?> getStudentSummary(@PathVariable String estudianteId) {
         return hoursService.getStudentSummary(estudianteId)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+            .map(ResponseEntity::ok)
+            .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping
@@ -43,6 +45,7 @@ public class HoursController {
     }
 
     @PatchMapping("/{id}/validar")
+    @PreAuthorize("hasAnyRole('TUTOR', 'COORDINADOR')")
     public ResponseEntity<?> validarHoursRegistration(
             @PathVariable Long id,
             @RequestBody ValidarRequest request) {

@@ -1,4 +1,9 @@
 # Configuración del API Gateway
+logging:
+  level:
+    root: INFO
+    com.uce: DEBUG
+
 server:
   port: 8082
 
@@ -30,6 +35,7 @@ spring:
                 maxAge: 3600
           default-filters:
             - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials, RETAIN_FIRST
+            - CircuitBreaker=name=default,fallbackUri=forward:/fallback
           # --- RUTAS: Enrutamiento a los microservicios internos ---
           # Las URIs usan variables de entorno para funcionar tanto en local (localhost)
           # como en Docker (nombres de servicio de docker-compose).
@@ -106,6 +112,13 @@ spring:
               uri: ${NOTIFICATION_SERVICE_URL:http://notification-service:8087}
               predicates:
                 - Path=/api/notifications/**
+              filters:
+                - name: JwtAuthenticationFilter
+
+            - id: notification-ws
+              uri: ${NOTIFICATION_SERVICE_URL:http://notification-service:8087}
+              predicates:
+                - Path=/ws/**
               filters:
                 - name: JwtAuthenticationFilter
 

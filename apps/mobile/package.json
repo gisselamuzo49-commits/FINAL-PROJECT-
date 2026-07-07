@@ -1,0 +1,30 @@
+{
+  "name": "pasantias-uce-mobile",
+  "version": "1.0.0",
+  "main": "expo-router/entry",
+  "private": true,
+  "scripts": {
+    "start": "npx expo start",
+    "android": "npx expo start --android",
+    "ios": "npx expo start --ios",
+    "web": "npx expo start --web",
+    "build": "npx expo export -p web",
+    "test": "echo \"No tests yet (mobile)\" && exit 0"
+  },
+  "dependencies": {
+    "expo": "~54.0.31",
+    "expo-router": "~6.0.22",
+    "expo-splash-screen": "~31.0.13",
+    "expo-status-bar": "~2.2.3",
+    "expo-web-browser": "~14.1.6",
+    "react": "19.0.0",
+    "react-dom": "19.0.0",
+    "react-native": "0.79.2",
+    "react-native-web": "~0.21.0",
+    "react-native-webview": "^13.13.5"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.25.2",
+    "typescript": "^5.3.3"
+  }
+}

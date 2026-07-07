@@ -18,8 +18,13 @@ import reactor.core.publisher.Mono;
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @Component
 public class JwtAuthenticationFilter extends AbstractGatewayFilterFactory<JwtAuthenticationFilter.Config> {
+
+    private static final Logger logger = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
 
     @Value("${security.jwt.secret}")
     private String jwtSecret;
@@ -32,6 +37,7 @@ public class JwtAuthenticationFilter extends AbstractGatewayFilterFactory<JwtAut
     public GatewayFilter apply(Config config) {
         return (exchange, chain) -> {
             ServerHttpRequest request = exchange.getRequest();
+            logger.info("Routing request to: {}", request.getPath().value());
 
             // 0. Permitir solicitudes CORS preflight (OPTIONS) sin validación de token
             if (org.springframework.http.HttpMethod.OPTIONS.equals(request.getMethod())) {
@@ -52,9 +58,18 @@ public class JwtAuthenticationFilter extends AbstractGatewayFilterFactory<JwtAut
                 JwtParser parser = Jwts.parser().verifyWith(key).build();
                 Claims claims = parser.parseSignedClaims(token).getPayload();
 
+                String rol = claims.get("rol", String.class);
+                if (rol == null) {
+                    rol = claims.get("role", String.class);
+                }
+                if (rol == null) {
+                    rol = "";
+                }
+
                 // 3. Mutar la petición para agregar datos del usuario autenticado para consumo interno
                 ServerHttpRequest mutatedRequest = request.mutate()
                         .header("X-Auth-User", claims.getSubject())
+                        .header("X-Auth-Roles", rol)
                         .build();
 
                 return chain.filter(exchange.mutate().request(mutatedRequest).build());

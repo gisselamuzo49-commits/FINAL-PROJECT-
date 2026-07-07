@@ -5,6 +5,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.Column;
 
 @Entity
 @Table(name = "profiles")
@@ -20,6 +21,20 @@ public class UserProfile {
     private String phone;
     private String role; // STUDENT, TUTOR, COORDINATOR
     private String carrera;
+
+    @Column(columnDefinition = "TEXT")
+    private String habilidades;
+
+    @Column(columnDefinition = "TEXT")
+    private String cursos;
+
+    @Column(columnDefinition = "TEXT")
+    private String experiencia;
+
+    @Column(columnDefinition = "TEXT")
+    private String descripcion;
+
+    private String facultad;
 
     // Getters y Setters
     public Long getId() { return id; }
@@ -42,4 +57,19 @@ public class UserProfile {
 
     public String getCarrera() { return carrera; }
     public void setCarrera(String carrera) { this.carrera = carrera; }
+
+    public String getHabilidades() { return habilidades; }
+    public void setHabilidades(String habilidades) { this.habilidades = habilidades; }
+
+    public String getCursos() { return cursos; }
+    public void setCursos(String cursos) { this.cursos = cursos; }
+
+    public String getExperiencia() { return experiencia; }
+    public void setExperiencia(String experiencia) { this.experiencia = experiencia; }
+
+    public String getDescripcion() { return descripcion; }
+    public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
+
+    public String getFacultad() { return facultad; }
+    public void setFacultad(String facultad) { this.facultad = facultad; }
 }

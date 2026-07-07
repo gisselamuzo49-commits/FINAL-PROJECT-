@@ -20,6 +20,7 @@ import org.testcontainers.containers.Neo4jContainer;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.util.List;
 import java.util.Map;
@@ -37,6 +38,12 @@ class PostulacionIntegrationTest {
     @Container
     static Neo4jContainer<?> neo4j = new Neo4jContainer<>("neo4j:5.12.0-community")
             .withAdminPassword("password123");
+
+    @MockitoBean
+    private com.uce.internship_service.kafka.PostulacionEventProducer postulacionEventProducer;
+
+    @MockitoBean
+    private com.uce.internship_service.elasticsearch.OfertaSearchService ofertaSearchService;
 
     @LocalServerPort
     private int port;
@@ -138,10 +145,14 @@ class PostulacionIntegrationTest {
 
         // 7. Modificar estado (PATCH /api/internships/applications/{postulacionId}/status)
         StatusUpdateRequest patchReq = new StatusUpdateRequest("ACEPTADA");
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("X-Auth-User", "tutor-1");
+        headers.set("X-Auth-Roles", "TUTOR");
         ResponseEntity<Map> patchRes = restTemplate.exchange(
                 baseUrl + "/applications/" + postulacionId + "/status",
                 HttpMethod.PATCH,
-                new HttpEntity<>(patchReq),
+                new HttpEntity<>(patchReq, headers),
                 Map.class
         );
         assertEquals(HttpStatus.OK, patchRes.getStatusCode());
@@ -155,7 +166,7 @@ class PostulacionIntegrationTest {
             restTemplate.exchange(
                     baseUrl + "/applications/" + postulacionId + "/status",
                     HttpMethod.PATCH,
-                    new HttpEntity<>(badPatchReq),
+                    new HttpEntity<>(badPatchReq, headers),
                     Map.class
             );
             fail("Debería lanzar HttpClientErrorException.BadRequest");
