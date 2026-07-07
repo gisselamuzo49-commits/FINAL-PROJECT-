@@ -3,6 +3,7 @@
 > **Este archivo se actualiza al final de cada sesión de trabajo.** Es el primer lugar
 > donde el agente debe mirar para saber "¿dónde quedamos?".
 
+_Última actualización: 2026-07-06 (Soporte de ignore_unreachable en bastion backups - Rama feature/infra-bastion-unreachable)_
 _Última actualización: 2026-07-06 (Instalación limpia de overrides globales de React 19.1.0 - Rama QA)_
 _Última actualización: 2026-07-06 (Downgrade de react-native-screens a 4.16.0 para evitar bug en Fabric - Rama QA)_
 _Última actualización: 2026-07-05 (Notificaciones en Tiempo Real con WebSockets y Merge de QA - Rama feature/GAME-158-websockets)_
@@ -13,6 +14,12 @@ _Última actualización: 2026-07-05 (Configurar Cypress Cloud - Rama feature/GAM
 _Última actualización: 2026-07-05 (CRUD de Perfil de Usuario - Rama feature/GAME-167-user-profile)_
 _Última actualización: 2026-07-05 (Wrapper de Escritorio con Electron - Rama feature/GAME-146-desktop-electron)_
 _Última actualización: 2026-07-05 (Aplicación Móvil con Expo - Rama feature/GAME-147-mobile-expo)_
+
+## ✅ COMPLETADO HOY — Soporte de ignore_unreachable en bastion backups (06/Jul)
+
+Se previno el fallo por timeout SSH en la conexión al bastion host (on-premise simulado) durante el despliegue automático:
+- **Playbooks Modificados:** Se agregaron las directivas `ignore_unreachable: true` a la tarea "Crear directorio de backups en bastion (on-premise simulado)" tanto en [deploy-prod.yml](file:///c:/Users/gisse/sistema-pasantias-vinculacion/infra/ansible/deploy-prod.yml) como en [deploy-qa.yml](file:///c:/Users/gisse/sistema-pasantias-vinculacion/infra/ansible/deploy-qa.yml).
+- **Control de Excepciones:** Esto evita que el playbook falle e interrumpa el pipeline de CI con exit code 4 cuando el bastion host temporal no es accesible.
 
 ## ✅ COMPLETADO HOY — Instalación Limpia de Overrides Globales de React (06/Jul)
 
@@ -67,6 +74,7 @@ Se actualizaron las dependencias de la aplicación móvil ([package.json](file:/
 - **Ajuste de React:** Se utilizaron las versiones estables de `react@18.3.1` y `react-dom@18.3.1` (debido a que la versión `18.3.2` indicada no existe en el registro de npm).
 - **Ajuste de React Native y Expo:** Se aplicó `react-native@0.76.9`, `expo-router@~4.0.17`, `expo-splash-screen@~0.29.21`, `expo-status-bar@~2.0.1`, `react-native-webview@13.12.5` y `react-native-web@~0.19.13`.
 - **Instalación Exitosa:** Se ejecutó con éxito `npm install --legacy-peer-deps` en la carpeta `apps/mobile` para mitigar conflictos de dependencias del monorepo, instalando todos los paquetes requeridos de forma exitosa.
+>>>>>>> origin/QA
 
 ## ✅ COMPLETADO HOY — Corrección de Selectores y Comando en Cypress (06/Jul)
 
