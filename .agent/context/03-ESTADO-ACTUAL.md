@@ -3,6 +3,7 @@
 > **Este archivo se actualiza al final de cada sesión de trabajo.** Es el primer lugar
 > donde el agente debe mirar para saber "¿dónde quedamos?".
 
+_Última actualización: 2026-07-07 (Fix del bean KafkaTemplate en internship-service - Rama feature/GAME-170-fix-kafkatemplate-internship)_
 _Última actualización: 2026-07-06 (Fix de Kafka y Cassandra en QA - Rama feature/GAME-169-fix-kafka-cassandra-qa)_
 _Última actualización: 2026-07-06 (Fix de logs en PROD - Rama feature/GAME-168-fix-logs-prod)_
 _Última actualización: 2026-07-06 (Soporte de ignore_unreachable en bastion backups - Rama feature/infra-bastion-unreachable)_
@@ -16,6 +17,12 @@ _Última actualización: 2026-07-05 (Configurar Cypress Cloud - Rama feature/GAM
 _Última actualización: 2026-07-05 (CRUD de Perfil de Usuario - Rama feature/GAME-167-user-profile)_
 _Última actualización: 2026-07-05 (Wrapper de Escritorio con Electron - Rama feature/GAME-146-desktop-electron)_
 _Última actualización: 2026-07-05 (Aplicación Móvil con Expo - Rama feature/GAME-147-mobile-expo)_
+
+## ✅ COMPLETADO HOY — Fix de autoconfiguración de Kafka en internship-service (07/Jul)
+
+Se corrigió el fallo de inicialización del bean `KafkaTemplate` en el arranque de `internship-service` en el entorno de QA:
+- **Actualización de Dependencia:** Se reemplazó la dependencia simple de `org.springframework.kafka:spring-kafka` por el starter oficial `org.springframework.boot:spring-boot-starter-kafka` en [pom.xml](file:///c:/Users/gisse/sistema-pasantias-vinculacion/apps/internship-service/pom.xml). Esto permite que Spring Boot 4.0.6 resuelva e inyecte automáticamente la autoconfiguración del bean `KafkaTemplate`, solucionando el error "No qualifying bean of type KafkaTemplate".
+- **Verificación Local:** Se validó la correcta compilación y empaquetado del servicio ejecutando `./mvnw clean test-compile` con un resultado exitoso de `BUILD SUCCESS`.
 
 ## ✅ COMPLETADO HOY — Fixes de arranque de servicios en QA (Kafka & Cassandra keyspace) (06/Jul)
 
