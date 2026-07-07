@@ -1,10 +1,10 @@
-package com.uce.hours_service.services;
+package com.uce.hours_service.cqrs;
 
+import com.uce.hours_service.cqrs.commands.CreateHoursCommand;
+import com.uce.hours_service.cqrs.commands.ValidateHoursCommand;
 import com.uce.hours_service.models.EstadoHoras;
 import com.uce.hours_service.models.RegistroHoras;
-import com.uce.hours_service.models.HorasResumen;
 import com.uce.hours_service.repositories.RegistroHorasRepository;
-import com.uce.hours_service.repositories.HorasResumenRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
-public class HoursService {
+public class HoursCommandService {
 
     static final String TOPIC = "horas.registradas";
 
@@ -21,50 +21,33 @@ public class HoursService {
     private RegistroHorasRepository repository;
 
     @Autowired
-    private HorasResumenRepository resumenRepository;
-
-    @Autowired
     private KafkaTemplate<String, String> kafkaTemplate;
 
-    // -------------------------------------------------------------------------
-    // Queries
-    // -------------------------------------------------------------------------
-
-    public Optional<HorasResumen> getStudentSummary(String estudianteId) {
-        return resumenRepository.findById(estudianteId);
-    }
-
-    // -------------------------------------------------------------------------
-    // Commands
-    // -------------------------------------------------------------------------
-
-    public RegistroHoras createHoursRegistration(RegistroHoras registro) {
+    public RegistroHoras createHoursRegistration(CreateHoursCommand command) {
+        RegistroHoras registro = new RegistroHoras();
+        registro.setEstudianteId(command.getEstudianteId());
+        registro.setProyectoId(command.getProyectoId());
+        registro.setFecha(command.getFecha());
+        registro.setHoras(command.getHoras());
+        registro.setDescripcionActividad(command.getDescripcionActividad());
         registro.setEstado(EstadoHoras.PENDIENTE);
+
         RegistroHoras saved = repository.save(registro);
         kafkaTemplate.send(TOPIC, saved.getEstudianteId(), toJson(saved));
         return saved;
     }
 
-    public Optional<RegistroHoras> validarHoursRegistration(Long id, String tutorId, boolean aprobado) {
-        return repository.findById(id).map(registro -> {
-            registro.setTutorId(tutorId);
+    public Optional<RegistroHoras> validarHoursRegistration(ValidateHoursCommand command) {
+        return repository.findById(command.getId()).map(registro -> {
+            registro.setTutorId(command.getTutorId());
             registro.setFechaValidacion(LocalDateTime.now());
-            registro.setEstado(aprobado ? EstadoHoras.VALIDADO : EstadoHoras.RECHAZADO);
+            registro.setEstado(command.isAprobado() ? EstadoHoras.VALIDADO : EstadoHoras.RECHAZADO);
             RegistroHoras saved = repository.save(registro);
             kafkaTemplate.send(TOPIC, saved.getEstudianteId(), toJson(saved));
             return saved;
         });
     }
 
-    // -------------------------------------------------------------------------
-    // Private helpers
-    // -------------------------------------------------------------------------
-
-    /**
-     * Builds the Kafka payload JSON manually — no Jackson needed here since the
-     * fields are simple strings/numbers and must match the schema in section 5
-     * of 10-DISENO-HOURS-SERVICE.md exactly.
-     */
     private String toJson(RegistroHoras r) {
         String fechaValidacion = r.getFechaValidacion() != null
                 ? "\"" + r.getFechaValidacion() + "\""
@@ -86,7 +69,6 @@ public class HoursService {
                 + "}";
     }
 
-    /** Minimal JSON-string escaping for the descripcionActividad free-text field. */
     private String escapeJson(String s) {
         if (s == null) return "";
         return s.replace("\\", "\\\\").replace("\"", "\\\"");

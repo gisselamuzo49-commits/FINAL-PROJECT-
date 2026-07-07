@@ -3,6 +3,7 @@
 > **Este archivo se actualiza al final de cada sesión de trabajo.** Es el primer lugar
 > donde el agente debe mirar para saber "¿dónde quedamos?".
 
+_Última actualización: 2026-07-07 (Refactor CQRS formal en hours-service - Rama feature/GAME-172-cqrs-hours)_
 _Última actualización: 2026-07-07 (Implementación de ASG y Launch Template en PROD - Rama feature/GAME-171-terraform-asg)_
 _Última actualización: 2026-07-07 (Fix del bean KafkaTemplate en internship-service - Rama feature/GAME-170-fix-kafkatemplate-internship)_
 _Última actualización: 2026-07-06 (Fix de Kafka y Cassandra en QA - Rama feature/GAME-169-fix-kafka-cassandra-qa)_
@@ -18,6 +19,16 @@ _Última actualización: 2026-07-05 (Configurar Cypress Cloud - Rama feature/GAM
 _Última actualización: 2026-07-05 (CRUD de Perfil de Usuario - Rama feature/GAME-167-user-profile)_
 _Última actualización: 2026-07-05 (Wrapper de Escritorio con Electron - Rama feature/GAME-146-desktop-electron)_
 _Última actualización: 2026-07-05 (Aplicación Móvil con Expo - Rama feature/GAME-147-mobile-expo)_
+
+## ✅ COMPLETADO HOY — Refactor formal de CQRS en hours-service (07/Jul)
+
+Se formalizó el patrón de diseño CQRS (Command Query Responsibility Segregation) en el microservicio `hours-service` sin alterar su comportamiento ni lógica de negocio:
+- **Clases de Comando:** Se crearon las clases inmutables `CreateHoursCommand` y `ValidateHoursCommand` en `com.uce.hours_service.cqrs.commands`.
+- **Servicio de Comandos (`HoursCommandService`):** Maneja la lógica de escritura (comandos) interactuando con PostgreSQL (`RegistroHorasRepository`) y publicando eventos a Kafka (`horas.registradas`). Se migró la serialización manual JSON a esta clase.
+- **Servicio de Consultas (`HoursQueryService`):** Administra la lectura (consultas) consultando MongoDB a través de `HorasResumenRepository`.
+- **Eliminación del Servicio Monolítico:** Se removió el antiguo `HoursService.java` para evitar duplicación.
+- **Actualización de Controladores y Tests:** Se adaptaron `HoursController.java` y su correspondiente `HoursControllerTest.java` inyectando y mockeando por separado ambos servicios CQRS con Mockito `@Mock` y `@InjectMocks` sin romper el ciclo de pruebas unitarias.
+- **Verificación Local:** Se corrió `./mvnw clean test-compile` confirmando la correcta compilación de todo el módulo y de todas sus suites de pruebas.
 
 ## ✅ COMPLETADO HOY — Implementación de ASG y Launch Template en PROD (07/Jul)
 
