@@ -657,6 +657,7 @@
       delegate_to: "{{ bastion_host | default('10.0.1.166') }}"
       shell: mkdir -p /opt/backups/postgres
       ignore_errors: true
+      ignore_unreachable: true
 
 # ─────────────────────────────────────────
 # POSTGRESQL REPLICA — us-east-1b
