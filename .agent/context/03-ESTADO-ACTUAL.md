@@ -3,7 +3,7 @@
 > **Este archivo se actualiza al final de cada sesión de trabajo.** Es el primer lugar
 > donde el agente debe mirar para saber "¿dónde quedamos?".
 
-_Última actualización: 2026-07-06 (Ajuste de threshold y checks de k6 - Rama QA)_
+_Última actualización: 2026-07-06 (Ajustar selectores de login y comando cy.login en Cypress - Rama QA)_
 _Última actualización: 2026-07-05 (Notificaciones en Tiempo Real con WebSockets y Merge de QA - Rama feature/GAME-158-websockets)_
 _Última actualización: 2026-07-05 (Reducir listeners ALB PROD - Rama feature/GAME-162-alb-reducir-listeners)_
 _Última actualización: 2026-07-05 (Agregar réplica PostgreSQL PROD - Rama feature/GAME-163-postgres-replica)_
@@ -12,6 +12,13 @@ _Última actualización: 2026-07-05 (Configurar Cypress Cloud - Rama feature/GAM
 _Última actualización: 2026-07-05 (CRUD de Perfil de Usuario - Rama feature/GAME-167-user-profile)_
 _Última actualización: 2026-07-05 (Wrapper de Escritorio con Electron - Rama feature/GAME-146-desktop-electron)_
 _Última actualización: 2026-07-05 (Aplicación Móvil con Expo - Rama feature/GAME-147-mobile-expo)_
+
+## ✅ COMPLETADO HOY — Corrección de Selectores y Comando en Cypress (06/Jul)
+
+Se corrigieron los fallos en la ejecución de pruebas E2E con Cypress:
+- **Importación de Comandos:** Se añadió `import './commands'` en `cypress/support/e2e.js` para asegurar que el comando personalizado `cy.login()` esté disponible en toda la suite de pruebas, resolviendo el error `cy.login is not a function`.
+- **Simplificación y Corrección de Selectores:** Se simplificaron los selectores de los campos en `cypress/support/commands.js` y `cypress/e2e/01_login.cy.js` para usar selectores CSS directos y estables de `Login.jsx` (`input[type="email"]`, `input[type="password"]` y `button[type="submit"]`).
+- **Navegación Estable:** Se modificó la visita inicial del test a `/login` en lugar de `/` para evitar la doble redirección (`/` -> `/home` -> `/login`) al iniciar la prueba sin token JWT.
 
 ## ✅ COMPLETADO HOY — Ajuste de Threshold y Checks de K6 (06/Jul)
 
