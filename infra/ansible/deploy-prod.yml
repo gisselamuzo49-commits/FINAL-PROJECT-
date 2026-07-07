@@ -135,6 +135,9 @@
               ON CONFLICT (email) DO NOTHING;
           EOSQL
 
+    - name: Crear directorio de logs
+      shell: mkdir -p /var/log/pasantias && chmod 777 /var/log/pasantias
+
     # ── Pull de imágenes ─────────────────
     - name: Pull postgres image
       shell: docker pull {{ postgres_image }}
@@ -253,6 +256,7 @@
           --network pasantias-net \
           --restart always \
           -p 8080:8080 \
+          -v /var/log/pasantias:/var/log/pasantias \
           -e DB_HOST=postgres-db \
           -e DB_PORT=5432 \
           -e DB_NAME=auth_db \
@@ -268,6 +272,7 @@
           --network pasantias-net \
           --restart always \
           -p 8081:8081 \
+          -v /var/log/pasantias:/var/log/pasantias \
           -e DB_HOST=postgres-db \
           -e DB_PORT=5432 \
           -e DB_NAME=internship_db \
@@ -285,6 +290,7 @@
           --network pasantias-net \
           --restart always \
           -p 8083:8083 \
+          -v /var/log/pasantias:/var/log/pasantias \
           -e DB_HOST=postgres-db \
           -e DB_PORT=5432 \
           -e DB_NAME=user_db \
@@ -299,6 +305,7 @@
           --network pasantias-net \
           --restart always \
           -p 8084:8084 \
+          -v /var/log/pasantias:/var/log/pasantias \
           -e DB_HOST=postgres-db \
           -e DB_PORT=5432 \
           -e DB_NAME=linkage_db \
@@ -487,6 +494,7 @@
         --network pasantias-net
         --restart always
         -p 8085:8085
+        -v /var/log/pasantias:/var/log/pasantias
         -e DB_HOST=postgres-db
         -e DB_PORT=5432
         -e DB_NAME=hours_db
@@ -505,6 +513,7 @@
         --network pasantias-net
         --restart always
         -p 8086:8086
+        -v /var/log/pasantias:/var/log/pasantias
         -e DB_HOST=postgres-db
         -e DB_PORT=5432
         -e DB_NAME=evaluation_db
@@ -521,6 +530,7 @@
         --network pasantias-net
         --restart always
         -p 8087:8087
+        -v /var/log/pasantias:/var/log/pasantias
         -e DB_HOST=postgres-db
         -e DB_PORT=5432
         -e DB_NAME=notification_db
@@ -539,6 +549,7 @@
         --network pasantias-net
         --restart always
         -p 8088:8088
+        -v /var/log/pasantias:/var/log/pasantias
         -e DB_HOST=postgres-db
         -e DB_PORT=5432
         -e DB_NAME=document_db
@@ -559,6 +570,7 @@
         --network pasantias-net
         --restart always
         -p 8089:8089
+        -v /var/log/pasantias:/var/log/pasantias
         -e DB_HOST=postgres-db
         -e DB_PORT=5432
         -e DB_NAME=report_db
@@ -580,6 +592,7 @@
         --health-retries=3
         --health-start-period=40s
         -p 8090:8090
+        -v /var/log/pasantias:/var/log/pasantias
         -e RABBITMQ_HOST=rabbitmq
         -e RABBITMQ_PORT=5672
         -e RABBITMQ_USER=guest
@@ -593,6 +606,7 @@
           --network pasantias-net \
           --restart always \
           -p 8082:8082 \
+          -v /var/log/pasantias:/var/log/pasantias \
           -e AUTH_SERVICE_URL=http://auth-service:8080 \
           -e INTERNSHIP_SERVICE_URL=http://internship-service:8081 \
           -e USER_SERVICE_URL=http://user-service:8083 \
