@@ -3,6 +3,7 @@
     "name": "Pasantías UCE",
     "slug": "pasantias-uce",
     "version": "1.0.0",
+    "scheme": "pasantias-uce",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -19,12 +20,15 @@
       "package": "com.uce.pasantias"
     },
     "ios": {
-      "bundleIdentifier": "com.uce.pasantias"
+      "bundleIdentifier": "com.uce.pasantias",
+      "supportsTablet": true
     },
     "web": {
       "bundler": "metro"
     },
     "plugins": ["expo-router"],
-    "scheme": "pasantias-uce"
+    "experiments": {
+      "typedRoutes": true
+    }
   }
 }

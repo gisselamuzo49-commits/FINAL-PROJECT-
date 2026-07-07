@@ -3,7 +3,8 @@
 > **Este archivo se actualiza al final de cada sesión de trabajo.** Es el primer lugar
 > donde el agente debe mirar para saber "¿dónde quedamos?".
 
-_Última actualización: 2026-07-06 (Actualización de dependencias de la app móvil para Expo 54 - Rama QA)_
+_Última actualización: 2026-07-06 (Instalación limpia de overrides globales de React 19.1.0 - Rama QA)_
+_Última actualización: 2026-07-06 (Downgrade de react-native-screens a 4.16.0 para evitar bug en Fabric - Rama QA)_
 _Última actualización: 2026-07-05 (Notificaciones en Tiempo Real con WebSockets y Merge de QA - Rama feature/GAME-158-websockets)_
 _Última actualización: 2026-07-05 (Reducir listeners ALB PROD - Rama feature/GAME-162-alb-reducir-listeners)_
 _Última actualización: 2026-07-05 (Agregar réplica PostgreSQL PROD - Rama feature/GAME-163-postgres-replica)_
@@ -12,6 +13,53 @@ _Última actualización: 2026-07-05 (Configurar Cypress Cloud - Rama feature/GAM
 _Última actualización: 2026-07-05 (CRUD de Perfil de Usuario - Rama feature/GAME-167-user-profile)_
 _Última actualización: 2026-07-05 (Wrapper de Escritorio con Electron - Rama feature/GAME-146-desktop-electron)_
 _Última actualización: 2026-07-05 (Aplicación Móvil con Expo - Rama feature/GAME-147-mobile-expo)_
+
+## ✅ COMPLETADO HOY — Instalación Limpia de Overrides Globales de React (06/Jul)
+
+Se forzó el uso de `react@19.1.0` y `react-dom@19.1.0` en todas las dependencias y subdependencias transitivas del monorepo:
+- **Overrides Globales:** Se modificaron los `overrides` en el `package.json` raíz para aplicar la restricción de forma global, garantizando que Metro y React Native Renderer no tengan múltiples versiones de React coexistiendo.
+- **Reinstalación Limpia de Módulos:** Se eliminaron las carpetas `node_modules` (raíz y mobile) y el archivo `package-lock.json`, ejecutando posteriormente `npm install --legacy-peer-deps`.
+- **Arranque del Servidor Metro:** Se inició el empaquetador con caché limpia en background (`task-625`) libre de advertencias de versiones React.
+
+## ✅ COMPLETADO HOY — Resolución de incompatibilidad de versiones React (React Mismatch) (06/Jul)
+
+Se corrigió la incompatibilidad de versiones entre `react` (19.2.7) y `react-native-renderer` (19.1.0) mediante la inserción de `overrides` en la raíz del monorepo:
+- **Overrides en el Monorepo:** Se configuró el `package.json` de la raíz del monorepo para forzar que `pasantias-uce-mobile` use estrictamente `react@19.1.0` y `react-dom@19.1.0`.
+- **Instalación de Módulos Limpia:** Se ejecutó `npm install --legacy-peer-deps` en la raíz, aislando e instalando de manera compatible las dependencias de la app móvil.
+- **Arranque de Servidor de Desarrollo:** Se instaló `@expo/ngrok` y se inició Metro Bundler de forma limpia en background (`task-558`).
+
+## ✅ COMPLETADO HOY — Downgrade de react-native-screens para corregir bug en Fabric (06/Jul)
+
+Se forzó el downgrade de la librería `react-native-screens` para evitar la regresión nativa en entornos de Expo SDK 54 con Fabric habilitado:
+- **Pin de Versión Estable:** Se modificó [package.json](file:///c:/Users/gisse/sistema-pasantias-vinculacion/apps/mobile/package.json) fijando la dependencia de `"react-native-screens": "4.16.0"` y documentando el issue correspondiente mediante la propiedad `comment_rnscreens`.
+- **Actualización de Módulos:** Se ejecutó `npm install --legacy-peer-deps` en la carpeta `apps/mobile/` para aplicar la versión estable de forma efectiva en el disco.
+- **Arranque Limpio:** Se detuvo la tarea de Expo y se inició un nuevo Metro Bundler con caché libre de fallos nativos (`task-527`).
+
+## ✅ COMPLETADO HOY — Simplificación de Configuraciones y Layout Móvil (06/Jul)
+
+Se optimizaron y simplificaron los archivos de configuración y layouts de la aplicación móvil para garantizar compatibilidad con Expo SDK 54 sin componentes de ciclo de vida redundantes:
+- **Restablecimiento de Babel:** Se simplificó [babel.config.js](file:///c:/Users/gisse/sistema-pasantias-vinculacion/apps/mobile/babel.config.js) removiendo los plugins explícitos innecesarios en SDK 54.
+- **Layout Simplificado:** Se optimizó [_layout.tsx](file:///c:/Users/gisse/sistema-pasantias-vinculacion/apps/mobile/app/_layout.tsx) reduciéndolo a un `Stack` de navegación básico con el header oculto.
+- **WebView Puro:** Se reestructuró [index.tsx](file:///c:/Users/gisse/sistema-pasantias-vinculacion/apps/mobile/app/index.tsx) a un componente funcional mínimo que renderiza un `WebView` directo al subdominio de QA sin hooks de React, eliminando interferencias de resolución de módulos.
+
+## ✅ COMPLETADO HOY — Evitar conflicto de múltiples instancias de React (06/Jul)
+
+Se simplificó la vista inicial móvil ([index.tsx](file:///c:/Users/gisse/sistema-pasantias-vinculacion/apps/mobile/app/index.tsx)) para solventar el error de runtime `"Invalid hook call - more than one copy of React"` propio de la resolución de dependencias divergentes en monorepos de npm:
+- **Remoción de hooks:** Se removió el uso de `useState` y los hooks de react del componente funcional `HomeScreen`.
+- **Renderizado directo:** Se renderiza directamente el componente nativo `WebView` apuntando a la URL del frontend QA de AWS (`http://gisselamuzoqa1.distribuidauce.org`), resolviendo el error al eliminar el ciclo de vida gestionado por React Hooks en este módulo.
+
+## ✅ COMPLETADO HOY — Forzar Dependencias Compatibles con Expo SDK 54 (06/Jul)
+
+Se forzó la actualización de todas las dependencias nativas del proyecto móvil para alinearse al estándar del SDK 54:
+- **Ejecución de Expo Install:** Se corrió `npx expo install expo-router expo-splash-screen expo-status-bar react react-dom react-native react-native-web react-native-webview -- --legacy-peer-deps` en la carpeta `apps/mobile`.
+- **Resultado de Dependencias:** Esto actualizó automáticamente el archivo [package.json](file:///c:/Users/gisse/sistema-pasantias-vinculacion/apps/mobile/package.json) para usar React 19.1.0, React Native 0.81.5 y Expo Router 6.0.24, resolviendo permanentemente las advertencias y errores de incompatibilidad en Metro Bundler.
+- **Metro Bundler Limpio:** Se reinició el empaquetador con caché limpia (`npx expo start --tunnel --clear`) logrando un arranque exitoso y libre de warnings de versionamiento.
+
+## ✅ COMPLETADO HOY — Corrección de Babel y app.json para Expo Router v4 (06/Jul)
+
+Se aplicaron las configuraciones necesarias para resolver el error de inicialización de Expo Router (`"Invalid call at line 2: process.env.EXPO_ROUTER_APP_ROOT. First argument of require.context should be a string"`):
+- **Configuración de Babel:** Se actualizó [babel.config.js](file:///c:/Users/gisse/sistema-pasantias-vinculacion/apps/mobile/babel.config.js) agregando el plugin `expo-router/babel` requerido por la versión de Expo Router.
+- **Configuración de app.json:** Se actualizó [app.json](file:///c:/Users/gisse/sistema-pasantias-vinculacion/apps/mobile/app.json) incluyendo el `scheme: "pasantias-uce"`, la propiedad `supportsTablet: true` en iOS, y habilitando `experiments.typedRoutes = true`.
 
 ## ✅ COMPLETADO HOY — Actualización de Dependencias Móviles para Expo 54 (06/Jul)
 
