@@ -493,6 +493,81 @@ resource "aws_s3_bucket_acl" "documents_prod" {
 }
 
 # ─────────────────────────────────────────
+# LAUNCH TEMPLATE
+# ─────────────────────────────────────────
+resource "aws_launch_template" "prod_lt" {
+  name_prefix            = "pasantias-prod-lt-"
+  image_id               = data.aws_ami.ubuntu.id
+  instance_type          = "t3.large"
+  key_name               = data.aws_key_pair.prod_key.key_name
+  vpc_security_group_ids = [aws_security_group.sg_private.id]
+
+  block_device_mappings {
+    device_name = "/dev/sda1"
+    ebs {
+      volume_size           = 30
+      volume_type           = "gp3"
+      delete_on_termination = true
+    }
+  }
+
+  user_data = base64encode(<<-EOF
+    #!/bin/bash
+    apt-get update -y
+    apt-get install -y ca-certificates curl gnupg apt-transport-https
+    install -m 0755 -d /etc/apt/keyrings
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+    chmod a+r /etc/apt/keyrings/docker.gpg
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu noble stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
+    apt-get update -y
+    apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
+    systemctl enable docker
+    systemctl start docker
+    usermod -aG docker ubuntu
+  EOF
+  )
+
+  tag_specifications {
+    resource_type = "instance"
+    tags = {
+      Name = "pasantias-prod-asg-instance"
+    }
+  }
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+# ─────────────────────────────────────────
+# AUTO SCALING GROUP
+# ─────────────────────────────────────────
+resource "aws_autoscaling_group" "prod_asg" {
+  name                      = "pasantias-prod-asg"
+  desired_capacity          = 1
+  min_size                  = 1
+  max_size                  = 3
+  vpc_zone_identifier       = [aws_subnet.private_1a.id, aws_subnet.private_1b.id]
+  health_check_type         = "EC2"
+  health_check_grace_period = 300
+
+  launch_template {
+    id      = aws_launch_template.prod_lt.id
+    version = "$Latest"
+  }
+
+  tag {
+    key                 = "Name"
+    value               = "pasantias-prod-asg-instance"
+    propagate_at_launch = true
+  }
+
+  lifecycle {
+    ignore_changes = [desired_capacity]
+  }
+}
+
+# ─────────────────────────────────────────
 # AUTO SCALING POLICIES — CPU based
 # ─────────────────────────────────────────
 resource "aws_autoscaling_policy" "scale_up" {
