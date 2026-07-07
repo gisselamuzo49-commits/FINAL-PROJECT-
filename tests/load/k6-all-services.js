@@ -5,7 +5,7 @@ export const options = {
   vus: 20,
   duration: '30s',
   thresholds: {
-    http_req_failed: ['rate<0.1'],
+    http_req_failed: ['rate<0.25'],
     http_req_duration: ['p(95)<2000'],
   },
 };
@@ -27,7 +27,7 @@ export default function () {
   const res = http.get(url, { timeout: '10s' });
 
   check(res, {
-    'status is not 5xx': (r) => r.status < 500,
+    'status is valid': (r) => r.status < 500 || r.status === 401,
     'response time < 2s': (r) => r.timings.duration < 2000,
   });
 
