@@ -3,6 +3,8 @@
 > **Este archivo se actualiza al final de cada sesión de trabajo.** Es el primer lugar
 > donde el agente debe mirar para saber "¿dónde quedamos?".
 
+_Última actualización: 2026-07-06 (Fix de Kafka y Cassandra en QA - Rama feature/GAME-169-fix-kafka-cassandra-qa)_
+_Última actualización: 2026-07-06 (Fix de logs en PROD - Rama feature/GAME-168-fix-logs-prod)_
 _Última actualización: 2026-07-06 (Soporte de ignore_unreachable en bastion backups - Rama feature/infra-bastion-unreachable)_
 _Última actualización: 2026-07-06 (Instalación limpia de overrides globales de React 19.1.0 - Rama QA)_
 _Última actualización: 2026-07-06 (Downgrade de react-native-screens a 4.16.0 para evitar bug en Fabric - Rama QA)_
@@ -14,6 +16,19 @@ _Última actualización: 2026-07-05 (Configurar Cypress Cloud - Rama feature/GAM
 _Última actualización: 2026-07-05 (CRUD de Perfil de Usuario - Rama feature/GAME-167-user-profile)_
 _Última actualización: 2026-07-05 (Wrapper de Escritorio con Electron - Rama feature/GAME-146-desktop-electron)_
 _Última actualización: 2026-07-05 (Aplicación Móvil con Expo - Rama feature/GAME-147-mobile-expo)_
+
+## ✅ COMPLETADO HOY — Fixes de arranque de servicios en QA (Kafka & Cassandra keyspace) (06/Jul)
+
+Se resolvieron dos fallos críticos detectados durante el arranque de la infraestructura en el entorno de QA:
+- **KAFKA_BOOTSTRAP_SERVERS en internship-service:** Se añadió la variable de entorno `KAFKA_BOOTSTRAP_SERVERS=kafka:9092` al contenedor `internship-service` en [deploy-qa.yml](file:///c:/Users/gisse/sistema-pasantias-vinculacion/infra/ansible/deploy-qa.yml) para corregir el fallo de inicialización por falta del bean de `KafkaTemplate`.
+- **Autocreación del keyspace pasantias_events en Cassandra:** Se insertó un paso automatizado en [deploy-qa.yml](file:///c:/Users/gisse/sistema-pasantias-vinculacion/infra/ansible/deploy-qa.yml) inmediatamente después de asegurar el arranque de Cassandra. Este paso espera a que Cassandra acepte conexiones CQL (bucle de hasta 30 reintentos cada 5s) y luego ejecuta la sentencia CQL `CREATE KEYSPACE IF NOT EXISTS pasantias_events WITH replication = {'class': 'SimpleStrategy', 'replication_factor': 1};` usando `docker exec cqlsh` de forma segura antes de levantar `notification-service`.
+
+## ✅ COMPLETADO HOY — Paridad de volumen de logs en producción (06/Jul)
+
+Se implementó el fix de logs en el entorno de producción para sincronizarlo con las mejoras aplicadas previamente en QA:
+- **Directorio de logs:** Se añadió la tarea "Crear directorio de logs" (`mkdir -p /var/log/pasantias && chmod 777 /var/log/pasantias`) antes del pull de imágenes en [deploy-prod.yml](file:///c:/Users/gisse/sistema-pasantias-vinculacion/infra/ansible/deploy-prod.yml).
+- **Volumen de Docker:** Se integró el volumen `-v /var/log/pasantias:/var/log/pasantias` en los bloques `docker run` de los 11 microservicios (auth, internship, user, linkage, hours, evaluation, notification, document, report, ai-service y gateway).
+- **Paridad de despliegue:** Esto asegura que los logs estructurados logback-spring.xml de producción se consoliden correctamente en el host del EC2 de producción.
 
 ## ✅ COMPLETADO HOY — Soporte de ignore_unreachable en bastion backups (06/Jul)
 

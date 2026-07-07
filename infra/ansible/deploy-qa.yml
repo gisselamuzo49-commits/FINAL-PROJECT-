@@ -344,6 +344,7 @@
           -e NEO4J_URI=bolt://neo4j:7687 \
           -e NEO4J_USER=neo4j \
           -e NEO4J_PASSWORD={{ neo4j_password }} \
+          -e KAFKA_BOOTSTRAP_SERVERS=kafka:9092 \
           -e JAVA_TOOL_OPTIONS="-Xmx256m -Xms128m" \
           {{ docker_image_internship }}
 
@@ -514,6 +515,18 @@
            -e HEAP_NEWSIZE=128M \
            -v cassandra_data:/var/lib/cassandra \
            cassandra:4.1)
+
+    - name: Esperar a que Cassandra acepte conexiones CQL
+      shell: |
+        for i in $(seq 1 30); do
+          docker exec cassandra cqlsh -e "DESCRIBE KEYSPACES" && exit 0
+          sleep 5
+        done
+        exit 1
+
+    - name: Crear keyspace pasantias_events en Cassandra
+      shell: |
+        docker exec cassandra cqlsh -e "CREATE KEYSPACE IF NOT EXISTS pasantias_events WITH replication = {'class': 'SimpleStrategy', 'replication_factor': 1};"
 
     - name: Asegurar que elasticsearch está corriendo
       shell: |
