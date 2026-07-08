@@ -3,7 +3,7 @@ import { useOutletContext } from 'react-router-dom';
 
 function Notifications() {
   const { getHeaders, logout } = useOutletContext();
-  const API = import.meta.env.VITE_API_BASE_URL || `http://${window.location.hostname}`;
+  const API = import.meta.env.VITE_API_BASE_URL || '';
 
   const token = localStorage.getItem('token');
   let payload = {};
@@ -61,11 +61,8 @@ function Notifications() {
     const token = localStorage.getItem('token');
     if (!token) return;
 
-    let wsHost = window.location.hostname;
-    if (API.includes('://')) {
-      wsHost = API.split('://')[1];
-    }
     const wsProto = window.location.protocol === 'https:' ? 'wss' : 'ws';
+    const wsHost = window.location.host;
     const ws = new WebSocket(`${wsProto}://${wsHost}/ws/websocket`);
 
     ws.onopen = () => {

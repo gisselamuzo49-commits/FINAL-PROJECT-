@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-function LinkageTab({ API_URL, GATEWAY_PORT, getHeaders, logout }) {
+function LinkageTab({ getHeaders, logout }) {
   const [projects, setProjects] = useState([]);
   const [mensajeProjects, setMensajeProjects] = useState(null);
 
@@ -11,7 +11,7 @@ function LinkageTab({ API_URL, GATEWAY_PORT, getHeaders, logout }) {
   const [projectStatus, setProjectStatus] = useState("PLANNED");
 
   const cargarProyectos = () => {
-    fetch(`${API_URL}:${GATEWAY_PORT}/api/linkage`, { headers: getHeaders() })
+    fetch(`/api/linkage`, { headers: getHeaders() })
       .then(response => {
         if (response.status === 401) { logout(); throw new Error("Sesión expirada"); }
         if (!response.ok) throw new Error("Error al conectar con Linkage-Service");
@@ -24,7 +24,7 @@ function LinkageTab({ API_URL, GATEWAY_PORT, getHeaders, logout }) {
   const registrarProyecto = (e) => {
     e.preventDefault();
     setMensajeProjects(null);
-    fetch(`${API_URL}:${GATEWAY_PORT}/api/linkage`, {
+    fetch(`/api/linkage`, {
       method: "POST",
       headers: getHeaders(),
       body: JSON.stringify({ name: projectName, description: projectDesc, institution, status: projectStatus })
