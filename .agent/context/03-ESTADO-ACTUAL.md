@@ -3,6 +3,7 @@
 > **Este archivo se actualiza al final de cada sesión de trabajo.** Es el primer lugar
 > donde el agente debe mirar para saber "¿dónde quedamos?".
 
+_Última actualización: 2026-07-08 (Solución de Mixed Content en frontend-web - Rama feature/GAME-175-fix-mixed-content)_
 _Última actualización: 2026-07-08 (Implementación de Transactional Outbox en hours-service - Rama feature/GAME-174-outbox-hours)_
 _Última actualización: 2026-07-07 (Corrección de tráfico cleartext y offline en WebView móvil - Rama feature/GAME-173-fix-mobile-webview)_
 _Última actualización: 2026-07-07 (Refactor CQRS formal en hours-service - Rama feature/GAME-172-cqrs-hours)_
@@ -21,6 +22,14 @@ _Última actualización: 2026-07-05 (Configurar Cypress Cloud - Rama feature/GAM
 _Última actualización: 2026-07-05 (CRUD de Perfil de Usuario - Rama feature/GAME-167-user-profile)_
 _Última actualización: 2026-07-05 (Wrapper de Escritorio con Electron - Rama feature/GAME-146-desktop-electron)_
 _Última actualización: 2026-07-05 (Aplicación Móvil con Expo - Rama feature/GAME-147-mobile-expo)_
+
+## ✅ COMPLETADO HOY — Corrección de Mixed Content en frontend-web (08/Jul)
+
+Se resolvió el error de Mixed Content cuando se accede vía HTTPS a la aplicación web:
+- **Llamadas Relativas (/api):** Se modificó la constante `API` para que sea una cadena vacía, haciendo que todas las llamadas HTTP utilicen rutas relativas (`/api/...`). Nginx enruta `/api/...` al gateway de forma interna.
+- **WebSocket Seguro y Dinámico:** Se simplificó la conexión de WebSocket en `Notifications.jsx` resolviendo el protocolo (`wss`/`ws`) y host (`window.location.host`, que incluye el puerto si es desarrollo) dinámicamente según la página.
+- **Configuración de WebSocket en Nginx:** Se agregó la directiva `location /ws/` en `apps/frontend-web/nginx.conf` con las directivas de upgrade (`proxy_http_version 1.1`, `Connection "upgrade"`, `Upgrade $http_upgrade`) para enrutar el tráfico de WebSocket de manera interna.
+- **Compilación Exitosa:** Se verificó que el build de producción (`npm run build`) se ejecuta exitosamente.
 
 ## ✅ COMPLETADO HOY — Patrón Transactional Outbox en hours-service (08/Jul)
 
