@@ -17,7 +17,8 @@
         "foregroundImage": "./assets/icon.png",
         "backgroundColor": "#0a1628"
       },
-      "package": "com.uce.pasantias"
+      "package": "com.uce.pasantias",
+      "usesCleartextTraffic": true
     },
     "ios": {
       "bundleIdentifier": "com.uce.pasantias",

@@ -3,11 +3,13 @@ package com.uce.hours_service.cqrs;
 import com.uce.hours_service.cqrs.commands.CreateHoursCommand;
 import com.uce.hours_service.cqrs.commands.ValidateHoursCommand;
 import com.uce.hours_service.models.EstadoHoras;
+import com.uce.hours_service.models.OutboxEvent;
 import com.uce.hours_service.models.RegistroHoras;
+import com.uce.hours_service.repositories.OutboxEventRepository;
 import com.uce.hours_service.repositories.RegistroHorasRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -15,14 +17,13 @@ import java.util.Optional;
 @Service
 public class HoursCommandService {
 
-    static final String TOPIC = "horas.registradas";
-
     @Autowired
     private RegistroHorasRepository repository;
 
     @Autowired
-    private KafkaTemplate<String, String> kafkaTemplate;
+    private OutboxEventRepository outboxRepository;
 
+    @Transactional
     public RegistroHoras createHoursRegistration(CreateHoursCommand command) {
         RegistroHoras registro = new RegistroHoras();
         registro.setEstudianteId(command.getEstudianteId());
@@ -33,17 +34,32 @@ public class HoursCommandService {
         registro.setEstado(EstadoHoras.PENDIENTE);
 
         RegistroHoras saved = repository.save(registro);
-        kafkaTemplate.send(TOPIC, saved.getEstudianteId(), toJson(saved));
+        
+        OutboxEvent event = new OutboxEvent(
+            saved.getEstudianteId(),
+            "HORAS_REGISTRADAS",
+            toJson(saved)
+        );
+        outboxRepository.save(event);
+
         return saved;
     }
 
+    @Transactional
     public Optional<RegistroHoras> validarHoursRegistration(ValidateHoursCommand command) {
         return repository.findById(command.getId()).map(registro -> {
             registro.setTutorId(command.getTutorId());
             registro.setFechaValidacion(LocalDateTime.now());
             registro.setEstado(command.isAprobado() ? EstadoHoras.VALIDADO : EstadoHoras.RECHAZADO);
             RegistroHoras saved = repository.save(registro);
-            kafkaTemplate.send(TOPIC, saved.getEstudianteId(), toJson(saved));
+            
+            OutboxEvent event = new OutboxEvent(
+                saved.getEstudianteId(),
+                "HORAS_REGISTRADAS",
+                toJson(saved)
+            );
+            outboxRepository.save(event);
+
             return saved;
         });
     }
@@ -74,3 +90,4 @@ public class HoursCommandService {
         return s.replace("\\", "\\\\").replace("\"", "\\\"");
     }
 }
+

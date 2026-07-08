@@ -1,6 +1,10 @@
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 
-export default function OfflineScreen() {
+interface OfflineScreenProps {
+  onRetry?: () => void;
+}
+
+export default function OfflineScreen({ onRetry }: OfflineScreenProps) {
   return (
     <View style={styles.container}>
       <Text style={styles.icon}>📡</Text>
@@ -8,7 +12,7 @@ export default function OfflineScreen() {
       <Text style={styles.text}>
         No se puede conectar al servidor de Pasantías UCE.
       </Text>
-      <TouchableOpacity style={styles.button}>
+      <TouchableOpacity style={styles.button} onPress={onRetry}>
         <Text style={styles.buttonText}>🔄 Reintentar</Text>
       </TouchableOpacity>
       <Text style={styles.footer}>

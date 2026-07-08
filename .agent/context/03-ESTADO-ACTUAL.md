@@ -3,6 +3,8 @@
 > **Este archivo se actualiza al final de cada sesión de trabajo.** Es el primer lugar
 > donde el agente debe mirar para saber "¿dónde quedamos?".
 
+_Última actualización: 2026-07-08 (Implementación de Transactional Outbox en hours-service - Rama feature/GAME-174-outbox-hours)_
+_Última actualización: 2026-07-07 (Corrección de tráfico cleartext y offline en WebView móvil - Rama feature/GAME-173-fix-mobile-webview)_
 _Última actualización: 2026-07-07 (Refactor CQRS formal en hours-service - Rama feature/GAME-172-cqrs-hours)_
 _Última actualización: 2026-07-07 (Implementación de ASG y Launch Template en PROD - Rama feature/GAME-171-terraform-asg)_
 _Última actualización: 2026-07-07 (Fix del bean KafkaTemplate en internship-service - Rama feature/GAME-170-fix-kafkatemplate-internship)_
@@ -19,6 +21,24 @@ _Última actualización: 2026-07-05 (Configurar Cypress Cloud - Rama feature/GAM
 _Última actualización: 2026-07-05 (CRUD de Perfil de Usuario - Rama feature/GAME-167-user-profile)_
 _Última actualización: 2026-07-05 (Wrapper de Escritorio con Electron - Rama feature/GAME-146-desktop-electron)_
 _Última actualización: 2026-07-05 (Aplicación Móvil con Expo - Rama feature/GAME-147-mobile-expo)_
+
+## ✅ COMPLETADO HOY — Patrón Transactional Outbox en hours-service (08/Jul)
+
+Se implementó el patrón Transactional Outbox en el microservicio `hours-service` para garantizar consistencia atómica entre la persistencia de horas en PostgreSQL y el envío de eventos a Kafka:
+- **Entidad OutboxEvent:** Creada la entidad y repositorio correspondientes para almacenar eventos en la tabla `outbox_event`.
+- **Transaccionalidad en HoursCommandService:** Anotados con `@Transactional` los métodos de comandos. Se eliminó la inyección directa de `KafkaTemplate` y ahora se guarda un evento `"PENDING"` de tipo `"HORAS_REGISTRADAS"` de forma transaccional con la entidad `RegistroHoras`.
+- **OutboxRelay Scheduler:** Se programó un scheduler con `@Scheduled(fixedDelay = 5000)` que busca eventos `"PENDING"`, los despacha de forma síncrona a Kafka y si el envío es exitoso, los marca como `"SENT"`.
+- **Suite de Pruebas Verificada:** Pruebas unitarias e integración en verde (`BUILD SUCCESS`).
+
+## ✅ COMPLETADO HOY — Soporte Cleartext HTTP y reintento Offline en App Móvil (07/Jul)
+
+Se corrigió el bloqueo de carga de contenido HTTP no seguro en el WebView de Android y se mejoró la experiencia sin conexión:
+- **usesCleartextTraffic:** Se añadió la directiva `"usesCleartextTraffic": true` en [apps/mobile/app.json](file:///c:/Users/gisse/sistema-pasantias-vinculacion/apps/mobile/app.json) bajo la sección de configuración de Android.
+- **WebView Props:** Se integraron las propiedades `originWhitelist={["*"]}` y `mixedContentMode="always"` al componente `<WebView>` en [apps/mobile/app/index.tsx](file:///c:/Users/gisse/sistema-pasantias-vinculacion/apps/mobile/app/index.tsx) para permitir tráfico mixto y redirecciones HTTP.
+- **Manejador Offline con Reintento:**
+  - Se modificó [apps/mobile/app/offline.tsx](file:///c:/Users/gisse/sistema-pasantias-vinculacion/apps/mobile/app/offline.tsx) para aceptar opcionalmente un prop `onRetry` de callback, enlazándolo al evento `onPress` del botón "Reintentar".
+  - Se configuró el componente de WebView en `index.tsx` usando hooks `useState` y `useRef` para capturar errores de red (`onError`, `onHttpError`) estableciendo un estado `hasError = true` y renderizando la pantalla de error offline de forma condicional.
+  - Al presionar reintentar, se limpia el error y se ejecuta el método `.reload()` nativo del WebView.
 
 ## ✅ COMPLETADO HOY — Refactor formal de CQRS en hours-service (07/Jul)
 
