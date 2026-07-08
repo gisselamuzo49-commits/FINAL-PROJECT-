@@ -3,6 +3,7 @@
 > **Este archivo se actualiza al final de cada sesión de trabajo.** Es el primer lugar
 > donde el agente debe mirar para saber "¿dónde quedamos?".
 
+_Última actualización: 2026-07-08 (Corrección de jobs omitidos en pipeline de QA - Rama feature/GAME-177-fix-pipeline-skipped)_
 _Última actualización: 2026-07-08 (Soporte de CORS para dominio QA en gateway-service - Rama feature/GAME-176-cors-qa-domain)_
 _Última actualización: 2026-07-08 (Solución de Mixed Content en frontend-web - Rama feature/GAME-175-fix-mixed-content)_
 _Última actualización: 2026-07-08 (Implementación de Transactional Outbox en hours-service - Rama feature/GAME-174-outbox-hours)_
@@ -23,6 +24,12 @@ _Última actualización: 2026-07-05 (Configurar Cypress Cloud - Rama feature/GAM
 _Última actualización: 2026-07-05 (CRUD de Perfil de Usuario - Rama feature/GAME-167-user-profile)_
 _Última actualización: 2026-07-05 (Wrapper de Escritorio con Electron - Rama feature/GAME-146-desktop-electron)_
 _Última actualización: 2026-07-05 (Aplicación Móvil con Expo - Rama feature/GAME-147-mobile-expo)_
+
+## ✅ COMPLETADO HOY — Corrección de Jobs Omitidos en Pipeline de QA (08/Jul)
+
+Se corrigió la omisión sistemática de los trabajos `load-test` (k6) y `e2e-tests` (Cypress) en el workflow de QA:
+- **Condición de Ejecución:** Se añadió la línea `if: always() && needs.deploy.result == 'success'` a ambos trabajos en [.github/workflows/deploy-qa.yml](file:///.github/workflows/deploy-qa.yml). Esto asegura que se ejecuten una vez que el despliegue termine correctamente, evitando el comportamiento por defecto de GitHub Actions que los salta debido a la evaluación condicional en el trabajo `deploy`.
+- **Validación de Sintaxis:** Se comprobó que el archivo conserva una sintaxis YAML válida y una indentación alineada.
 
 ## ✅ COMPLETADO HOY — Soporte de CORS para dominio QA en gateway-service (08/Jul)
 

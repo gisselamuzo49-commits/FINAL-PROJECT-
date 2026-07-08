@@ -386,6 +386,7 @@ jobs:
   load-test:
     name: K6 Load Testing
     needs: deploy
+    if: always() && needs.deploy.result == 'success'
     runs-on: [self-hosted, linux, x64]
     continue-on-error: true
     steps:
@@ -422,6 +423,7 @@ jobs:
   e2e-tests:
     name: Cypress E2E Tests
     needs: deploy
+    if: always() && needs.deploy.result == 'success'
     runs-on: ubuntu-latest
     continue-on-error: true
     steps:
