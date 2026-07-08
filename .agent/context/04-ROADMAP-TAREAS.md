@@ -80,6 +80,7 @@ que reemplaza la planificación genérica original.
 - [x] Implementar patrón Circuit Breaker con Resilience4j en los 5 microservicios restantes (auth, gateway, internship, linkage, user) con pruebas de validación en verde. ✅
 - [x] Implementar notificaciones en tiempo real utilizando WebSockets en notification-service y el frontend. ✅ (02/Jul)
 - [x] Corregir Mixed Content en frontend-web mediante rutas relativas y proxy pass de WebSockets en Nginx. ✅ (08/Jul)
+- [x] Corregir bloqueo de CORS por dominio HTTPS en gateway-service. ✅ (08/Jul)
 
 
 ### Semana 5 — Sesión de diseño + Terraform modular + infraestructura PROD

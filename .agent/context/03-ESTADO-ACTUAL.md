@@ -3,6 +3,7 @@
 > **Este archivo se actualiza al final de cada sesión de trabajo.** Es el primer lugar
 > donde el agente debe mirar para saber "¿dónde quedamos?".
 
+_Última actualización: 2026-07-08 (Soporte de CORS para dominio QA en gateway-service - Rama feature/GAME-176-cors-qa-domain)_
 _Última actualización: 2026-07-08 (Solución de Mixed Content en frontend-web - Rama feature/GAME-175-fix-mixed-content)_
 _Última actualización: 2026-07-08 (Implementación de Transactional Outbox en hours-service - Rama feature/GAME-174-outbox-hours)_
 _Última actualización: 2026-07-07 (Corrección de tráfico cleartext y offline en WebView móvil - Rama feature/GAME-173-fix-mobile-webview)_
@@ -22,6 +23,13 @@ _Última actualización: 2026-07-05 (Configurar Cypress Cloud - Rama feature/GAM
 _Última actualización: 2026-07-05 (CRUD de Perfil de Usuario - Rama feature/GAME-167-user-profile)_
 _Última actualización: 2026-07-05 (Wrapper de Escritorio con Electron - Rama feature/GAME-146-desktop-electron)_
 _Última actualización: 2026-07-05 (Aplicación Móvil con Expo - Rama feature/GAME-147-mobile-expo)_
+
+## ✅ COMPLETADO HOY — Soporte de CORS para dominio QA en gateway-service (08/Jul)
+
+Se resolvió el error de `403 Forbidden` al intentar autenticar por dominio HTTPS (`https://gisselamuzoqa1.distribuidauce.org`):
+- **Orígenes Permitidos en Gateway:** Se agregaron las variables de entorno `ALLOWED_ORIGIN_4` y `ALLOWED_ORIGIN_5` a la propiedad `allowedOriginPatterns` dentro de `apps/gateway-service/src/main/resources/application.yml`.
+- **Valores por Defecto:** Los defaults se configuraron como `https://gisselamuzoqa1.distribuidauce.org` para QA y `https://gissleamuzoprod1.distribuidauce.org` para el dominio de PROD.
+- **Validación del YML:** Se corrió `.\mvnw test-compile` de manera exitosa para confirmar que el archivo de configuración es sintácticamente correcto.
 
 ## ✅ COMPLETADO HOY — Corrección de Mixed Content en frontend-web (08/Jul)
 
