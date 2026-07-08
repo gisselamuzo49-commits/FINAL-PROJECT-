@@ -3,7 +3,7 @@ import { useOutletContext } from 'react-router-dom';
 
 function Evaluations() {
   const { getHeaders, logout } = useOutletContext();
-  const API = import.meta.env.VITE_API_BASE_URL || `http://${window.location.hostname}`;
+  const API = import.meta.env.VITE_API_BASE_URL || '';
 
   const token = localStorage.getItem('token');
   let payload = {};

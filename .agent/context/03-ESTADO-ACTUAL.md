@@ -4,6 +4,8 @@
 > donde el agente debe mirar para saber "¿dónde quedamos?".
 
 _Última actualización: 2026-07-08 (Corrección de jobs omitidos en pipeline de QA - Rama feature/GAME-177-fix-pipeline-skipped)_
+_Última actualización: 2026-07-08 (Soporte de CORS para dominio QA en gateway-service - Rama feature/GAME-176-cors-qa-domain)_
+_Última actualización: 2026-07-08 (Solución de Mixed Content en frontend-web - Rama feature/GAME-175-fix-mixed-content)_
 _Última actualización: 2026-07-08 (Implementación de Transactional Outbox en hours-service - Rama feature/GAME-174-outbox-hours)_
 _Última actualización: 2026-07-07 (Corrección de tráfico cleartext y offline en WebView móvil - Rama feature/GAME-173-fix-mobile-webview)_
 _Última actualización: 2026-07-07 (Refactor CQRS formal en hours-service - Rama feature/GAME-172-cqrs-hours)_
@@ -28,6 +30,21 @@ _Última actualización: 2026-07-05 (Aplicación Móvil con Expo - Rama feature/
 Se corrigió la omisión sistemática de los trabajos `load-test` (k6) y `e2e-tests` (Cypress) en el workflow de QA:
 - **Condición de Ejecución:** Se añadió la línea `if: always() && needs.deploy.result == 'success'` a ambos trabajos en [.github/workflows/deploy-qa.yml](file:///.github/workflows/deploy-qa.yml). Esto asegura que se ejecuten una vez que el despliegue termine correctamente, evitando el comportamiento por defecto de GitHub Actions que los salta debido a la evaluación condicional en el trabajo `deploy`.
 - **Validación de Sintaxis:** Se comprobó que el archivo conserva una sintaxis YAML válida y una indentación alineada.
+
+## ✅ COMPLETADO HOY — Soporte de CORS para dominio QA en gateway-service (08/Jul)
+
+Se resolvió el error de `403 Forbidden` al intentar autenticar por dominio HTTPS (`https://gisselamuzoqa1.distribuidauce.org`):
+- **Orígenes Permitidos en Gateway:** Se agregaron las variables de entorno `ALLOWED_ORIGIN_4` y `ALLOWED_ORIGIN_5` a la propiedad `allowedOriginPatterns` dentro de `apps/gateway-service/src/main/resources/application.yml`.
+- **Valores por Defecto:** Los defaults se configuraron como `https://gisselamuzoqa1.distribuidauce.org` para QA y `https://gissleamuzoprod1.distribuidauce.org` para el dominio de PROD.
+- **Validación del YML:** Se corrió `.\mvnw test-compile` de manera exitosa para confirmar que el archivo de configuración es sintácticamente correcto.
+
+## ✅ COMPLETADO HOY — Corrección de Mixed Content en frontend-web (08/Jul)
+
+Se resolvió el error de Mixed Content cuando se accede vía HTTPS a la aplicación web:
+- **Llamadas Relativas (/api):** Se modificó la constante `API` para que sea una cadena vacía, haciendo que todas las llamadas HTTP utilicen rutas relativas (`/api/...`). Nginx enruta `/api/...` al gateway de forma interna.
+- **WebSocket Seguro y Dinámico:** Se simplificó la conexión de WebSocket en `Notifications.jsx` resolviendo el protocolo (`wss`/`ws`) y host (`window.location.host`, que incluye el puerto si es desarrollo) dinámicamente según la página.
+- **Configuración de WebSocket en Nginx:** Se agregó la directiva `location /ws/` en `apps/frontend-web/nginx.conf` con las directivas de upgrade (`proxy_http_version 1.1`, `Connection "upgrade"`, `Upgrade $http_upgrade`) para enrutar el tráfico de WebSocket de manera interna.
+- **Compilación Exitosa:** Se verificó que el build de producción (`npm run build`) se ejecuta exitosamente.
 
 ## ✅ COMPLETADO HOY — Patrón Transactional Outbox en hours-service (08/Jul)
 
