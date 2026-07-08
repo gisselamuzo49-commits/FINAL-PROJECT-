@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-function LoginCard({ API_URL, GATEWAY_PORT, setToken, setUserEmail }) {
+function LoginCard({ setToken, setUserEmail }) {
   const [isRegisterMode, setIsRegisterMode] = useState(false);
   const [emailLogin, setEmailLogin] = useState("");
   const [passwordLogin, setPasswordLogin] = useState("");
@@ -13,7 +13,7 @@ function LoginCard({ API_URL, GATEWAY_PORT, setToken, setUserEmail }) {
   const registrarUsuario = (e) => {
     e.preventDefault();
     setMensajeAuth(null);
-    fetch(`${API_URL}:${GATEWAY_PORT}/api/auth/register`, {
+    fetch(`/api/auth/register`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email: email, password: password })
@@ -34,7 +34,7 @@ function LoginCard({ API_URL, GATEWAY_PORT, setToken, setUserEmail }) {
   const iniciarSesion = (e) => {
     e.preventDefault();
     setMensajeAuth(null);
-    fetch(`${API_URL}:${GATEWAY_PORT}/api/auth/login`, {
+    fetch(`/api/auth/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email: emailLogin, password: passwordLogin })

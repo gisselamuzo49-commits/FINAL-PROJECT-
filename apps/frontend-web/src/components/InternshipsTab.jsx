@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-function InternshipsTab({ API_URL, GATEWAY_PORT, getHeaders, logout }) {
+function InternshipsTab({ getHeaders, logout }) {
   const [pasantias, setPasantias] = useState([]);
   const [mensajePasantias, setMensajePasantias] = useState(null);
   
@@ -11,7 +11,7 @@ function InternshipsTab({ API_URL, GATEWAY_PORT, getHeaders, logout }) {
   const [statusPasantia, setStatusPasantia] = useState("ABIERTA");
 
   const cargarPasantias = () => {
-    fetch(`${API_URL}:${GATEWAY_PORT}/api/internships`, { headers: getHeaders() })
+    fetch(`/api/internships`, { headers: getHeaders() })
       .then(response => {
         if (response.status === 401) { logout(); throw new Error("Sesión expirada"); }
         if (!response.ok) throw new Error("Error al conectar con Internship-Service");
@@ -24,7 +24,7 @@ function InternshipsTab({ API_URL, GATEWAY_PORT, getHeaders, logout }) {
   const registrarPasantia = (e) => {
     e.preventDefault();
     setMensajePasantias(null);
-    fetch(`${API_URL}:${GATEWAY_PORT}/api/internships`, {
+    fetch(`/api/internships`, {
       method: "POST",
       headers: getHeaders(),
       body: JSON.stringify({ title, company, description, status: statusPasantia })
