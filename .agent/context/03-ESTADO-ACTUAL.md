@@ -3,6 +3,7 @@
 > **Este archivo se actualiza al final de cada sesión de trabajo.** Es el primer lugar
 > donde el agente debe mirar para saber "¿dónde quedamos?".
 
+_Última actualización: 2026-07-08 (Implementación de Transactional Outbox en hours-service - Rama feature/GAME-174-outbox-hours)_
 _Última actualización: 2026-07-07 (Corrección de tráfico cleartext y offline en WebView móvil - Rama feature/GAME-173-fix-mobile-webview)_
 _Última actualización: 2026-07-07 (Refactor CQRS formal en hours-service - Rama feature/GAME-172-cqrs-hours)_
 _Última actualización: 2026-07-07 (Implementación de ASG y Launch Template en PROD - Rama feature/GAME-171-terraform-asg)_
@@ -20,6 +21,14 @@ _Última actualización: 2026-07-05 (Configurar Cypress Cloud - Rama feature/GAM
 _Última actualización: 2026-07-05 (CRUD de Perfil de Usuario - Rama feature/GAME-167-user-profile)_
 _Última actualización: 2026-07-05 (Wrapper de Escritorio con Electron - Rama feature/GAME-146-desktop-electron)_
 _Última actualización: 2026-07-05 (Aplicación Móvil con Expo - Rama feature/GAME-147-mobile-expo)_
+
+## ✅ COMPLETADO HOY — Patrón Transactional Outbox en hours-service (08/Jul)
+
+Se implementó el patrón Transactional Outbox en el microservicio `hours-service` para garantizar consistencia atómica entre la persistencia de horas en PostgreSQL y el envío de eventos a Kafka:
+- **Entidad OutboxEvent:** Creada la entidad y repositorio correspondientes para almacenar eventos en la tabla `outbox_event`.
+- **Transaccionalidad en HoursCommandService:** Anotados con `@Transactional` los métodos de comandos. Se eliminó la inyección directa de `KafkaTemplate` y ahora se guarda un evento `"PENDING"` de tipo `"HORAS_REGISTRADAS"` de forma transaccional con la entidad `RegistroHoras`.
+- **OutboxRelay Scheduler:** Se programó un scheduler con `@Scheduled(fixedDelay = 5000)` que busca eventos `"PENDING"`, los despacha de forma síncrona a Kafka y si el envío es exitoso, los marca como `"SENT"`.
+- **Suite de Pruebas Verificada:** Pruebas unitarias e integración en verde (`BUILD SUCCESS`).
 
 ## ✅ COMPLETADO HOY — Soporte Cleartext HTTP y reintento Offline en App Móvil (07/Jul)
 

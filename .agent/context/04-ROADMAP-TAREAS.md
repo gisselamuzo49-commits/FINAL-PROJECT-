@@ -37,10 +37,7 @@ que reemplaza la planificación genérica original.
   semana), `document-service` y `report-service` (semana 3). ✅ Cluster creado
   13/jun, connection string pendiente de agregar como `MONGO_URI` (GitHub Secret) en
   Semana 4.
-- [x] `hours-service` (8085): CQRS — comandos REST escriben en `hours_db` (PostgreSQL),
-  evento `horas.registradas` a Kafka, proyección de lectura en MongoDB. ✅ Completo
-  (5 etapas + Circuit Breaker de Resilience4j programático en cliente gRPC, 19/19 tests incl. integración end-to-end con Testcontainers). PR abierto
-  hacia `QA`, sin mergear — ver `03-ESTADO-ACTUAL.md`.
+- [x] `hours-service` (8085): CQRS — comandos REST escriben en `hours_db` (PostgreSQL), evento `horas.registradas` a Kafka, proyección de lectura en MongoDB. ✅ Completo (5 etapas + Circuit Breaker de Resilience4j programático en cliente gRPC, 19/19 tests incl. integración con Testcontainers). Implementado e integrado también el patrón **Transactional Outbox** para atomicidad Postgres ↔ Kafka. PR listo para mergear — ver `03-ESTADO-ACTUAL.md`.
 - [ ] Quick wins en paralelo (bajo costo, alto impacto en backlog docente):
   - [x] Logging estructurado (niveles INFO/DEBUG/WARN/ERROR) en JSON para todos los 11 microservicios del sistema. ✅ (02/Jul) — backlog docente #1.
   - [ ] Workspace de Postman compartido con el docente, todas las rutas actuales —
