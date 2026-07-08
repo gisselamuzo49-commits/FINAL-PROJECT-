@@ -23,6 +23,8 @@ spring:
                   - "${ALLOWED_ORIGIN_1:http://localhost:5173}"
                   - "${ALLOWED_ORIGIN_2:http://32.193.25.6}"
                   - "${ALLOWED_ORIGIN_3:http://pasantias-prod-elb-115885246.us-east-1.elb.amazonaws.com}"
+                  - "${ALLOWED_ORIGIN_4:https://gisselamuzoqa1.distribuidauce.org}"
+                  - "${ALLOWED_ORIGIN_5:https://gissleamuzoprod1.distribuidauce.org}"
                 allowedMethods:
                   - GET
                   - POST
