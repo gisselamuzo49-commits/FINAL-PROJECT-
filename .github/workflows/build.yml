@@ -26,7 +26,7 @@ jobs:
                      hours-service internship-service linkage-service notification-service \
                      report-service; do
             echo "== Compilando $svc =="
-            mvn -f apps/$svc/pom.xml clean verify -DskipTests
+            mvn -f apps/$svc/pom.xml clean verify
           done
 
       - name: SonarQube Scan
