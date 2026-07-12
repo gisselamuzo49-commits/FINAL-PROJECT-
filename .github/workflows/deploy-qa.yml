@@ -411,7 +411,7 @@ jobs:
 
       - name: Run k6 load test
         env:
-          TARGET_HOST: "10.0.1.238"
+          TARGET_HOST: "10.0.1.251"
         run: |
           k6 run \
             --vus 20 \
@@ -435,8 +435,7 @@ jobs:
         with:
           record: true
           browser: chrome
-          headless: true
         env:
           CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
           CYPRESS_PROJECT_ID: ${{ secrets.CYPRESS_PROJECT_ID }}
-          CYPRESS_BASE_URL: http://50.19.247.85
+          CYPRESS_BASE_URL: http://54.227.79.26
