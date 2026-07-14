@@ -24,8 +24,7 @@ public class KafkaDocumentConsumer {
         try {
             HorasRegistradasEvent event = objectMapper.readValue(message, HorasRegistradasEvent.class);
             if (event.getEstudianteId() == null || event.getId() == null) {
-                logger.warn("El evento recibido tiene id o estudianteId nulo. Ignorando...");
-                return;
+                throw new IllegalArgumentException("Kafka event is missing id or estudianteId");
             }
 
             String estado = event.getEstado();
@@ -44,6 +43,7 @@ public class KafkaDocumentConsumer {
 
         } catch (Exception e) {
             logger.error("Error al procesar y deserializar evento Kafka: {}", e.getMessage(), e);
+            throw new IllegalStateException("No se pudo procesar el evento Kafka de documentos", e);
         }
     }
 

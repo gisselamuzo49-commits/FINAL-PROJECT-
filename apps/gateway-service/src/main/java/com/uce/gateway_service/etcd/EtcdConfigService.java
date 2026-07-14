@@ -5,11 +5,15 @@ import io.etcd.jetcd.Client;
 import io.etcd.jetcd.kv.GetResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.nio.charset.StandardCharsets;
 
 @Service
 public class EtcdConfigService {
+
+    private static final Logger logger = LoggerFactory.getLogger(EtcdConfigService.class);
 
     private final Client etcdClient;
 
@@ -33,7 +37,7 @@ public class EtcdConfigService {
             ByteSequence bsValue = ByteSequence.from(value, StandardCharsets.UTF_8);
             etcdClient.getKVClient().put(bsKey, bsValue).get();
         } catch (Exception e) {
-            // Log error but don't fail
+            logger.error("Unable to write etcd configuration for key {}", key, e);
         }
     }
 
@@ -47,7 +51,7 @@ public class EtcdConfigService {
                     .toString(StandardCharsets.UTF_8);
             }
         } catch (Exception e) {
-            // Log error
+            logger.error("Unable to read etcd configuration for key {}", key, e);
         }
         return null;
     }
