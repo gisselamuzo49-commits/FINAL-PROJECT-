@@ -3,23 +3,16 @@
 import { useState, useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import { supabase } from '../lib/supabaseClient';
+import { decodeToken, getUserId, getUserName } from '../lib/auth';
 
 function Encuestas() {
   useOutletContext();
-  
-  // JWT Parsing
-  const token = localStorage.getItem('token');
-  let jwtPayload = {};
-  if (token && token.split('.').length === 3) {
-    try {
-      jwtPayload = JSON.parse(atob(token.split('.')[1]));
-    } catch (e) {
-      console.error('Error al decodificar JWT:', e);
-    }
-  }
 
-  const estudianteId = jwtPayload.id || jwtPayload.userId || jwtPayload.sub || 'estudiante_id_placeholder';
-  const nombreEstudiante = jwtPayload.nombre || jwtPayload.name || 'Estudiante UCE';
+  // JWT Parsing
+  const jwtPayload = decodeToken();
+
+  const estudianteId = getUserId(jwtPayload) || 'estudiante_id_placeholder';
+  const nombreEstudiante = getUserName(jwtPayload) || 'Estudiante UCE';
 
   // State Management
   const [encuestas, setEncuestas] = useState([]);

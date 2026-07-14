@@ -1,21 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
+import { API_BASE_URL as API } from '../lib/api';
+import { decodeToken, getUserId } from '../lib/auth';
 
 function Profile() {
   const { getHeaders, logout } = useOutletContext();
-  const API = import.meta.env.VITE_API_BASE_URL || `http://${window.location.hostname}`;
 
-  const token = localStorage.getItem('token');
-  let jwtPayload = {};
-  if (token && token.split('.').length === 3) {
-    try {
-      jwtPayload = JSON.parse(atob(token.split('.')[1]));
-    } catch (e) {
-      console.error('JWT decode error:', e);
-    }
-  }
+  const jwtPayload = decodeToken();
 
-  const userId = jwtPayload.id || jwtPayload.userId || jwtPayload.sub;
+  const userId = getUserId(jwtPayload);
   const initialRole = jwtPayload.rol || jwtPayload.role || 'STUDENT';
   const userEmail = jwtPayload.email || jwtPayload.sub || '';
 

@@ -1,18 +1,13 @@
 import { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import selloUce from '../../assets/images/branding/sello-uce.png';
+import { getUserRole } from '../../lib/auth';
 
 function Sidebar({ user = {}, onLogout, isOpen, onClose }) {
   const [internshipsOpen, setInternshipsOpen] = useState(false);
   const [linkageOpen, setLinkageOpen] = useState(false);
 
-  const token = localStorage.getItem('token');
-  const payload = token && token.split('.').length === 3 ? JSON.parse(atob(token.split('.')[1])) : {};
-  const rol = (payload.rol 
-    || payload.role 
-    || payload.authorities 
-    || payload.authority 
-    || '').toString().toUpperCase();
+  const rol = getUserRole();
 
   const isEstudiante = rol.includes('ESTUDIANTE');
   const isTutor = rol.includes('TUTOR');

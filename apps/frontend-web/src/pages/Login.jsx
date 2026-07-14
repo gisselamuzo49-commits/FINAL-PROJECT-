@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
 import AuthLayout from '../components/auth/AuthLayout';
+import { API_BASE_URL as API } from '../lib/api';
 
 function Login() {
   const [email, setEmail] = useState('');
@@ -29,7 +30,6 @@ function Login() {
   const handleSubmit = (e) => {
     e.preventDefault();
     setError(null);
-    const API = import.meta.env.VITE_API_BASE_URL || `http://${window.location.hostname}`;
     fetch(`${API}/api/auth/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -64,7 +64,6 @@ function Login() {
       return;
     }
 
-    const API = import.meta.env.VITE_API_BASE_URL || `http://${window.location.hostname}`;
     fetch(`${API}/api/auth/register`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
