@@ -21,7 +21,7 @@ El servicio consume eventos de registro de horas desde Apache Kafka (`horas.regi
 | `DB_PORT` | Puerto de PostgreSQL (default: `5432`) |
 | `DB_NAME` | Nombre de la base de datos (default: `notification_db`) |
 | `DB_USER` | Usuario de base de datos (default: `postgres`) |
-| `DB_PASSWORD` | Contraseña de base de datos (default: `postgres`) |
+| `DB_PASSWORD` | Contraseña de base de datos (requerida) |
 | `KAFKA_BOOTSTRAP_SERVERS` | Direcciones del broker de Kafka (default: `localhost:9092`) |
 | `MQTT_HOST` | Host del broker MQTT HiveMQ Cloud (default: `58567514d2724107bcd88d74e13a8bd8.s1.eu.hivemq.cloud`) |
 | `MQTT_PORT` | Puerto MQTT TLS (default: `8883`) |

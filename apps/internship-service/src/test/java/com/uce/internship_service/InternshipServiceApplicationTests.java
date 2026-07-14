@@ -27,7 +27,7 @@ class InternshipServiceApplicationTests {
 
     @Container
     static Neo4jContainer<?> neo4j = new Neo4jContainer<>("neo4j:5.12.0-community")
-            .withAdminPassword("password123");
+            .withAdminPassword("test-only-neo4j-password");
 
     @DynamicPropertySource
     static void configureProperties(DynamicPropertyRegistry registry) {

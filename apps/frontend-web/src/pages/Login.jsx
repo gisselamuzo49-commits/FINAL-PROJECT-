@@ -16,7 +16,6 @@ function Login() {
   const [regEmail, setRegEmail] = useState('');
   const [regPassword, setRegPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [rol, setRol] = useState('ESTUDIANTE');
   const [showRegPassword, setShowRegPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [regError, setRegError] = useState(null);
@@ -68,7 +67,7 @@ function Login() {
     fetch(`${API}/api/auth/register`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ nombre, email: regEmail, password: regPassword, rol })
+      body: JSON.stringify({ nombre, email: regEmail, password: regPassword })
     })
       .then(response => {
         return response.text().then(text => {
@@ -94,7 +93,6 @@ function Login() {
           setRegEmail('');
           setRegPassword('');
           setConfirmPassword('');
-          setRol('ESTUDIANTE');
         }, 2000);
       })
       .catch(err => setRegError(err.message));
@@ -175,20 +173,6 @@ function Login() {
                   {showConfirmPassword ? '🙈' : '👁'}
                 </button>
               </div>
-            </div>
-
-            {/* Rol input selector */}
-            <div className="flex flex-col space-y-2">
-              <label className="text-sm font-medium text-gray-200 text-left">Rol</label>
-              <select
-                value={rol}
-                onChange={(e) => setRol(e.target.value)}
-                className="bg-gray-100 rounded-lg px-4 py-3 w-full text-gray-900 focus:outline-none focus:ring-2 focus:ring-[var(--color-purple)] appearance-none cursor-pointer"
-              >
-                <option value="ESTUDIANTE">Estudiante</option>
-                <option value="TUTOR">Tutor</option>
-                <option value="COORDINADOR">Coordinador</option>
-              </select>
             </div>
 
             {/* Submit button */}

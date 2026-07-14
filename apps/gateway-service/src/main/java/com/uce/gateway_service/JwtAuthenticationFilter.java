@@ -58,18 +58,25 @@ public class JwtAuthenticationFilter extends AbstractGatewayFilterFactory<JwtAut
                 JwtParser parser = Jwts.parser().verifyWith(key).build();
                 Claims claims = parser.parseSignedClaims(token).getPayload();
 
-                String rol = claims.get("rol", String.class);
-                if (rol == null) {
-                    rol = claims.get("role", String.class);
+                String roleClaim = claims.get("rol", String.class);
+                if (roleClaim == null) {
+                    roleClaim = claims.get("role", String.class);
                 }
-                if (rol == null) {
-                    rol = "";
-                }
+                final String rol = roleClaim == null ? "" : roleClaim;
+
+                String userId = claims.get("id", String.class);
 
                 // 3. Mutar la petición para agregar datos del usuario autenticado para consumo interno
                 ServerHttpRequest mutatedRequest = request.mutate()
-                        .header("X-Auth-User", claims.getSubject())
-                        .header("X-Auth-Roles", rol)
+                        .headers(headers -> {
+                            headers.set("X-Auth-User", claims.getSubject());
+                            headers.set("X-Auth-Roles", rol);
+                            if (userId != null) {
+                                headers.set("X-Auth-User-Id", userId);
+                            } else {
+                                headers.remove("X-Auth-User-Id");
+                            }
+                        })
                         .build();
 
                 return chain.filter(exchange.mutate().request(mutatedRequest).build());

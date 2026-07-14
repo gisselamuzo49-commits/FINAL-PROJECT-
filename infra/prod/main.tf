@@ -22,6 +22,11 @@ provider "aws" {
   region = "us-east-1"
 }
 
+variable "admin_cidr" {
+  description = "CIDR autorizado para acceso SSH al bastion"
+  type        = string
+}
+
 # ─────────────────────────────────────────
 # VPC
 # ─────────────────────────────────────────
@@ -144,7 +149,7 @@ resource "aws_security_group" "sg_bastion" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = [var.admin_cidr]
   }
   egress {
     from_port   = 0
@@ -220,47 +225,11 @@ resource "aws_security_group" "sg_private" {
     security_groups = [aws_security_group.sg_elb.id]
   }
   ingress {
-    description     = "Auth service desde ELB"
-    from_port       = 8080
-    to_port         = 8080
-    protocol        = "tcp"
-    security_groups = [aws_security_group.sg_elb.id]
-  }
-  ingress {
-    description     = "Internship service desde ELB"
-    from_port       = 8081
-    to_port         = 8081
-    protocol        = "tcp"
-    security_groups = [aws_security_group.sg_elb.id]
-  }
-  ingress {
     description     = "Gateway service desde ELB"
     from_port       = 8082
     to_port         = 8082
     protocol        = "tcp"
     security_groups = [aws_security_group.sg_elb.id]
-  }
-  ingress {
-    description     = "User service desde ELB"
-    from_port       = 8083
-    to_port         = 8083
-    protocol        = "tcp"
-    security_groups = [aws_security_group.sg_elb.id]
-  }
-  ingress {
-    description     = "Linkage service desde ELB"
-    from_port       = 8084
-    to_port         = 8084
-    protocol        = "tcp"
-    security_groups = [aws_security_group.sg_elb.id]
-  }
-  # Acceso público a la UI y webhooks de n8n
-  ingress {
-    description = "n8n UI and Webhooks"
-    from_port   = 5678
-    to_port     = 5678
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
   }
   egress {
     from_port   = 0

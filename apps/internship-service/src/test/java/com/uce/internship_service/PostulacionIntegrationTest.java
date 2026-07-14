@@ -37,7 +37,7 @@ class PostulacionIntegrationTest {
 
     @Container
     static Neo4jContainer<?> neo4j = new Neo4jContainer<>("neo4j:5.12.0-community")
-            .withAdminPassword("password123");
+            .withAdminPassword("test-only-neo4j-password");
 
     @MockitoBean
     private com.uce.internship_service.kafka.PostulacionEventProducer postulacionEventProducer;

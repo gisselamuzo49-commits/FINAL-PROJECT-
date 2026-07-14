@@ -1,6 +1,6 @@
 describe('Flujo de Postulaciones', () => {
   beforeEach(() => {
-    cy.login('estudiante@uce.edu.ec', 'password123')
+    cy.login('estudiante@uce.edu.ec', Cypress.env('TEST_PASSWORD'))
   })
 
   it('ESTUDIANTE puede ver ofertas de pasantías', () => {

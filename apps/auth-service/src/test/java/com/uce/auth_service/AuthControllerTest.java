@@ -89,11 +89,10 @@ public class AuthControllerTest {
     public void test_registro_exitoso() throws Exception {
         Map<String, String> request = new HashMap<>();
         request.put("nombre", "Test User");
-        request.put("email", "newuser@example.com");
+        request.put("email", "newuser@uce.edu.ec");
         request.put("password", "password123");
-        request.put("rol", "ESTUDIANTE");
-
-        Mockito.when(authService.registerUser("Test User", "newuser@example.com", "password123", "ESTUDIANTE"))
+        request.put("rol", "COORDINADOR");
+        Mockito.when(authService.registerUser("Test User", "newuser@uce.edu.ec", "password123"))
                 .thenReturn("mocked-jwt-token");
 
         mockMvc.perform(post("/api/auth/register")
@@ -107,11 +106,9 @@ public class AuthControllerTest {
     public void test_registro_email_duplicado() throws Exception {
         Map<String, String> request = new HashMap<>();
         request.put("nombre", "Test User");
-        request.put("email", "existing@example.com");
+        request.put("email", "existing@uce.edu.ec");
         request.put("password", "password123");
-        request.put("rol", "ESTUDIANTE");
-
-        Mockito.when(authService.registerUser("Test User", "existing@example.com", "password123", "ESTUDIANTE"))
+        Mockito.when(authService.registerUser("Test User", "existing@uce.edu.ec", "password123"))
                 .thenThrow(new RuntimeException("Email ya registrado"));
 
         mockMvc.perform(post("/api/auth/register")

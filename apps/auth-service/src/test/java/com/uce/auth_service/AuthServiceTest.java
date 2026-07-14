@@ -8,6 +8,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -68,16 +69,18 @@ public class AuthServiceTest {
 
     @Test
     public void test_registerUser_exitoso() {
-        Mockito.when(userRepository.findByEmail("new@example.com")).thenReturn(Optional.empty());
+        Mockito.when(userRepository.findByEmail("new@uce.edu.ec")).thenReturn(Optional.empty());
         Mockito.when(userRepository.save(Mockito.any(User.class))).thenAnswer(invocation -> {
             User u = invocation.getArgument(0);
             u.setId(1L);
             return u;
         });
 
-        String token = authService.registerUser("New User", "new@example.com", "password123", "ESTUDIANTE");
+        String token = authService.registerUser("New User", "new@uce.edu.ec", "password123");
         assertNotNull(token);
 
-        Mockito.verify(userRepository, Mockito.times(1)).save(Mockito.any(User.class));
+        ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
+        Mockito.verify(userRepository).save(userCaptor.capture());
+        assertEquals(Role.ESTUDIANTE, userCaptor.getValue().getRol());
     }
 }

@@ -9,7 +9,7 @@
     "build": "turbo run build",
     "test": "turbo run test",
     "lint": "turbo run lint",
-    "cy:run": "cypress run --record --key 6b907c17-a291-43fe-97d7-e5e52c0b1a38"
+    "cy:run": "cypress run --record"
   },
   "devDependencies": {
     "turbo": "^2.0.0",

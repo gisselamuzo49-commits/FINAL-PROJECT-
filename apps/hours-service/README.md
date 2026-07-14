@@ -136,7 +136,7 @@ docker run -d \
   -e DB_PORT=5432 \
   -e DB_NAME=hours_db \
   -e DB_USER=postgres \
-  -e DB_PASSWORD=postgres \
+  -e DB_PASSWORD="<secret-managed-outside-source-control>" \
   -e MONGO_URI=mongodb://mongodb:27017/hours_read_db \
   -e KAFKA_BOOTSTRAP_SERVERS=kafka:9092 \
   -e USER_SERVICE_GRPC_HOST=user-service \

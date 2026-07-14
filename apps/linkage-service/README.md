@@ -79,7 +79,7 @@ El servicio lee la siguiente configuración a través de variables de entorno (c
 | `DB_NAME` | `linkage_db` | Nombre de la base de datos de vinculación. |
 | `DB_USER` | `postgres` | Nombre de usuario de conexión a la base de datos. |
 | `DB_PASSWORD` | `postgres` | Contraseña de conexión a la base de datos. |
-| `JWT_SECRET` | `v9y$B&E)H@McQfT...` | Clave secreta para la firma y validación de tokens JWT. |
+| `JWT_SECRET` | Sin valor por defecto | Clave secreta para la firma y validación de tokens JWT. |
 
 ---
 
@@ -100,7 +100,7 @@ docker run -d \
   -e DB_PORT=5432 \
   -e DB_NAME=linkage_db \
   -e DB_USER=postgres \
-  -e DB_PASSWORD=postgres \
+  -e DB_PASSWORD="<secret-managed-outside-source-control>" \
   gdmuzo/linkage-service:latest
 ```
 

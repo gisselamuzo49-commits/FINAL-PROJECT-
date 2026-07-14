@@ -1,6 +1,6 @@
 describe('Flujo de Encuestas Supabase', () => {
   beforeEach(() => {
-    cy.login('estudiante@uce.edu.ec', 'password123')
+    cy.login('estudiante@uce.edu.ec', Cypress.env('TEST_PASSWORD'))
   })
 
   it('ESTUDIANTE puede ver sección de encuestas', () => {

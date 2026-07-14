@@ -42,15 +42,16 @@ public class AuthController {
             String token = authService.registerUser(
                 body.get("nombre"),
                 body.get("email"), 
-                body.get("password"),
-                body.get("rol")
+                body.get("password")
             );
             return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("token", token));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
         } catch (RuntimeException e) {
             if ("Email ya registrado".equals(e.getMessage())) {
                 return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("error", e.getMessage()));
             }
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", e.getMessage()));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "Error al registrar el usuario"));
         }
     }
 

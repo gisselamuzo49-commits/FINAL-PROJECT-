@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
+import java.util.Locale;
 import java.util.Optional;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 
@@ -27,14 +28,27 @@ public class AuthService {
 
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
-    public String registerUser(String nombre, String email, String password, String rolStr) {
-        if (userRepository.findByEmail(email).isPresent()) {
+    public String registerUser(String nombre, String email, String password) {
+        if (nombre == null || nombre.isBlank()
+                || email == null || email.isBlank()
+                || password == null || password.isBlank()) {
+            throw new IllegalArgumentException("Nombre, email y contraseña son obligatorios");
+        }
+        String normalizedName = nombre.trim();
+        String normalizedEmail = email.trim().toLowerCase(Locale.ROOT);
+        if (normalizedName.length() > 255
+                || !normalizedEmail.matches("^[^@\\s]+@uce\\.edu\\.ec$")
+                || password.length() < 8
+                || password.length() > 128) {
+            throw new IllegalArgumentException("Datos de registro inválidos");
+        }
+        if (userRepository.findByEmail(normalizedEmail).isPresent()) {
             throw new RuntimeException("Email ya registrado");
         }
-        Role rol = Role.valueOf(rolStr.toUpperCase());
+        Role rol = Role.ESTUDIANTE;
         User user = new User();
-        user.setNombre(nombre);
-        user.setEmail(email);
+        user.setNombre(normalizedName);
+        user.setEmail(normalizedEmail);
         user.setPassword(passwordEncoder.encode(password));
         user.setRol(rol);
         userRepository.save(user);

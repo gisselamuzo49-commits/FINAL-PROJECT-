@@ -109,7 +109,7 @@ docker run -d \
   -e DB_PORT=5432 \
   -e DB_NAME=evaluation_db \
   -e DB_USER=postgres \
-  -e DB_PASSWORD=postgres \
+  -e DB_PASSWORD="<secret-managed-outside-source-control>" \
   -e USER_SERVICE_GRPC_HOST=user-service \
   -e USER_SERVICE_GRPC_PORT=9083 \
   gdmuzo/evaluation-service:latest

@@ -55,7 +55,7 @@ jobs:
         image: postgres:15
         env:
           POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
+          POSTGRES_PASSWORD: ci-test-only-password
           POSTGRES_DB: postgres
         ports:
           - 5432:5432
@@ -70,8 +70,8 @@ jobs:
       DB_PORT: 5432
       DB_NAME: postgres
       DB_USER: postgres
-      DB_PASSWORD: postgres
-      JWT_SECRET: v9y$B&E)H@McQfTjWmZq4t7w!z%C*F-JaNdRgUkXp2r5u8x/A?D(G+KbPeShVmYq
+      DB_PASSWORD: ci-test-only-password
+      JWT_SECRET: ${{ secrets.PROD_JWT_SECRET }}
 
     steps:
       - name: Checkout code
@@ -256,4 +256,21 @@ jobs:
             -e "dockerhub_username=${{ secrets.DOCKERHUB_USERNAME }}" \
             -e "dockerhub_token=${{ secrets.DOCKERHUB_TOKEN }}" \
             -e "supabase_url=${{ secrets.SUPABASE_URL }}" \
-            -e "supabase_anon_key=${{ secrets.SUPABASE_ANON_KEY }}"
+            -e "supabase_anon_key=${{ secrets.SUPABASE_ANON_KEY }}" \
+            -e "jwt_secret=$JWT_SECRET" \
+            -e "db_password=$DB_PASSWORD" \
+            -e "neo4j_password=$NEO4J_PASSWORD" \
+            -e "mqtt_password=$MQTT_PASSWORD" \
+            -e "rabbitmq_password=$RABBITMQ_PASSWORD" \
+            -e "influxdb_password=$INFLUXDB_PASSWORD" \
+            -e "influxdb_token=$INFLUXDB_TOKEN" \
+            -e "allowed_origins=$ALLOWED_ORIGINS"
+        env:
+          JWT_SECRET: ${{ secrets.PROD_JWT_SECRET }}
+          DB_PASSWORD: ${{ secrets.PROD_DB_PASSWORD }}
+          NEO4J_PASSWORD: ${{ secrets.PROD_NEO4J_PASSWORD }}
+          MQTT_PASSWORD: ${{ secrets.PROD_MQTT_PASSWORD }}
+          RABBITMQ_PASSWORD: ${{ secrets.PROD_RABBITMQ_PASSWORD }}
+          INFLUXDB_PASSWORD: ${{ secrets.PROD_INFLUXDB_PASSWORD }}
+          INFLUXDB_TOKEN: ${{ secrets.PROD_INFLUXDB_TOKEN }}
+          ALLOWED_ORIGINS: ${{ vars.PROD_ALLOWED_ORIGINS }}

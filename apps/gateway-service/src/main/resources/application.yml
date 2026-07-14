@@ -20,9 +20,7 @@ spring:
             cors-configurations:
               '[/**]':
                 allowedOriginPatterns:
-                  - "${ALLOWED_ORIGIN_1:http://localhost:5173}"
-                  - "${ALLOWED_ORIGIN_2:http://32.193.25.6}"
-                  - "${ALLOWED_ORIGIN_3:http://pasantias-prod-elb-115885246.us-east-1.elb.amazonaws.com}"
+                  - "${CORS_ALLOWED_ORIGINS:http://localhost:5173}"
                 allowedMethods:
                   - GET
                   - POST
@@ -30,7 +28,10 @@ spring:
                   - PATCH
                   - DELETE
                   - OPTIONS
-                allowedHeaders: "*"
+                allowedHeaders:
+                  - Authorization
+                  - Content-Type
+                  - Accept
                 allowCredentials: true
                 maxAge: 3600
           default-filters:
@@ -147,7 +148,7 @@ spring:
 # Configuración de seguridad JWT compartida
 security:
   jwt:
-    secret: ${JWT_SECRET:v9y$B&E)H@McQfTjWmZq4t7w!z%C*F-JaNdRgUkXp2r5u8x/A?D(G+KbPeShVmYq}
+    secret: ${JWT_SECRET}
 
 # Configuración de etcd (Configuración Distribuida)
 etcd:

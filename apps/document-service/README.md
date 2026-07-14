@@ -21,7 +21,7 @@ El servicio consume eventos de registro de horas validadas desde Apache Kafka (`
 | `DB_PORT` | Puerto de PostgreSQL (default: `5432`) |
 | `DB_NAME` | Nombre de la base de datos Postgres (default: `document_db`) |
 | `DB_USER` | Usuario de base de datos Postgres (default: `postgres`) |
-| `DB_PASSWORD` | Contraseña de base de datos Postgres (default: `postgres`) |
+| `DB_PASSWORD` | Contraseña de base de datos Postgres (requerida) |
 | `MONGO_URI` | Connection String de MongoDB (default: `mongodb://localhost:27017/document_read_db`) |
 | `KAFKA_BOOTSTRAP_SERVERS` | Direcciones del broker de Kafka (default: `localhost:9092`) |
 | `S3_BUCKET_NAME` | Nombre del bucket S3 de AWS (`pasantias-documents-qa` / `pasantias-documents-prod`) |

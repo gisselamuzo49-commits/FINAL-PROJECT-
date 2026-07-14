@@ -83,6 +83,6 @@ docker run -d \
   -e INTERNSHIP_SERVICE_URL=http://internship-service:8081 \
   -e USER_SERVICE_URL=http://user-service:8083 \
   -e LINKAGE_SERVICE_URL=http://linkage-service:8084 \
-  -e JWT_SECRET=v9y$B&E)H@McQfTjWmZq4t7w!z%C*F-JaNdRgUkXp2r5u8x/A?D(G+KbPeShVmYq \
+  -e JWT_SECRET="<secret-managed-outside-source-control>" \
   gdmuzo/gateway-service:latest
 ```

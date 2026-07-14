@@ -102,6 +102,6 @@ docker run -d \
   -e DB_PORT=5432 \
   -e DB_NAME=internship_db \
   -e DB_USER=postgres \
-  -e DB_PASSWORD=postgres \
+  -e DB_PASSWORD="<secret-managed-outside-source-control>" \
   gdmuzo/internship-service:latest
 ```

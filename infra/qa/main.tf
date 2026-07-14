@@ -22,6 +22,11 @@ provider "aws" {
   region = "us-east-1"
 }
 
+variable "admin_cidr" {
+  description = "CIDR autorizado para SSH y la interfaz administrativa de n8n"
+  type        = string
+}
+
 # ─────────────────────────────────────────
 # VPC
 # ─────────────────────────────────────────
@@ -115,7 +120,7 @@ resource "aws_security_group" "sg_bastion" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = [var.admin_cidr]
   }
   egress {
     from_port   = 0
@@ -167,7 +172,7 @@ resource "aws_security_group" "sg_private" {
     from_port   = 5678
     to_port     = 5678
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = [var.admin_cidr]
     description = "n8n UI and Webhooks"
   }
   egress {
