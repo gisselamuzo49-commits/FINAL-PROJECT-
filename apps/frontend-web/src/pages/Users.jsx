@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
+import { API_BASE_URL as API } from '../lib/api';
 
 function Users() {
   const { getHeaders, logout } = useOutletContext();
-  const API = import.meta.env.VITE_API_BASE_URL || `http://${window.location.hostname}`;
   const [profiles, setProfiles] = useState([]);
   const [mensajeProfiles, setMensajeProfiles] = useState(null);
 

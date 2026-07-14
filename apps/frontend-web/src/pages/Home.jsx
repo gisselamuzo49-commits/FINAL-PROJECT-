@@ -1,20 +1,16 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 import { useState, useEffect } from 'react';
 import { Link, useOutletContext } from 'react-router-dom';
+import { API_BASE_URL as API } from '../lib/api';
+import { decodeToken, getUserId, getUserName } from '../lib/auth';
 
 function Home() {
   const { getHeaders, logout } = useOutletContext();
-  const API = import.meta.env.VITE_API_BASE_URL || `http://${window.location.hostname}`;
 
   // --- JWT-based user data ---
-  const token = localStorage.getItem('token');
-  let jwtPayload = {};
-  if (token && token.split('.').length === 3) {
-    try { jwtPayload = JSON.parse(atob(token.split('.')[1])); }
-    catch (e) { console.error('JWT decode error:', e); }
-  }
-  const estudianteId = jwtPayload.id || jwtPayload.userId || jwtPayload.sub;
-  const nombre = jwtPayload.nombre || jwtPayload.name || jwtPayload.firstName || jwtPayload.fullName || jwtPayload.username;
+  const jwtPayload = decodeToken();
+  const estudianteId = getUserId(jwtPayload);
+  const nombre = getUserName(jwtPayload);
 
   // --- PANEL States ---
   const [hoursSummary, setHoursSummary] = useState(null);

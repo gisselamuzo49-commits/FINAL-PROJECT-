@@ -1,17 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
+import { API_BASE_URL as API } from '../lib/api';
+import { decodeToken, getUserId } from '../lib/auth';
 
 function MyApplications() {
   const { getHeaders, logout } = useOutletContext();
-  const API = import.meta.env.VITE_API_BASE_URL || `http://${window.location.hostname}`;
 
-  const token = localStorage.getItem('token');
-  let payload = {};
-  if (token && token.split('.').length === 3) {
-    try { payload = JSON.parse(atob(token.split('.')[1])); }
-    catch (e) { console.error('JWT decode error:', e); }
-  }
-  const estudianteId = payload.id || payload.userId || payload.sub;
+  const payload = decodeToken();
+  const estudianteId = getUserId(payload);
 
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);

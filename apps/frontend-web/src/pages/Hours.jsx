@@ -1,22 +1,15 @@
 import { useState, useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
+import { API_BASE_URL as API } from '../lib/api';
+import { decodeToken, getUserId, getUserRole } from '../lib/auth';
 
 function Hours() {
   const { getHeaders, logout } = useOutletContext();
-  const API = import.meta.env.VITE_API_BASE_URL || `http://${window.location.hostname}`;
 
-  const token = localStorage.getItem('token');
-  let payload = {};
-  if (token && token.split('.').length === 3) {
-    try {
-      payload = JSON.parse(atob(token.split('.')[1]));
-    } catch (e) {
-      console.error(e);
-    }
-  }
+  const payload = decodeToken();
 
-  const userId = payload.id || payload.userId || payload.sub;
-  const rol = (payload.rol || payload.role || '').toString().toUpperCase();
+  const userId = getUserId(payload);
+  const rol = getUserRole(payload);
   const isStudent = rol.includes('STUDENT') || rol.includes('ESTUDIANTE');
   const isTutorOrCoordinador = rol.includes('TUTOR') || rol.includes('COORDINADOR') || rol.includes('ADMIN');
 

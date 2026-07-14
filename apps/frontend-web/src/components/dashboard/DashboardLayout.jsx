@@ -2,22 +2,17 @@ import { useState, useEffect } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import Header from './Header';
+import { API_BASE_URL as API } from '../../lib/api';
+import { decodeToken, getUserId, getUserName } from '../../lib/auth';
 
 function DashboardLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const navigate = useNavigate();
 
-  const API = import.meta.env.VITE_API_BASE_URL || `http://${window.location.hostname}`;
-
   // --- JWT-based user data ---
-  const token = localStorage.getItem('token');
-  let jwtPayload = {};
-  if (token && token.split('.').length === 3) {
-    try { jwtPayload = JSON.parse(atob(token.split('.')[1])); }
-    catch { /* ignore */ }
-  }
-  const jwtNombre = jwtPayload.nombre || jwtPayload.name || jwtPayload.firstName || null;
-  const jwtId = jwtPayload.id || jwtPayload.userId || jwtPayload.sub;
+  const jwtPayload = decodeToken();
+  const jwtNombre = getUserName(jwtPayload);
+  const jwtId = getUserId(jwtPayload);
 
   const getHeaders = () => {
     const token = localStorage.getItem("token");
@@ -43,7 +38,6 @@ function DashboardLayout() {
         setNotificationCount(unread);
       })
       .catch(() => setNotificationCount(0));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [jwtId]);
 
   const user = {

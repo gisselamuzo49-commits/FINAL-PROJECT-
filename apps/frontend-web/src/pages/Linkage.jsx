@@ -1,16 +1,15 @@
 import { useState, useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
+import { API_BASE_URL as API } from '../lib/api';
+import { decodeToken, getUserRole } from '../lib/auth';
 
 function Linkage() {
   const { getHeaders, logout } = useOutletContext();
-  const API = import.meta.env.VITE_API_BASE_URL || `http://${window.location.hostname}`;
   const [projects, setProjects] = useState([]);
   const [mensajeProjects, setMensajeProjects] = useState(null);
 
   // --- Decodificar Rol desde JWT ---
-  const token = localStorage.getItem('token');
-  const payload = token && token.split('.').length === 3 ? JSON.parse(atob(token.split('.')[1])) : {};
-  const rol = (payload.rol || payload.role || '').toString().toUpperCase();
+  const rol = getUserRole(decodeToken());
   const canPublish = rol.includes('TUTOR') || rol.includes('COORDINADOR') || rol.includes('ADMIN');
 
   // Form States

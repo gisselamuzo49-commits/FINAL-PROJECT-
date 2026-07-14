@@ -1,27 +1,15 @@
 import { Navigate } from 'react-router-dom';
+import { getToken, decodeToken, getUserRole } from '../../lib/auth';
 
 const RoleProtectedRoute = ({ children, allowedRoles }) => {
-  let isAuthorized = false;
-  let hasToken = false;
+  const token = getToken();
 
-  try {
-    const token = localStorage.getItem('token');
-    if (token) {
-      hasToken = true;
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      const userRole = (payload.rol || payload.role || '').toUpperCase();
-      
-      if (!allowedRoles || allowedRoles.includes(userRole)) {
-        isAuthorized = true;
-      }
-    }
-  } catch {
-    isAuthorized = false;
-  }
-
-  if (!hasToken) {
+  if (!token) {
     return <Navigate to="/login" replace />;
   }
+
+  const userRole = getUserRole(decodeToken(token));
+  const isAuthorized = !allowedRoles || allowedRoles.includes(userRole);
 
   if (!isAuthorized) {
     return <Navigate to="/home" replace />;
