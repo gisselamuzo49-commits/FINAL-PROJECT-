@@ -2,6 +2,8 @@ package com.uce.gateway_service.dynamodb;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 import software.amazon.awssdk.services.dynamodb.model.*;
@@ -12,7 +14,9 @@ import java.util.Map;
 
 @Service
 public class TokenBlacklistService {
-    
+
+    private static final Logger logger = LoggerFactory.getLogger(TokenBlacklistService.class);
+
     private final DynamoDbClient dynamoDbClient;
     private final String tableName = "jwt-blacklist";
     
@@ -47,10 +51,10 @@ public class TokenBlacklistService {
                     .billingMode(BillingMode.PAY_PER_REQUEST)
                 );
             } catch (Exception ex) {
-                // Log and ignore to prevent startup failure in environments without AWS access
+                logger.warn("Unable to create DynamoDB token blacklist table; revocation features may be unavailable", ex);
             }
         } catch (Exception e) {
-            // Log and ignore to prevent startup failure in environments without AWS access
+            logger.warn("Unable to verify DynamoDB token blacklist table; revocation features may be unavailable", e);
         }
     }
     
@@ -76,7 +80,8 @@ public class TokenBlacklistService {
             );
             return response.hasItem();
         } catch (Exception e) {
-            return false;
+            logger.error("Unable to check whether token is revoked", e);
+            throw new IllegalStateException("Token revocation status could not be verified", e);
         }
     }
 }

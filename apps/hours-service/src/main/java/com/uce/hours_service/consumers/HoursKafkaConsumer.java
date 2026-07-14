@@ -9,11 +9,15 @@ import com.uce.hours_service.client.StudentInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 
 @Component
 public class HoursKafkaConsumer {
+
+    private static final Logger logger = LoggerFactory.getLogger(HoursKafkaConsumer.class);
 
     @Autowired
     private HorasResumenRepository repository;
@@ -28,7 +32,7 @@ public class HoursKafkaConsumer {
         try {
             HorasRegistradasEvent event = objectMapper.readValue(message, HorasRegistradasEvent.class);
             if (event.getEstudianteId() == null) {
-                return;
+                throw new IllegalArgumentException("Kafka event is missing estudianteId");
             }
 
             HorasResumen resumen = repository.findById(event.getEstudianteId())
@@ -85,8 +89,8 @@ public class HoursKafkaConsumer {
             repository.save(resumen);
 
         } catch (Exception e) {
-            System.err.println("Error processing Kafka event: " + e.getMessage());
-            e.printStackTrace();
+            logger.error("Error processing Kafka hours event: {}", message, e);
+            throw new IllegalStateException("Unable to process Kafka hours event", e);
         }
     }
 

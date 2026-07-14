@@ -8,6 +8,8 @@ import org.apache.http.HttpHost;
 import org.elasticsearch.client.RestClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.Instant;
 import java.util.HashMap;
@@ -15,6 +17,8 @@ import java.util.Map;
 
 @Service
 public class OfertaSearchService {
+
+    private static final Logger logger = LoggerFactory.getLogger(OfertaSearchService.class);
 
     private final ElasticsearchClient esClient;
     private final String index;
@@ -55,7 +59,7 @@ public class OfertaSearchService {
                 .document(doc)
             );
         } catch (Exception e) {
-            // Log error but don't fail the main operation
+            logger.error("Unable to index internship offer {} in Elasticsearch index {}", id, index, e);
         }
     }
 

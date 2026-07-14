@@ -1,12 +1,13 @@
-from fastapi import FastAPI, status
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
 from typing import List, Dict, Any
 from models.recommender import TFIDFRecommender
 from models.risk_predictor import RiskPredictor
 from workers.rabbitmq_worker import RabbitMQClient
-from database.sqlite_cache import init_db, get_cached_prediction, save_prediction
+from database.sqlite_cache import DB_PATH, init_db, get_cached_prediction, save_prediction
 import logging
 import json
+import sqlite3
 from datetime import datetime
 
 class JsonFormatter(logging.Formatter):
@@ -127,16 +128,17 @@ def publish_task(req: TaskRequest):
 
 @app.get("/api/ai/cache/stats")
 def cache_stats():
-    import sqlite3
-    from database.sqlite_cache import DB_PATH
     try:
-        conn = sqlite3.connect(DB_PATH)
-        cursor = conn.cursor()
-        cursor.execute("SELECT COUNT(*) FROM prediction_cache")
-        count = cursor.fetchone()[0]
-        conn.close()
-    except Exception:
-        count = 0
+        with sqlite3.connect(DB_PATH) as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT COUNT(*) FROM prediction_cache")
+            count = cursor.fetchone()[0]
+    except sqlite3.Error as exc:
+        logger.exception("Failed to read prediction cache statistics")
+        raise HTTPException(
+            status_code=503,
+            detail="Prediction cache statistics are unavailable",
+        ) from exc
     return {
         "total_cached_predictions": count,
         "database": "SQLite"

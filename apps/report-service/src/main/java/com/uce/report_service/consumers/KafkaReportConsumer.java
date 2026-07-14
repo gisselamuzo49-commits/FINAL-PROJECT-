@@ -78,8 +78,7 @@ public class KafkaReportConsumer {
             }
 
             if (id == null || estudianteId == null || estado == null) {
-                log.warn("Invalid event payload: {}", message);
-                return;
+                throw new IllegalArgumentException("Kafka event is missing id, estudianteId, or estado");
             }
 
             // 1. Upsert RegistroHorasReporte in PostgreSQL
@@ -131,6 +130,7 @@ public class KafkaReportConsumer {
 
         } catch (Exception e) {
             log.error("Error processing event message: {}", message, e);
+            throw new IllegalStateException("Unable to process Kafka report event", e);
         }
     }
 
