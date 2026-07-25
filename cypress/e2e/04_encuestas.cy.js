@@ -5,7 +5,7 @@ describe('Flujo de Encuestas Supabase', () => {
 
   it('ESTUDIANTE puede ver sección de encuestas', () => {
     cy.visit('/encuestas')
-    cy.contains('Encuestas').should('be.visible')
+    cy.contains('Encuestas de Satisfacción Post-Práctica').should('be.visible')
   })
 
   it('Formulario de encuesta carga sin error', () => {

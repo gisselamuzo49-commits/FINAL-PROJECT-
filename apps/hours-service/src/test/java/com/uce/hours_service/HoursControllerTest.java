@@ -3,7 +3,10 @@ package com.uce.hours_service;
 import com.uce.hours_service.models.EstadoHoras;
 import com.uce.hours_service.models.RegistroHoras;
 import com.uce.hours_service.models.HorasResumen;
-import com.uce.hours_service.services.HoursService;
+import com.uce.hours_service.cqrs.HoursCommandService;
+import com.uce.hours_service.cqrs.HoursQueryService;
+import com.uce.hours_service.cqrs.commands.CreateHoursCommand;
+import com.uce.hours_service.cqrs.commands.ValidateHoursCommand;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -27,7 +30,10 @@ class HoursControllerTest {
     private MockMvc mockMvc;
 
     @Mock
-    private HoursService hoursService;
+    private HoursCommandService commandService;
+
+    @Mock
+    private HoursQueryService queryService;
 
     @InjectMocks
     private HoursController hoursController;
@@ -73,7 +79,7 @@ class HoursControllerTest {
         mockRegistro.setDescripcionActividad("Actividad de prueba");
         mockRegistro.setEstado(EstadoHoras.PENDIENTE);
 
-        Mockito.when(hoursService.createHoursRegistration(any(RegistroHoras.class)))
+        Mockito.when(commandService.createHoursRegistration(any(CreateHoursCommand.class)))
                 .thenReturn(mockRegistro);
 
         mockMvc.perform(post("/api/hours")
@@ -130,7 +136,7 @@ class HoursControllerTest {
         mockRegistro.setTutorId("200");
         mockRegistro.setEstado(EstadoHoras.VALIDADO);
 
-        Mockito.when(hoursService.validarHoursRegistration(eq(1L), eq("200"), eq(true)))
+        Mockito.when(commandService.validarHoursRegistration(any(ValidateHoursCommand.class)))
                 .thenReturn(Optional.of(mockRegistro));
 
         mockMvc.perform(patch("/api/hours/1/validar")
@@ -144,7 +150,7 @@ class HoursControllerTest {
 
     @Test
     void validarHoursRegistration_NonExistentId_ReturnsNotFound() throws Exception {
-        Mockito.when(hoursService.validarHoursRegistration(eq(999L), eq("200"), eq(true)))
+        Mockito.when(commandService.validarHoursRegistration(any(ValidateHoursCommand.class)))
                 .thenReturn(Optional.empty());
 
         mockMvc.perform(patch("/api/hours/999/validar")
@@ -177,7 +183,7 @@ class HoursControllerTest {
         mockResumen.setTotalHorasValidadas(10.0);
         mockResumen.setTotalHorasPendientes(5.0);
 
-        Mockito.when(hoursService.getStudentSummary("100"))
+        Mockito.when(queryService.getStudentSummary("100"))
                 .thenReturn(Optional.of(mockResumen));
 
         mockMvc.perform(get("/api/hours/student/100"))
@@ -189,7 +195,7 @@ class HoursControllerTest {
 
     @Test
     void getStudentSummary_NonExistentStudent_ReturnsNotFound() throws Exception {
-        Mockito.when(hoursService.getStudentSummary("999"))
+        Mockito.when(queryService.getStudentSummary("999"))
                 .thenReturn(Optional.empty());
 
         mockMvc.perform(get("/api/hours/student/999"))

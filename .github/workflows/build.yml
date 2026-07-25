@@ -1,0 +1,36 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - SonarQube
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configurar Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Compilar los 9 microservicios Java
+        run: |
+          for svc in auth-service document-service evaluation-service gateway-service \
+                     hours-service internship-service linkage-service notification-service \
+                     report-service; do
+            echo "== Compilando $svc =="
+            mvn -f apps/$svc/pom.xml clean verify
+          done
+
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@v6
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}

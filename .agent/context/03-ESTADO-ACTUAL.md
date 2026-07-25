@@ -3,6 +3,16 @@
 > **Este archivo se actualiza al final de cada sesión de trabajo.** Es el primer lugar
 > donde el agente debe mirar para saber "¿dónde quedamos?".
 
+_Última actualización: 2026-07-08 (Corrección de jobs omitidos en pipeline de QA - Rama feature/GAME-177-fix-pipeline-skipped)_
+_Última actualización: 2026-07-08 (Soporte de CORS para dominio QA en gateway-service - Rama feature/GAME-176-cors-qa-domain)_
+_Última actualización: 2026-07-08 (Solución de Mixed Content en frontend-web - Rama feature/GAME-175-fix-mixed-content)_
+_Última actualización: 2026-07-08 (Implementación de Transactional Outbox en hours-service - Rama feature/GAME-174-outbox-hours)_
+_Última actualización: 2026-07-07 (Corrección de tráfico cleartext y offline en WebView móvil - Rama feature/GAME-173-fix-mobile-webview)_
+_Última actualización: 2026-07-07 (Refactor CQRS formal en hours-service - Rama feature/GAME-172-cqrs-hours)_
+_Última actualización: 2026-07-07 (Implementación de ASG y Launch Template en PROD - Rama feature/GAME-171-terraform-asg)_
+_Última actualización: 2026-07-07 (Fix del bean KafkaTemplate en internship-service - Rama feature/GAME-170-fix-kafkatemplate-internship)_
+_Última actualización: 2026-07-06 (Fix de Kafka y Cassandra en QA - Rama feature/GAME-169-fix-kafka-cassandra-qa)_
+_Última actualización: 2026-07-06 (Fix de logs en PROD - Rama feature/GAME-168-fix-logs-prod)_
 _Última actualización: 2026-07-06 (Soporte de ignore_unreachable en bastion backups - Rama feature/infra-bastion-unreachable)_
 _Última actualización: 2026-07-06 (Instalación limpia de overrides globales de React 19.1.0 - Rama QA)_
 _Última actualización: 2026-07-06 (Downgrade de react-native-screens a 4.16.0 para evitar bug en Fabric - Rama QA)_
@@ -14,6 +24,82 @@ _Última actualización: 2026-07-05 (Configurar Cypress Cloud - Rama feature/GAM
 _Última actualización: 2026-07-05 (CRUD de Perfil de Usuario - Rama feature/GAME-167-user-profile)_
 _Última actualización: 2026-07-05 (Wrapper de Escritorio con Electron - Rama feature/GAME-146-desktop-electron)_
 _Última actualización: 2026-07-05 (Aplicación Móvil con Expo - Rama feature/GAME-147-mobile-expo)_
+
+## ✅ COMPLETADO HOY — Corrección de Jobs Omitidos en Pipeline de QA (08/Jul)
+
+Se corrigió la omisión sistemática de los trabajos `load-test` (k6) y `e2e-tests` (Cypress) en el workflow de QA:
+- **Condición de Ejecución:** Se añadió la línea `if: always() && needs.deploy.result == 'success'` a ambos trabajos en [.github/workflows/deploy-qa.yml](file:///.github/workflows/deploy-qa.yml). Esto asegura que se ejecuten una vez que el despliegue termine correctamente, evitando el comportamiento por defecto de GitHub Actions que los salta debido a la evaluación condicional en el trabajo `deploy`.
+- **Validación de Sintaxis:** Se comprobó que el archivo conserva una sintaxis YAML válida y una indentación alineada.
+
+## ✅ COMPLETADO HOY — Soporte de CORS para dominio QA en gateway-service (08/Jul)
+
+Se resolvió el error de `403 Forbidden` al intentar autenticar por dominio HTTPS (`https://gisselamuzoqa1.distribuidauce.org`):
+- **Orígenes Permitidos en Gateway:** Se agregaron las variables de entorno `ALLOWED_ORIGIN_4` y `ALLOWED_ORIGIN_5` a la propiedad `allowedOriginPatterns` dentro de `apps/gateway-service/src/main/resources/application.yml`.
+- **Valores por Defecto:** Los defaults se configuraron como `https://gisselamuzoqa1.distribuidauce.org` para QA y `https://gissleamuzoprod1.distribuidauce.org` para el dominio de PROD.
+- **Validación del YML:** Se corrió `.\mvnw test-compile` de manera exitosa para confirmar que el archivo de configuración es sintácticamente correcto.
+
+## ✅ COMPLETADO HOY — Corrección de Mixed Content en frontend-web (08/Jul)
+
+Se resolvió el error de Mixed Content cuando se accede vía HTTPS a la aplicación web:
+- **Llamadas Relativas (/api):** Se modificó la constante `API` para que sea una cadena vacía, haciendo que todas las llamadas HTTP utilicen rutas relativas (`/api/...`). Nginx enruta `/api/...` al gateway de forma interna.
+- **WebSocket Seguro y Dinámico:** Se simplificó la conexión de WebSocket en `Notifications.jsx` resolviendo el protocolo (`wss`/`ws`) y host (`window.location.host`, que incluye el puerto si es desarrollo) dinámicamente según la página.
+- **Configuración de WebSocket en Nginx:** Se agregó la directiva `location /ws/` en `apps/frontend-web/nginx.conf` con las directivas de upgrade (`proxy_http_version 1.1`, `Connection "upgrade"`, `Upgrade $http_upgrade`) para enrutar el tráfico de WebSocket de manera interna.
+- **Compilación Exitosa:** Se verificó que el build de producción (`npm run build`) se ejecuta exitosamente.
+
+## ✅ COMPLETADO HOY — Patrón Transactional Outbox en hours-service (08/Jul)
+
+Se implementó el patrón Transactional Outbox en el microservicio `hours-service` para garantizar consistencia atómica entre la persistencia de horas en PostgreSQL y el envío de eventos a Kafka:
+- **Entidad OutboxEvent:** Creada la entidad y repositorio correspondientes para almacenar eventos en la tabla `outbox_event`.
+- **Transaccionalidad en HoursCommandService:** Anotados con `@Transactional` los métodos de comandos. Se eliminó la inyección directa de `KafkaTemplate` y ahora se guarda un evento `"PENDING"` de tipo `"HORAS_REGISTRADAS"` de forma transaccional con la entidad `RegistroHoras`.
+- **OutboxRelay Scheduler:** Se programó un scheduler con `@Scheduled(fixedDelay = 5000)` que busca eventos `"PENDING"`, los despacha de forma síncrona a Kafka y si el envío es exitoso, los marca como `"SENT"`.
+- **Suite de Pruebas Verificada:** Pruebas unitarias e integración en verde (`BUILD SUCCESS`).
+
+## ✅ COMPLETADO HOY — Soporte Cleartext HTTP y reintento Offline en App Móvil (07/Jul)
+
+Se corrigió el bloqueo de carga de contenido HTTP no seguro en el WebView de Android y se mejoró la experiencia sin conexión:
+- **usesCleartextTraffic:** Se añadió la directiva `"usesCleartextTraffic": true` en [apps/mobile/app.json](file:///c:/Users/gisse/sistema-pasantias-vinculacion/apps/mobile/app.json) bajo la sección de configuración de Android.
+- **WebView Props:** Se integraron las propiedades `originWhitelist={["*"]}` y `mixedContentMode="always"` al componente `<WebView>` en [apps/mobile/app/index.tsx](file:///c:/Users/gisse/sistema-pasantias-vinculacion/apps/mobile/app/index.tsx) para permitir tráfico mixto y redirecciones HTTP.
+- **Manejador Offline con Reintento:**
+  - Se modificó [apps/mobile/app/offline.tsx](file:///c:/Users/gisse/sistema-pasantias-vinculacion/apps/mobile/app/offline.tsx) para aceptar opcionalmente un prop `onRetry` de callback, enlazándolo al evento `onPress` del botón "Reintentar".
+  - Se configuró el componente de WebView en `index.tsx` usando hooks `useState` y `useRef` para capturar errores de red (`onError`, `onHttpError`) estableciendo un estado `hasError = true` y renderizando la pantalla de error offline de forma condicional.
+  - Al presionar reintentar, se limpia el error y se ejecuta el método `.reload()` nativo del WebView.
+
+## ✅ COMPLETADO HOY — Refactor formal de CQRS en hours-service (07/Jul)
+
+Se formalizó el patrón de diseño CQRS (Command Query Responsibility Segregation) en el microservicio `hours-service` sin alterar su comportamiento ni lógica de negocio:
+- **Clases de Comando:** Se crearon las clases inmutables `CreateHoursCommand` y `ValidateHoursCommand` en `com.uce.hours_service.cqrs.commands`.
+- **Servicio de Comandos (`HoursCommandService`):** Maneja la lógica de escritura (comandos) interactuando con PostgreSQL (`RegistroHorasRepository`) y publicando eventos a Kafka (`horas.registradas`). Se migró la serialización manual JSON a esta clase.
+- **Servicio de Consultas (`HoursQueryService`):** Administra la lectura (consultas) consultando MongoDB a través de `HorasResumenRepository`.
+- **Eliminación del Servicio Monolítico:** Se removió el antiguo `HoursService.java` para evitar duplicación.
+- **Actualización de Controladores y Tests:** Se adaptaron `HoursController.java` y su correspondiente `HoursControllerTest.java` inyectando y mockeando por separado ambos servicios CQRS con Mockito `@Mock` y `@InjectMocks` sin romper el ciclo de pruebas unitarias.
+- **Verificación Local:** Se corrió `./mvnw clean test-compile` confirmando la correcta compilación de todo el módulo y de todas sus suites de pruebas.
+
+## ✅ COMPLETADO HOY — Implementación de ASG y Launch Template en PROD (07/Jul)
+
+Se configuraron los recursos faltantes para habilitar el grupo de Auto Scaling (ASG) en el entorno de producción (PROD):
+- **Launch Template (`prod_lt`):** Se declaró el recurso `aws_launch_template.prod_lt` en [infra/prod/main.tf](file:///c:/Users/gisse/sistema-pasantias-vinculacion/infra/prod/main.tf) especificando tipo de instancia `t3.large`, disco `gp3` de `30GB` con eliminación al terminar, la clave `PROD` y el script de inicialización (`user_data`) para instalar Docker y habilitar el servicio.
+- **Auto Scaling Group (`prod_asg`):** Se definió `aws_autoscaling_group.prod_asg` con una capacidad deseada de 1, mínima de 1 y máxima de 3. Se asignaron las subredes privadas `private_1a` y `private_1b` para redundancia multizona.
+- **Verificación sintáctica:** Se corrió `terraform validate` en la carpeta `infra/prod` confirmando exitosamente que la configuración es válida y no quedan referencias rotas a recursos inexistentes.
+
+
+## ✅ COMPLETADO HOY — Fix de autoconfiguración de Kafka en internship-service (07/Jul)
+
+Se corrigió el fallo de inicialización del bean `KafkaTemplate` en el arranque de `internship-service` en el entorno de QA:
+- **Actualización de Dependencia:** Se reemplazó la dependencia simple de `org.springframework.kafka:spring-kafka` por el starter oficial `org.springframework.boot:spring-boot-starter-kafka` en [pom.xml](file:///c:/Users/gisse/sistema-pasantias-vinculacion/apps/internship-service/pom.xml). Esto permite que Spring Boot 4.0.6 resuelva e inyecte automáticamente la autoconfiguración del bean `KafkaTemplate`, solucionando el error "No qualifying bean of type KafkaTemplate".
+- **Verificación Local:** Se validó la correcta compilación y empaquetado del servicio ejecutando `./mvnw clean test-compile` con un resultado exitoso de `BUILD SUCCESS`.
+
+## ✅ COMPLETADO HOY — Fixes de arranque de servicios en QA (Kafka & Cassandra keyspace) (06/Jul)
+
+Se resolvieron dos fallos críticos detectados durante el arranque de la infraestructura en el entorno de QA:
+- **KAFKA_BOOTSTRAP_SERVERS en internship-service:** Se añadió la variable de entorno `KAFKA_BOOTSTRAP_SERVERS=kafka:9092` al contenedor `internship-service` en [deploy-qa.yml](file:///c:/Users/gisse/sistema-pasantias-vinculacion/infra/ansible/deploy-qa.yml) para corregir el fallo de inicialización por falta del bean de `KafkaTemplate`.
+- **Autocreación del keyspace pasantias_events en Cassandra:** Se insertó un paso automatizado en [deploy-qa.yml](file:///c:/Users/gisse/sistema-pasantias-vinculacion/infra/ansible/deploy-qa.yml) inmediatamente después de asegurar el arranque de Cassandra. Este paso espera a que Cassandra acepte conexiones CQL (bucle de hasta 30 reintentos cada 5s) y luego ejecuta la sentencia CQL `CREATE KEYSPACE IF NOT EXISTS pasantias_events WITH replication = {'class': 'SimpleStrategy', 'replication_factor': 1};` usando `docker exec cqlsh` de forma segura antes de levantar `notification-service`.
+
+## ✅ COMPLETADO HOY — Paridad de volumen de logs en producción (06/Jul)
+
+Se implementó el fix de logs en el entorno de producción para sincronizarlo con las mejoras aplicadas previamente en QA:
+- **Directorio de logs:** Se añadió la tarea "Crear directorio de logs" (`mkdir -p /var/log/pasantias && chmod 777 /var/log/pasantias`) antes del pull de imágenes en [deploy-prod.yml](file:///c:/Users/gisse/sistema-pasantias-vinculacion/infra/ansible/deploy-prod.yml).
+- **Volumen de Docker:** Se integró el volumen `-v /var/log/pasantias:/var/log/pasantias` en los bloques `docker run` de los 11 microservicios (auth, internship, user, linkage, hours, evaluation, notification, document, report, ai-service y gateway).
+- **Paridad de despliegue:** Esto asegura que los logs estructurados logback-spring.xml de producción se consoliden correctamente en el host del EC2 de producción.
 
 ## ✅ COMPLETADO HOY — Soporte de ignore_unreachable en bastion backups (06/Jul)
 
