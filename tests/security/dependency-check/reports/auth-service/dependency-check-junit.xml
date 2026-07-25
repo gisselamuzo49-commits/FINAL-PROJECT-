@@ -1,0 +1,840 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites failures="87" name="dependency-check" tests="87">
+        <testsuite failures="0" errors="0" time="0" id="0" name="/src/target/auth-service-0.0.1-SNAPSHOT.jar" package="auth-service-0.0.1-SNAPSHOT.jar" skipped="0" tests="1" timestamp="2026-07-25T06:24:56.273517819">
+            <testcase classname="dependency-check" name="auth-service-0.0.1-SNAPSHOT.jar"/>
+    </testsuite>
+        <testsuite failures="0" errors="0" time="0" id="1" name="/src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/HdrHistogram-2.2.2.jar" package="auth-service-0.0.1-SNAPSHOT.jar: HdrHistogram-2.2.2.jar" skipped="0" tests="1" timestamp="2026-07-25T06:24:56.273517819">
+            <testcase classname="dependency-check" name="auth-service-0.0.1-SNAPSHOT.jar: HdrHistogram-2.2.2.jar"/>
+    </testsuite>
+        <testsuite failures="0" errors="0" time="0" id="2" name="/src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/HikariCP-7.0.2.jar" package="auth-service-0.0.1-SNAPSHOT.jar: HikariCP-7.0.2.jar" skipped="0" tests="1" timestamp="2026-07-25T06:24:56.273517819">
+            <testcase classname="dependency-check" name="auth-service-0.0.1-SNAPSHOT.jar: HikariCP-7.0.2.jar"/>
+    </testsuite>
+        <testsuite failures="0" errors="0" time="0" id="3" name="/src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/LatencyUtils-2.0.3.jar" package="auth-service-0.0.1-SNAPSHOT.jar: LatencyUtils-2.0.3.jar" skipped="0" tests="1" timestamp="2026-07-25T06:24:56.273517819">
+            <testcase classname="dependency-check" name="auth-service-0.0.1-SNAPSHOT.jar: LatencyUtils-2.0.3.jar"/>
+    </testsuite>
+        <testsuite failures="0" errors="0" time="0" id="4" name="/src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/angus-activation-2.0.3.jar" package="auth-service-0.0.1-SNAPSHOT.jar: angus-activation-2.0.3.jar" skipped="0" tests="1" timestamp="2026-07-25T06:24:56.273517819">
+            <testcase classname="dependency-check" name="auth-service-0.0.1-SNAPSHOT.jar: angus-activation-2.0.3.jar"/>
+    </testsuite>
+        <testsuite failures="0" errors="0" time="0" id="5" name="/src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/antlr4-runtime-4.13.2.jar" package="auth-service-0.0.1-SNAPSHOT.jar: antlr4-runtime-4.13.2.jar" skipped="0" tests="1" timestamp="2026-07-25T06:24:56.273517819">
+            <testcase classname="dependency-check" name="auth-service-0.0.1-SNAPSHOT.jar: antlr4-runtime-4.13.2.jar"/>
+    </testsuite>
+        <testsuite failures="0" errors="0" time="0" id="6" name="/src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/aspectjweaver-1.9.25.1.jar" package="auth-service-0.0.1-SNAPSHOT.jar: aspectjweaver-1.9.25.1.jar" skipped="0" tests="1" timestamp="2026-07-25T06:24:56.273517819">
+            <testcase classname="dependency-check" name="auth-service-0.0.1-SNAPSHOT.jar: aspectjweaver-1.9.25.1.jar"/>
+    </testsuite>
+        <testsuite failures="0" errors="0" time="0" id="7" name="/src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/byte-buddy-1.17.8.jar" package="auth-service-0.0.1-SNAPSHOT.jar: byte-buddy-1.17.8.jar" skipped="0" tests="1" timestamp="2026-07-25T06:24:56.273517819">
+            <testcase classname="dependency-check" name="auth-service-0.0.1-SNAPSHOT.jar: byte-buddy-1.17.8.jar"/>
+    </testsuite>
+        <testsuite failures="0" errors="0" time="0" id="8" name="/src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/checker-qual-3.52.0.jar" package="auth-service-0.0.1-SNAPSHOT.jar: checker-qual-3.52.0.jar" skipped="0" tests="1" timestamp="2026-07-25T06:24:56.273517819">
+            <testcase classname="dependency-check" name="auth-service-0.0.1-SNAPSHOT.jar: checker-qual-3.52.0.jar"/>
+    </testsuite>
+        <testsuite failures="0" errors="0" time="0" id="9" name="/src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/classmate-1.7.3.jar" package="auth-service-0.0.1-SNAPSHOT.jar: classmate-1.7.3.jar" skipped="0" tests="1" timestamp="2026-07-25T06:24:56.273517819">
+            <testcase classname="dependency-check" name="auth-service-0.0.1-SNAPSHOT.jar: classmate-1.7.3.jar"/>
+    </testsuite>
+        <testsuite failures="0" errors="0" time="0" id="10" name="/src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/commons-lang3-3.19.0.jar" package="auth-service-0.0.1-SNAPSHOT.jar: commons-lang3-3.19.0.jar" skipped="0" tests="1" timestamp="2026-07-25T06:24:56.273517819">
+            <testcase classname="dependency-check" name="auth-service-0.0.1-SNAPSHOT.jar: commons-lang3-3.19.0.jar"/>
+    </testsuite>
+        <testsuite failures="0" errors="0" time="0" id="11" name="/src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/commons-logging-1.3.6.jar" package="auth-service-0.0.1-SNAPSHOT.jar: commons-logging-1.3.6.jar" skipped="0" tests="1" timestamp="2026-07-25T06:24:56.273517819">
+            <testcase classname="dependency-check" name="auth-service-0.0.1-SNAPSHOT.jar: commons-logging-1.3.6.jar"/>
+    </testsuite>
+        <testsuite failures="0" errors="0" time="0" id="12" name="/src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/hibernate-core-7.2.12.Final.jar" package="auth-service-0.0.1-SNAPSHOT.jar: hibernate-core-7.2.12.Final.jar" skipped="0" tests="1" timestamp="2026-07-25T06:24:56.273517819">
+            <testcase classname="dependency-check" name="auth-service-0.0.1-SNAPSHOT.jar: hibernate-core-7.2.12.Final.jar"/>
+    </testsuite>
+        <testsuite failures="0" errors="0" time="0" id="13" name="/src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/hibernate-models-1.0.1.jar" package="auth-service-0.0.1-SNAPSHOT.jar: hibernate-models-1.0.1.jar" skipped="0" tests="1" timestamp="2026-07-25T06:24:56.273517819">
+            <testcase classname="dependency-check" name="auth-service-0.0.1-SNAPSHOT.jar: hibernate-models-1.0.1.jar"/>
+    </testsuite>
+        <testsuite failures="0" errors="0" time="0" id="14" name="/src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/istack-commons-runtime-4.1.2.jar" package="auth-service-0.0.1-SNAPSHOT.jar: istack-commons-runtime-4.1.2.jar" skipped="0" tests="1" timestamp="2026-07-25T06:24:56.273517819">
+            <testcase classname="dependency-check" name="auth-service-0.0.1-SNAPSHOT.jar: istack-commons-runtime-4.1.2.jar"/>
+    </testsuite>
+        <testsuite failures="0" errors="0" time="0" id="15" name="/src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/jackson-annotations-2.21.jar" package="auth-service-0.0.1-SNAPSHOT.jar: jackson-annotations-2.21.jar" skipped="0" tests="1" timestamp="2026-07-25T06:24:56.273517819">
+            <testcase classname="dependency-check" name="auth-service-0.0.1-SNAPSHOT.jar: jackson-annotations-2.21.jar"/>
+    </testsuite>
+        <testsuite failures="0" errors="0" time="0" id="16" name="/src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/jackson-core-2.21.2.jar" package="auth-service-0.0.1-SNAPSHOT.jar: jackson-core-2.21.2.jar" skipped="0" tests="1" timestamp="2026-07-25T06:24:56.273517819">
+            <testcase classname="dependency-check" name="auth-service-0.0.1-SNAPSHOT.jar: jackson-core-2.21.2.jar"/>
+    </testsuite>
+        <testsuite failures="0" errors="0" time="0" id="17" name="/src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/jackson-core-3.1.2.jar" package="auth-service-0.0.1-SNAPSHOT.jar: jackson-core-3.1.2.jar" skipped="0" tests="1" timestamp="2026-07-25T06:24:56.273517819">
+            <testcase classname="dependency-check" name="auth-service-0.0.1-SNAPSHOT.jar: jackson-core-3.1.2.jar"/>
+    </testsuite>
+        <testsuite failures="7" errors="0" time="0" id="18" name="/src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/jackson-databind-2.21.2.jar" package="auth-service-0.0.1-SNAPSHOT.jar: jackson-databind-2.21.2.jar" skipped="0" tests="7" timestamp="2026-07-25T06:24:56.273517819">
+            <testcase classname="CVE-2026-54512" name="pkg:maven/com.fasterxml.jackson.core/jackson-databind@2.21.2">
+                <failure message="cvssV3: HIGH, score: 8.1 (CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H/E:P/RC:R/MAV:A)"/>
+            <system-out>jackson-databind contains the general-purpose data-binding functionality and tree-model for Jackson Data Processor. From 2.10.0 until 2.18.8, 2.21.4, and 3.1.4, jackson-databind&apos;s PolymorphicTypeValidator (PTV) is the primary safety mechanism guarding polymorphic deserialization. When polymorphic typing is enabled and a type identifier contains generic parameters (i.e. the type ID string contains &lt;), DatabindContext._resolveAndValidateGeneric() validates only the raw container class name (the substring before &lt;) against the configured PTV. If the container type is approved, the method parses the full canonical type string via TypeFactory.constructFromCanonical() and returns the fully parameterized type without ever validating the nested type arguments against the PTV. The nested type arguments are then resolved, instantiated, and populated as beans during deserialization. An attacker who controls the type ID can therefore place a denied class as a generic type parameter of an allowed container — for example java.util.ArrayList&lt;com.evil.Gadget&gt; when only java.util.ArrayList is allow-listed. The container passes the PTV check; com.evil.Gadget is loaded via Class.forName(name, true, loader), instantiated, and its properties are set from attacker-controlled JSON. This completely bypasses an explicitly configured PTV allow-list. This vulnerability is fixed in 2.18.8, 2.21.4, and 3.1.4.</system-out>
+            <system-err>location: /src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/jackson-databind-2.21.2.jar, project-references: [  ]</system-err>
+        </testcase>
+            <testcase classname="CVE-2026-54513" name="pkg:maven/com.fasterxml.jackson.core/jackson-databind@2.21.2">
+                <failure message="cvssV3: HIGH, score: 8.1 (CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H/E:P/RC:R/MAV:A)"/>
+            <system-out>jackson-databind contains the general-purpose data-binding functionality and tree-model for Jackson Data Processor. From 2.10.0 until 2.18.8, 2.21.4, and 3.1.4, BasicPolymorphicTypeValidator.Builder.allowIfSubTypeIsArray() allowlists any array type based only on clazz.isArray(), without validating the array&apos;s component (element) type against the configured allowlist. A PTV built with allowIfSubTypeIsArray() plus an explicit concrete-type allowlist therefore still permits EvilType[] even though EvilType is not allowlisted. When Jackson deserializes the elements and no per-element type IDs are present, it instantiates the component type directly with no further PTV check, bypassing the allowlist. This vulnerability is fixed in 2.18.8, 2.21.4, and 3.1.4.</system-out>
+            <system-err>location: /src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/jackson-databind-2.21.2.jar, project-references: [  ]</system-err>
+        </testcase>
+            <testcase classname="CVE-2026-54518" name="pkg:maven/com.fasterxml.jackson.core/jackson-databind@2.21.2">
+                <failure message="cvssV3: MEDIUM, score: 6.5 (CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:N/E:P/RC:R/MAV:A)"/>
+            <system-out>jackson-databind contains the general-purpose data-binding functionality and tree-model for Jackson Data Processor. From 2.21.0 until 2.21.4 and 3.1.4, UnwrappedPropertyHandler.processUnwrappedCreatorProperties() replays buffered JSON into creator parameters but never consults prop.visibleInView(activeView). The normal property-based creator path gates creator properties on the active view, but this unwrapped-creator replay path bypasses that check, so a constructor parameter annotated with both @JsonView(AdminView.class) and @JsonUnwrapped is populated from attacker JSON even when a more restrictive view is active. This vulnerability is fixed in 2.21.4 and 3.1.4.</system-out>
+            <system-err>location: /src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/jackson-databind-2.21.2.jar, project-references: [  ]</system-err>
+        </testcase>
+            <testcase classname="CVE-2026-54514" name="pkg:maven/com.fasterxml.jackson.core/jackson-databind@2.21.2">
+                <failure message="cvssV3: MEDIUM, score: 5.3 (CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N/E:P/RC:R/MAV:A)"/>
+            <system-out>jackson-databind contains the general-purpose data-binding functionality and tree-model for Jackson Data Processor. From 2.0.0 until 2.18.8, 2.21.4, and 3.1.4, JDKFromStringDeserializer constructed InetSocketAddress with new InetSocketAddress(host, port), which performs eager DNS name resolution for hostname inputs at deserialization time. An application that binds untrusted JSON into a type containing an InetSocketAddress field issues an attacker-chosen DNS query during readValue, before any application-level validation or connect logic. The fix uses InetSocketAddress.createUnresolved(host, port), deferring DNS to an explicit connect. This vulnerability is fixed in 2.18.8, 2.21.4, and 3.1.4.</system-out>
+            <system-err>location: /src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/jackson-databind-2.21.2.jar, project-references: [  ]</system-err>
+        </testcase>
+            <testcase classname="CVE-2026-54515" name="pkg:maven/com.fasterxml.jackson.core/jackson-databind@2.21.2">
+                <failure message="cvssV3: MEDIUM, score: 5.3 (CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:N/E:P/RC:R/MAV:A)"/>
+            <system-out>jackson-databind contains the general-purpose data-binding functionality and tree-model for Jackson Data Processor. From 2.8.0 until 2.18.9, 2.21.5, and 3.1.4, in BeanDeserializerBase.createContextual(), per-property @JsonIgnoreProperties exclusions are applied by _handleByNameInclusion(), producing a contextual deserializer whose BeanPropertyMap has the ignored properties removed. The subsequent per-property case-insensitivity block (triggered by @JsonFormat(ACCEPT_CASE_INSENSITIVE_PROPERTIES)) rebuilds from this._beanProperties (the original, unfiltered map) instead of contextual._beanProperties, then overwrites the filtered map — restoring every property _handleByNameInclusion had just removed. The ignored property becomes writable again. This vulnerability is fixed in 2.18.9, 2.21.5, and 3.1.4.</system-out>
+            <system-err>location: /src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/jackson-databind-2.21.2.jar, project-references: [  ]</system-err>
+        </testcase>
+            <testcase classname="CVE-2026-54516" name="pkg:maven/com.fasterxml.jackson.core/jackson-databind@2.21.2">
+                <failure message="cvssV3: MEDIUM, score: 5.3 (CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:N/E:P/RC:R/MAV:A)"/>
+            <system-out>jackson-databind contains the general-purpose data-binding functionality and tree-model for Jackson Data Processor. From 2.21.0 until 2.21.4 and 3.1.4, POJOPropertiesCollector._renameProperties() allows a property with @JsonProperty(&quot;renamed&quot;) on the getter and @JsonIgnore on the setter to be renamed rather than dropped. With MapperFeature.INFER_PROPERTY_MUTATORS enabled (default), the private backing field is retained; during deserialization BeanDeserializerFactory.addBeanProps() sees hasField()==true, builds a FieldProperty, and makes the backing field writable. An attacker supplying the renamed JSON key writes the backing field directly, bypassing the @JsonIgnore on the setter. This vulnerability is fixed in 3.1.4.</system-out>
+            <system-err>location: /src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/jackson-databind-2.21.2.jar, project-references: [  ]</system-err>
+        </testcase>
+            <testcase classname="CVE-2026-54517" name="pkg:maven/com.fasterxml.jackson.core/jackson-databind@2.21.2">
+                <failure message="cvssV3: MEDIUM, score: 5.3 (CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:N/E:P/RC:R/MAV:A)"/>
+            <system-out>jackson-databind contains the general-purpose data-binding functionality and tree-model for Jackson Data Processor. From 2.21.0 until 2.21.4 and 3.1.4, in BeanDeserializer._deserializeUsingPropertyBased, the active-view (@JsonView) filter was applied only to creator properties; the regular property-buffering branch performed no prop.visibleInView(activeView) check. A change making SetterlessProperty.isMerging() return true routed setterless Collection/Map properties through this unguarded path, so a setterless collection annotated with a restricted @JsonView is populated from attacker JSON even when the active view excludes it. This vulnerability is fixed in 2.21.4 and 3.1.4.</system-out>
+            <system-err>location: /src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/jackson-databind-2.21.2.jar, project-references: [  ]</system-err>
+        </testcase>
+    </testsuite>
+        <testsuite failures="7" errors="0" time="0" id="19" name="/src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/jackson-databind-3.1.2.jar" package="auth-service-0.0.1-SNAPSHOT.jar: jackson-databind-3.1.2.jar" skipped="0" tests="7" timestamp="2026-07-25T06:24:56.273517819">
+            <testcase classname="CVE-2026-54512" name="pkg:maven/tools.jackson.core/jackson-databind@3.1.2">
+                <failure message="cvssV3: HIGH, score: 8.1 (CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H/E:P/RC:R/MAV:A)"/>
+            <system-out>jackson-databind contains the general-purpose data-binding functionality and tree-model for Jackson Data Processor. From 2.10.0 until 2.18.8, 2.21.4, and 3.1.4, jackson-databind&apos;s PolymorphicTypeValidator (PTV) is the primary safety mechanism guarding polymorphic deserialization. When polymorphic typing is enabled and a type identifier contains generic parameters (i.e. the type ID string contains &lt;), DatabindContext._resolveAndValidateGeneric() validates only the raw container class name (the substring before &lt;) against the configured PTV. If the container type is approved, the method parses the full canonical type string via TypeFactory.constructFromCanonical() and returns the fully parameterized type without ever validating the nested type arguments against the PTV. The nested type arguments are then resolved, instantiated, and populated as beans during deserialization. An attacker who controls the type ID can therefore place a denied class as a generic type parameter of an allowed container — for example java.util.ArrayList&lt;com.evil.Gadget&gt; when only java.util.ArrayList is allow-listed. The container passes the PTV check; com.evil.Gadget is loaded via Class.forName(name, true, loader), instantiated, and its properties are set from attacker-controlled JSON. This completely bypasses an explicitly configured PTV allow-list. This vulnerability is fixed in 2.18.8, 2.21.4, and 3.1.4.</system-out>
+            <system-err>location: /src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/jackson-databind-3.1.2.jar, project-references: [  ]</system-err>
+        </testcase>
+            <testcase classname="CVE-2026-54513" name="pkg:maven/tools.jackson.core/jackson-databind@3.1.2">
+                <failure message="cvssV3: HIGH, score: 8.1 (CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:H/E:P/RC:R/MAV:A)"/>
+            <system-out>jackson-databind contains the general-purpose data-binding functionality and tree-model for Jackson Data Processor. From 2.10.0 until 2.18.8, 2.21.4, and 3.1.4, BasicPolymorphicTypeValidator.Builder.allowIfSubTypeIsArray() allowlists any array type based only on clazz.isArray(), without validating the array&apos;s component (element) type against the configured allowlist. A PTV built with allowIfSubTypeIsArray() plus an explicit concrete-type allowlist therefore still permits EvilType[] even though EvilType is not allowlisted. When Jackson deserializes the elements and no per-element type IDs are present, it instantiates the component type directly with no further PTV check, bypassing the allowlist. This vulnerability is fixed in 2.18.8, 2.21.4, and 3.1.4.</system-out>
+            <system-err>location: /src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/jackson-databind-3.1.2.jar, project-references: [  ]</system-err>
+        </testcase>
+            <testcase classname="CVE-2026-54518" name="pkg:maven/tools.jackson.core/jackson-databind@3.1.2">
+                <failure message="cvssV3: MEDIUM, score: 6.5 (CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:N/E:P/RC:R/MAV:A)"/>
+            <system-out>jackson-databind contains the general-purpose data-binding functionality and tree-model for Jackson Data Processor. From 2.21.0 until 2.21.4 and 3.1.4, UnwrappedPropertyHandler.processUnwrappedCreatorProperties() replays buffered JSON into creator parameters but never consults prop.visibleInView(activeView). The normal property-based creator path gates creator properties on the active view, but this unwrapped-creator replay path bypasses that check, so a constructor parameter annotated with both @JsonView(AdminView.class) and @JsonUnwrapped is populated from attacker JSON even when a more restrictive view is active. This vulnerability is fixed in 2.21.4 and 3.1.4.</system-out>
+            <system-err>location: /src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/jackson-databind-3.1.2.jar, project-references: [  ]</system-err>
+        </testcase>
+            <testcase classname="CVE-2026-54514" name="pkg:maven/tools.jackson.core/jackson-databind@3.1.2">
+                <failure message="cvssV3: MEDIUM, score: 5.3 (CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N/E:P/RC:R/MAV:A)"/>
+            <system-out>jackson-databind contains the general-purpose data-binding functionality and tree-model for Jackson Data Processor. From 2.0.0 until 2.18.8, 2.21.4, and 3.1.4, JDKFromStringDeserializer constructed InetSocketAddress with new InetSocketAddress(host, port), which performs eager DNS name resolution for hostname inputs at deserialization time. An application that binds untrusted JSON into a type containing an InetSocketAddress field issues an attacker-chosen DNS query during readValue, before any application-level validation or connect logic. The fix uses InetSocketAddress.createUnresolved(host, port), deferring DNS to an explicit connect. This vulnerability is fixed in 2.18.8, 2.21.4, and 3.1.4.</system-out>
+            <system-err>location: /src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/jackson-databind-3.1.2.jar, project-references: [  ]</system-err>
+        </testcase>
+            <testcase classname="CVE-2026-54515" name="pkg:maven/tools.jackson.core/jackson-databind@3.1.2">
+                <failure message="cvssV3: MEDIUM, score: 5.3 (CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:N/E:P/RC:R/MAV:A)"/>
+            <system-out>jackson-databind contains the general-purpose data-binding functionality and tree-model for Jackson Data Processor. From 2.8.0 until 2.18.9, 2.21.5, and 3.1.4, in BeanDeserializerBase.createContextual(), per-property @JsonIgnoreProperties exclusions are applied by _handleByNameInclusion(), producing a contextual deserializer whose BeanPropertyMap has the ignored properties removed. The subsequent per-property case-insensitivity block (triggered by @JsonFormat(ACCEPT_CASE_INSENSITIVE_PROPERTIES)) rebuilds from this._beanProperties (the original, unfiltered map) instead of contextual._beanProperties, then overwrites the filtered map — restoring every property _handleByNameInclusion had just removed. The ignored property becomes writable again. This vulnerability is fixed in 2.18.9, 2.21.5, and 3.1.4.</system-out>
+            <system-err>location: /src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/jackson-databind-3.1.2.jar, project-references: [  ]</system-err>
+        </testcase>
+            <testcase classname="CVE-2026-54516" name="pkg:maven/tools.jackson.core/jackson-databind@3.1.2">
+                <failure message="cvssV3: MEDIUM, score: 5.3 (CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:N/E:P/RC:R/MAV:A)"/>
+            <system-out>jackson-databind contains the general-purpose data-binding functionality and tree-model for Jackson Data Processor. From 2.21.0 until 2.21.4 and 3.1.4, POJOPropertiesCollector._renameProperties() allows a property with @JsonProperty(&quot;renamed&quot;) on the getter and @JsonIgnore on the setter to be renamed rather than dropped. With MapperFeature.INFER_PROPERTY_MUTATORS enabled (default), the private backing field is retained; during deserialization BeanDeserializerFactory.addBeanProps() sees hasField()==true, builds a FieldProperty, and makes the backing field writable. An attacker supplying the renamed JSON key writes the backing field directly, bypassing the @JsonIgnore on the setter. This vulnerability is fixed in 3.1.4.</system-out>
+            <system-err>location: /src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/jackson-databind-3.1.2.jar, project-references: [  ]</system-err>
+        </testcase>
+            <testcase classname="CVE-2026-54517" name="pkg:maven/tools.jackson.core/jackson-databind@3.1.2">
+                <failure message="cvssV3: MEDIUM, score: 5.3 (CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:N/E:P/RC:R/MAV:A)"/>
+            <system-out>jackson-databind contains the general-purpose data-binding functionality and tree-model for Jackson Data Processor. From 2.21.0 until 2.21.4 and 3.1.4, in BeanDeserializer._deserializeUsingPropertyBased, the active-view (@JsonView) filter was applied only to creator properties; the regular property-buffering branch performed no prop.visibleInView(activeView) check. A change making SetterlessProperty.isMerging() return true routed setterless Collection/Map properties through this unguarded path, so a setterless collection annotated with a restricted @JsonView is populated from attacker JSON even when the active view excludes it. This vulnerability is fixed in 2.21.4 and 3.1.4.</system-out>
+            <system-err>location: /src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/jackson-databind-3.1.2.jar, project-references: [  ]</system-err>
+        </testcase>
+    </testsuite>
+        <testsuite failures="0" errors="0" time="0" id="20" name="/src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/jackson-dataformat-yaml-2.21.2.jar" package="auth-service-0.0.1-SNAPSHOT.jar: jackson-dataformat-yaml-2.21.2.jar" skipped="0" tests="1" timestamp="2026-07-25T06:24:56.273517819">
+            <testcase classname="dependency-check" name="auth-service-0.0.1-SNAPSHOT.jar: jackson-dataformat-yaml-2.21.2.jar"/>
+    </testsuite>
+        <testsuite failures="0" errors="0" time="0" id="21" name="/src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/jackson-datatype-jsr310-2.21.2.jar" package="auth-service-0.0.1-SNAPSHOT.jar: jackson-datatype-jsr310-2.21.2.jar" skipped="0" tests="1" timestamp="2026-07-25T06:24:56.273517819">
+            <testcase classname="dependency-check" name="auth-service-0.0.1-SNAPSHOT.jar: jackson-datatype-jsr310-2.21.2.jar"/>
+    </testsuite>
+        <testsuite failures="0" errors="0" time="0" id="22" name="/src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/jakarta.activation-api-2.1.4.jar" package="auth-service-0.0.1-SNAPSHOT.jar: jakarta.activation-api-2.1.4.jar" skipped="0" tests="1" timestamp="2026-07-25T06:24:56.273517819">
+            <testcase classname="dependency-check" name="auth-service-0.0.1-SNAPSHOT.jar: jakarta.activation-api-2.1.4.jar"/>
+    </testsuite>
+        <testsuite failures="0" errors="0" time="0" id="23" name="/src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/jakarta.annotation-api-3.0.0.jar" package="auth-service-0.0.1-SNAPSHOT.jar: jakarta.annotation-api-3.0.0.jar" skipped="0" tests="1" timestamp="2026-07-25T06:24:56.273517819">
+            <testcase classname="dependency-check" name="auth-service-0.0.1-SNAPSHOT.jar: jakarta.annotation-api-3.0.0.jar"/>
+    </testsuite>
+        <testsuite failures="0" errors="0" time="0" id="24" name="/src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/jakarta.inject-api-2.0.1.jar" package="auth-service-0.0.1-SNAPSHOT.jar: jakarta.inject-api-2.0.1.jar" skipped="0" tests="1" timestamp="2026-07-25T06:24:56.273517819">
+            <testcase classname="dependency-check" name="auth-service-0.0.1-SNAPSHOT.jar: jakarta.inject-api-2.0.1.jar"/>
+    </testsuite>
+        <testsuite failures="0" errors="0" time="0" id="25" name="/src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/jakarta.persistence-api-3.2.0.jar" package="auth-service-0.0.1-SNAPSHOT.jar: jakarta.persistence-api-3.2.0.jar" skipped="0" tests="1" timestamp="2026-07-25T06:24:56.273517819">
+            <testcase classname="dependency-check" name="auth-service-0.0.1-SNAPSHOT.jar: jakarta.persistence-api-3.2.0.jar"/>
+    </testsuite>
+        <testsuite failures="0" errors="0" time="0" id="26" name="/src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/jakarta.transaction-api-2.0.1.jar" package="auth-service-0.0.1-SNAPSHOT.jar: jakarta.transaction-api-2.0.1.jar" skipped="0" tests="1" timestamp="2026-07-25T06:24:56.273517819">
+            <testcase classname="dependency-check" name="auth-service-0.0.1-SNAPSHOT.jar: jakarta.transaction-api-2.0.1.jar"/>
+    </testsuite>
+        <testsuite failures="0" errors="0" time="0" id="27" name="/src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/jakarta.validation-api-3.1.1.jar" package="auth-service-0.0.1-SNAPSHOT.jar: jakarta.validation-api-3.1.1.jar" skipped="0" tests="1" timestamp="2026-07-25T06:24:56.273517819">
+            <testcase classname="dependency-check" name="auth-service-0.0.1-SNAPSHOT.jar: jakarta.validation-api-3.1.1.jar"/>
+    </testsuite>
+        <testsuite failures="0" errors="0" time="0" id="28" name="/src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/jakarta.xml.bind-api-4.0.4.jar" package="auth-service-0.0.1-SNAPSHOT.jar: jakarta.xml.bind-api-4.0.4.jar" skipped="0" tests="1" timestamp="2026-07-25T06:24:56.273517819">
+            <testcase classname="dependency-check" name="auth-service-0.0.1-SNAPSHOT.jar: jakarta.xml.bind-api-4.0.4.jar"/>
+    </testsuite>
+        <testsuite failures="0" errors="0" time="0" id="29" name="/src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/jaxb-core-4.0.6.jar" package="auth-service-0.0.1-SNAPSHOT.jar: jaxb-core-4.0.6.jar" skipped="0" tests="1" timestamp="2026-07-25T06:24:56.273517819">
+            <testcase classname="dependency-check" name="auth-service-0.0.1-SNAPSHOT.jar: jaxb-core-4.0.6.jar"/>
+    </testsuite>
+        <testsuite failures="0" errors="0" time="0" id="30" name="/src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/jaxb-runtime-4.0.6.jar" package="auth-service-0.0.1-SNAPSHOT.jar: jaxb-runtime-4.0.6.jar" skipped="0" tests="1" timestamp="2026-07-25T06:24:56.273517819">
+            <testcase classname="dependency-check" name="auth-service-0.0.1-SNAPSHOT.jar: jaxb-runtime-4.0.6.jar"/>
+    </testsuite>
+        <testsuite failures="0" errors="0" time="0" id="31" name="/src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/jboss-logging-3.6.3.Final.jar" package="auth-service-0.0.1-SNAPSHOT.jar: jboss-logging-3.6.3.Final.jar" skipped="0" tests="1" timestamp="2026-07-25T06:24:56.273517819">
+            <testcase classname="dependency-check" name="auth-service-0.0.1-SNAPSHOT.jar: jboss-logging-3.6.3.Final.jar"/>
+    </testsuite>
+        <testsuite failures="0" errors="0" time="0" id="32" name="/src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/jjwt-api-0.13.0.jar" package="auth-service-0.0.1-SNAPSHOT.jar: jjwt-api-0.13.0.jar" skipped="0" tests="1" timestamp="2026-07-25T06:24:56.273517819">
+            <testcase classname="dependency-check" name="auth-service-0.0.1-SNAPSHOT.jar: jjwt-api-0.13.0.jar"/>
+    </testsuite>
+        <testsuite failures="0" errors="0" time="0" id="33" name="/src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/jjwt-impl-0.13.0.jar" package="auth-service-0.0.1-SNAPSHOT.jar: jjwt-impl-0.13.0.jar" skipped="0" tests="1" timestamp="2026-07-25T06:24:56.273517819">
+            <testcase classname="dependency-check" name="auth-service-0.0.1-SNAPSHOT.jar: jjwt-impl-0.13.0.jar"/>
+    </testsuite>
+        <testsuite failures="0" errors="0" time="0" id="34" name="/src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/jjwt-jackson-0.13.0.jar" package="auth-service-0.0.1-SNAPSHOT.jar: jjwt-jackson-0.13.0.jar" skipped="0" tests="1" timestamp="2026-07-25T06:24:56.273517819">
+            <testcase classname="dependency-check" name="auth-service-0.0.1-SNAPSHOT.jar: jjwt-jackson-0.13.0.jar"/>
+    </testsuite>
+        <testsuite failures="0" errors="0" time="0" id="35" name="/src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/jspecify-1.0.0.jar" package="auth-service-0.0.1-SNAPSHOT.jar: jspecify-1.0.0.jar" skipped="0" tests="1" timestamp="2026-07-25T06:24:56.273517819">
+            <testcase classname="dependency-check" name="auth-service-0.0.1-SNAPSHOT.jar: jspecify-1.0.0.jar"/>
+    </testsuite>
+        <testsuite failures="0" errors="0" time="0" id="36" name="/src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/jul-to-slf4j-2.0.17.jar" package="auth-service-0.0.1-SNAPSHOT.jar: jul-to-slf4j-2.0.17.jar" skipped="0" tests="1" timestamp="2026-07-25T06:24:56.273517819">
+            <testcase classname="dependency-check" name="auth-service-0.0.1-SNAPSHOT.jar: jul-to-slf4j-2.0.17.jar"/>
+    </testsuite>
+        <testsuite failures="1" errors="0" time="0" id="37" name="/src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/log4j-api-2.25.4.jar" package="auth-service-0.0.1-SNAPSHOT.jar: log4j-api-2.25.4.jar" skipped="0" tests="1" timestamp="2026-07-25T06:24:56.273517819">
+            <testcase classname="CVE-2026-49844" name="pkg:maven/org.apache.logging.log4j/log4j-api@2.25.4">
+                <failure message="cvssV4: MEDIUM, score: 6.3 (CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:N/VI:N/VA:N/SC:N/SI:L/SA:N/E:X/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X)"/>
+            <system-out>Improper encoding of non-finite floating-point values during MapMessage JSON serialization in Apache Log4j API produces output that is not valid JSON. This issue affects Apache Log4j API versions 2.13.1 through 2.25.4 and version 2.26.0.
+
+The fix for CVE-2026-34481 did not cover all code paths: when a MapMessage contains a non-finite IEEE 754 value (NaN, Infinity, or -Infinity), MapMessage.asJson() emits the corresponding bare token. RFC 8259 does not permit these tokens, so a conformant parser rejects the resulting document.
+
+The defect is reachable only when both of the following conditions hold:
+
+  *  The application uses the  message resolver https://logging.apache.org/log4j/2.x/manual/json-template-layout.html#event-template-resolver-message  of JsonTemplateLayout or any other layout that relies on MapMessage.asJson() or MapMessage.getFormattedMessage(new String[]{&quot;JSON&quot;}).
+  *  The application logs a MapMessage that contains an attacker-controlled floating-point value.
+
+
+An attacker who can supply a non-finite value can cause the affected layout to emit malformed JSON, which may corrupt the enclosing log record or disrupt downstream log ingestion and parsing.
+
+Users are advised to upgrade to Apache Log4j API 2.25.5 or 2.26.1, both of which emit RFC 8259-compliant JSON for non-finite values.</system-out>
+            <system-err>location: /src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/log4j-api-2.25.4.jar, project-references: [  ]</system-err>
+        </testcase>
+    </testsuite>
+        <testsuite failures="0" errors="0" time="0" id="38" name="/src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/logback-core-1.5.32.jar" package="auth-service-0.0.1-SNAPSHOT.jar: logback-core-1.5.32.jar" skipped="0" tests="1" timestamp="2026-07-25T06:24:56.273517819">
+            <testcase classname="dependency-check" name="auth-service-0.0.1-SNAPSHOT.jar: logback-core-1.5.32.jar"/>
+    </testsuite>
+        <testsuite failures="0" errors="0" time="0" id="39" name="/src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/logstash-logback-encoder-7.4.jar" package="auth-service-0.0.1-SNAPSHOT.jar: logstash-logback-encoder-7.4.jar" skipped="0" tests="1" timestamp="2026-07-25T06:24:56.273517819">
+            <testcase classname="dependency-check" name="auth-service-0.0.1-SNAPSHOT.jar: logstash-logback-encoder-7.4.jar"/>
+    </testsuite>
+        <testsuite failures="0" errors="0" time="0" id="40" name="/src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/micrometer-core-1.16.5.jar" package="auth-service-0.0.1-SNAPSHOT.jar: micrometer-core-1.16.5.jar" skipped="0" tests="1" timestamp="2026-07-25T06:24:56.273517819">
+            <testcase classname="dependency-check" name="auth-service-0.0.1-SNAPSHOT.jar: micrometer-core-1.16.5.jar"/>
+    </testsuite>
+        <testsuite failures="2" errors="0" time="0" id="41" name="/src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/postgresql-42.7.10.jar" package="auth-service-0.0.1-SNAPSHOT.jar: postgresql-42.7.10.jar" skipped="0" tests="2" timestamp="2026-07-25T06:24:56.273517819">
+            <testcase classname="CVE-2026-54291" name="cpe:2.3:a:postgresql:postgresql_jdbc_driver:*:*:*:*:*:*:*:* versions from (including) 42.7.4; versions up to (excluding) 42.7.12">
+                <failure message="cvssV4: HIGH, score: 8.2 (CVSS:4.0/AV:N/AC:H/AT:P/PR:N/UI:N/VC:N/VI:H/VA:N/SC:N/SI:L/SA:N/E:X/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X)"/>
+            <system-out>pgjdbc is an open source postgresql JDBC Driver. In releases 42.7.4 through 42.7.11, channelBinding=require connections can be silently downgraded from SCRAM-SHA-256-PLUS with channel binding to plain SCRAM-SHA-256 without it, losing the man-in-the-middle protection the setting is meant to guarantee. An attacker who can intercept the TLS connection can trigger the downgrade with a certificate whose signature algorithm has no tls-server-end-point channel-binding hash, because the bundled com.ongres.scram:scram-client returns an empty byte array instead of failing and pgJDBC ScramAuthenticator checks only that the server advertised a PLUS mechanism, without rejecting the empty binding or checking that the negotiated mechanism uses channel binding. This issue is fixed in version 42.7.12.</system-out>
+            <system-err>location: /src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/postgresql-42.7.10.jar, project-references: [  ]</system-err>
+        </testcase>
+            <testcase classname="CVE-2026-42198" name="cpe:2.3:a:postgresql:postgresql_jdbc_driver:*:*:*:*:*:*:*:* versions from (including) 42.2.0; versions up to (excluding) 42.7.11">
+                <failure message="cvssV3: HIGH, score: 7.5 (CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H/E:P/RC:R/MAV:A)"/>
+            <system-out>pgjdbc is an open source postgresql JDBC Driver. From version 42.2.0 to before version 42.7.11, pgjdbc is vulnerable to a client-side denial of service during SCRAM-SHA-256 authentication. A malicious server can instruct the driver to perform SCRAM authentication with a very large iteration count. With a large enough value, the client spends an unbounded amount of CPU time inside PBKDF2 before authentication can fail. A single attempt ties up a CPU core. Repeated or concurrent attempts exhaust client CPU and can wedge connection pools. In affected versions, loginTimeout did not fully mitigate this problem. When loginTimeout expired, the caller could stop waiting, but the worker thread performing the connection attempt could continue running and burning CPU inside the SCRAM PBKDF2 computation. This issue has been patched in version 42.7.11.</system-out>
+            <system-err>location: /src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/postgresql-42.7.10.jar, project-references: [  ]</system-err>
+        </testcase>
+    </testsuite>
+        <testsuite failures="0" errors="0" time="0" id="42" name="/src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/resilience4j-annotations-2.2.0.jar" package="auth-service-0.0.1-SNAPSHOT.jar: resilience4j-annotations-2.2.0.jar" skipped="0" tests="1" timestamp="2026-07-25T06:24:56.273517819">
+            <testcase classname="dependency-check" name="auth-service-0.0.1-SNAPSHOT.jar: resilience4j-annotations-2.2.0.jar"/>
+    </testsuite>
+        <testsuite failures="0" errors="0" time="0" id="43" name="/src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/resilience4j-bulkhead-2.2.0.jar" package="auth-service-0.0.1-SNAPSHOT.jar: resilience4j-bulkhead-2.2.0.jar" skipped="0" tests="1" timestamp="2026-07-25T06:24:56.273517819">
+            <testcase classname="dependency-check" name="auth-service-0.0.1-SNAPSHOT.jar: resilience4j-bulkhead-2.2.0.jar"/>
+    </testsuite>
+        <testsuite failures="0" errors="0" time="0" id="44" name="/src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/resilience4j-circuitbreaker-2.2.0.jar" package="auth-service-0.0.1-SNAPSHOT.jar: resilience4j-circuitbreaker-2.2.0.jar" skipped="0" tests="1" timestamp="2026-07-25T06:24:56.273517819">
+            <testcase classname="dependency-check" name="auth-service-0.0.1-SNAPSHOT.jar: resilience4j-circuitbreaker-2.2.0.jar"/>
+    </testsuite>
+        <testsuite failures="0" errors="0" time="0" id="45" name="/src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/resilience4j-circularbuffer-2.2.0.jar" package="auth-service-0.0.1-SNAPSHOT.jar: resilience4j-circularbuffer-2.2.0.jar" skipped="0" tests="1" timestamp="2026-07-25T06:24:56.273517819">
+            <testcase classname="dependency-check" name="auth-service-0.0.1-SNAPSHOT.jar: resilience4j-circularbuffer-2.2.0.jar"/>
+    </testsuite>
+        <testsuite failures="0" errors="0" time="0" id="46" name="/src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/resilience4j-consumer-2.2.0.jar" package="auth-service-0.0.1-SNAPSHOT.jar: resilience4j-consumer-2.2.0.jar" skipped="0" tests="1" timestamp="2026-07-25T06:24:56.273517819">
+            <testcase classname="dependency-check" name="auth-service-0.0.1-SNAPSHOT.jar: resilience4j-consumer-2.2.0.jar"/>
+    </testsuite>
+        <testsuite failures="0" errors="0" time="0" id="47" name="/src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/resilience4j-core-2.2.0.jar" package="auth-service-0.0.1-SNAPSHOT.jar: resilience4j-core-2.2.0.jar" skipped="0" tests="1" timestamp="2026-07-25T06:24:56.273517819">
+            <testcase classname="dependency-check" name="auth-service-0.0.1-SNAPSHOT.jar: resilience4j-core-2.2.0.jar"/>
+    </testsuite>
+        <testsuite failures="0" errors="0" time="0" id="48" name="/src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/resilience4j-framework-common-2.2.0.jar" package="auth-service-0.0.1-SNAPSHOT.jar: resilience4j-framework-common-2.2.0.jar" skipped="0" tests="1" timestamp="2026-07-25T06:24:56.273517819">
+            <testcase classname="dependency-check" name="auth-service-0.0.1-SNAPSHOT.jar: resilience4j-framework-common-2.2.0.jar"/>
+    </testsuite>
+        <testsuite failures="0" errors="0" time="0" id="49" name="/src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/resilience4j-micrometer-2.2.0.jar" package="auth-service-0.0.1-SNAPSHOT.jar: resilience4j-micrometer-2.2.0.jar" skipped="0" tests="1" timestamp="2026-07-25T06:24:56.273517819">
+            <testcase classname="dependency-check" name="auth-service-0.0.1-SNAPSHOT.jar: resilience4j-micrometer-2.2.0.jar"/>
+    </testsuite>
+        <testsuite failures="0" errors="0" time="0" id="50" name="/src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/resilience4j-ratelimiter-2.2.0.jar" package="auth-service-0.0.1-SNAPSHOT.jar: resilience4j-ratelimiter-2.2.0.jar" skipped="0" tests="1" timestamp="2026-07-25T06:24:56.273517819">
+            <testcase classname="dependency-check" name="auth-service-0.0.1-SNAPSHOT.jar: resilience4j-ratelimiter-2.2.0.jar"/>
+    </testsuite>
+        <testsuite failures="0" errors="0" time="0" id="51" name="/src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/resilience4j-retry-2.2.0.jar" package="auth-service-0.0.1-SNAPSHOT.jar: resilience4j-retry-2.2.0.jar" skipped="0" tests="1" timestamp="2026-07-25T06:24:56.273517819">
+            <testcase classname="dependency-check" name="auth-service-0.0.1-SNAPSHOT.jar: resilience4j-retry-2.2.0.jar"/>
+    </testsuite>
+        <testsuite failures="0" errors="0" time="0" id="52" name="/src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/resilience4j-spring-boot3-2.2.0.jar" package="auth-service-0.0.1-SNAPSHOT.jar: resilience4j-spring-boot3-2.2.0.jar" skipped="0" tests="1" timestamp="2026-07-25T06:24:56.273517819">
+            <testcase classname="dependency-check" name="auth-service-0.0.1-SNAPSHOT.jar: resilience4j-spring-boot3-2.2.0.jar"/>
+    </testsuite>
+        <testsuite failures="0" errors="0" time="0" id="53" name="/src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/resilience4j-spring6-2.2.0.jar" package="auth-service-0.0.1-SNAPSHOT.jar: resilience4j-spring6-2.2.0.jar" skipped="0" tests="1" timestamp="2026-07-25T06:24:56.273517819">
+            <testcase classname="dependency-check" name="auth-service-0.0.1-SNAPSHOT.jar: resilience4j-spring6-2.2.0.jar"/>
+    </testsuite>
+        <testsuite failures="0" errors="0" time="0" id="54" name="/src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/resilience4j-timelimiter-2.2.0.jar" package="auth-service-0.0.1-SNAPSHOT.jar: resilience4j-timelimiter-2.2.0.jar" skipped="0" tests="1" timestamp="2026-07-25T06:24:56.273517819">
+            <testcase classname="dependency-check" name="auth-service-0.0.1-SNAPSHOT.jar: resilience4j-timelimiter-2.2.0.jar"/>
+    </testsuite>
+        <testsuite failures="0" errors="0" time="0" id="55" name="/src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/slf4j-api-2.0.17.jar" package="auth-service-0.0.1-SNAPSHOT.jar: slf4j-api-2.0.17.jar" skipped="0" tests="1" timestamp="2026-07-25T06:24:56.273517819">
+            <testcase classname="dependency-check" name="auth-service-0.0.1-SNAPSHOT.jar: slf4j-api-2.0.17.jar"/>
+    </testsuite>
+        <testsuite failures="0" errors="0" time="0" id="56" name="/src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/snakeyaml-2.5.jar" package="auth-service-0.0.1-SNAPSHOT.jar: snakeyaml-2.5.jar" skipped="0" tests="1" timestamp="2026-07-25T06:24:56.273517819">
+            <testcase classname="dependency-check" name="auth-service-0.0.1-SNAPSHOT.jar: snakeyaml-2.5.jar"/>
+    </testsuite>
+        <testsuite failures="0" errors="0" time="0" id="57" name="/src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/spring-boot-4.0.6.jar" package="auth-service-0.0.1-SNAPSHOT.jar: spring-boot-4.0.6.jar" skipped="0" tests="1" timestamp="2026-07-25T06:24:56.273517819">
+            <testcase classname="dependency-check" name="auth-service-0.0.1-SNAPSHOT.jar: spring-boot-4.0.6.jar"/>
+    </testsuite>
+        <testsuite failures="0" errors="0" time="0" id="58" name="/src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/spring-boot-autoconfigure-4.0.6.jar" package="auth-service-0.0.1-SNAPSHOT.jar: spring-boot-autoconfigure-4.0.6.jar" skipped="0" tests="1" timestamp="2026-07-25T06:24:56.273517819">
+            <testcase classname="dependency-check" name="auth-service-0.0.1-SNAPSHOT.jar: spring-boot-autoconfigure-4.0.6.jar"/>
+    </testsuite>
+        <testsuite failures="0" errors="0" time="0" id="59" name="/src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/spring-boot-data-commons-4.0.6.jar" package="auth-service-0.0.1-SNAPSHOT.jar: spring-boot-data-commons-4.0.6.jar" skipped="0" tests="1" timestamp="2026-07-25T06:24:56.273517819">
+            <testcase classname="dependency-check" name="auth-service-0.0.1-SNAPSHOT.jar: spring-boot-data-commons-4.0.6.jar"/>
+    </testsuite>
+        <testsuite failures="0" errors="0" time="0" id="60" name="/src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/spring-boot-data-jpa-4.0.6.jar" package="auth-service-0.0.1-SNAPSHOT.jar: spring-boot-data-jpa-4.0.6.jar" skipped="0" tests="1" timestamp="2026-07-25T06:24:56.273517819">
+            <testcase classname="dependency-check" name="auth-service-0.0.1-SNAPSHOT.jar: spring-boot-data-jpa-4.0.6.jar"/>
+    </testsuite>
+        <testsuite failures="0" errors="0" time="0" id="61" name="/src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/spring-boot-hibernate-4.0.6.jar" package="auth-service-0.0.1-SNAPSHOT.jar: spring-boot-hibernate-4.0.6.jar" skipped="0" tests="1" timestamp="2026-07-25T06:24:56.273517819">
+            <testcase classname="dependency-check" name="auth-service-0.0.1-SNAPSHOT.jar: spring-boot-hibernate-4.0.6.jar"/>
+    </testsuite>
+        <testsuite failures="0" errors="0" time="0" id="62" name="/src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/spring-boot-http-converter-4.0.6.jar" package="auth-service-0.0.1-SNAPSHOT.jar: spring-boot-http-converter-4.0.6.jar" skipped="0" tests="1" timestamp="2026-07-25T06:24:56.273517819">
+            <testcase classname="dependency-check" name="auth-service-0.0.1-SNAPSHOT.jar: spring-boot-http-converter-4.0.6.jar"/>
+    </testsuite>
+        <testsuite failures="0" errors="0" time="0" id="63" name="/src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/spring-boot-jackson-4.0.6.jar" package="auth-service-0.0.1-SNAPSHOT.jar: spring-boot-jackson-4.0.6.jar" skipped="0" tests="1" timestamp="2026-07-25T06:24:56.273517819">
+            <testcase classname="dependency-check" name="auth-service-0.0.1-SNAPSHOT.jar: spring-boot-jackson-4.0.6.jar"/>
+    </testsuite>
+        <testsuite failures="0" errors="0" time="0" id="64" name="/src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/spring-boot-jarmode-tools-4.0.6.jar" package="auth-service-0.0.1-SNAPSHOT.jar: spring-boot-jarmode-tools-4.0.6.jar" skipped="0" tests="1" timestamp="2026-07-25T06:24:56.273517819">
+            <testcase classname="dependency-check" name="auth-service-0.0.1-SNAPSHOT.jar: spring-boot-jarmode-tools-4.0.6.jar"/>
+    </testsuite>
+        <testsuite failures="0" errors="0" time="0" id="65" name="/src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/spring-boot-jdbc-4.0.6.jar" package="auth-service-0.0.1-SNAPSHOT.jar: spring-boot-jdbc-4.0.6.jar" skipped="0" tests="1" timestamp="2026-07-25T06:24:56.273517819">
+            <testcase classname="dependency-check" name="auth-service-0.0.1-SNAPSHOT.jar: spring-boot-jdbc-4.0.6.jar"/>
+    </testsuite>
+        <testsuite failures="0" errors="0" time="0" id="66" name="/src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/spring-boot-jpa-4.0.6.jar" package="auth-service-0.0.1-SNAPSHOT.jar: spring-boot-jpa-4.0.6.jar" skipped="0" tests="1" timestamp="2026-07-25T06:24:56.273517819">
+            <testcase classname="dependency-check" name="auth-service-0.0.1-SNAPSHOT.jar: spring-boot-jpa-4.0.6.jar"/>
+    </testsuite>
+        <testsuite failures="0" errors="0" time="0" id="67" name="/src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/spring-boot-persistence-4.0.6.jar" package="auth-service-0.0.1-SNAPSHOT.jar: spring-boot-persistence-4.0.6.jar" skipped="0" tests="1" timestamp="2026-07-25T06:24:56.273517819">
+            <testcase classname="dependency-check" name="auth-service-0.0.1-SNAPSHOT.jar: spring-boot-persistence-4.0.6.jar"/>
+    </testsuite>
+        <testsuite failures="0" errors="0" time="0" id="68" name="/src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/spring-boot-servlet-4.0.6.jar" package="auth-service-0.0.1-SNAPSHOT.jar: spring-boot-servlet-4.0.6.jar" skipped="0" tests="1" timestamp="2026-07-25T06:24:56.273517819">
+            <testcase classname="dependency-check" name="auth-service-0.0.1-SNAPSHOT.jar: spring-boot-servlet-4.0.6.jar"/>
+    </testsuite>
+        <testsuite failures="0" errors="0" time="0" id="69" name="/src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/spring-boot-sql-4.0.6.jar" package="auth-service-0.0.1-SNAPSHOT.jar: spring-boot-sql-4.0.6.jar" skipped="0" tests="1" timestamp="2026-07-25T06:24:56.273517819">
+            <testcase classname="dependency-check" name="auth-service-0.0.1-SNAPSHOT.jar: spring-boot-sql-4.0.6.jar"/>
+    </testsuite>
+        <testsuite failures="0" errors="0" time="0" id="70" name="/src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/spring-boot-tomcat-4.0.6.jar" package="auth-service-0.0.1-SNAPSHOT.jar: spring-boot-tomcat-4.0.6.jar" skipped="0" tests="1" timestamp="2026-07-25T06:24:56.273517819">
+            <testcase classname="dependency-check" name="auth-service-0.0.1-SNAPSHOT.jar: spring-boot-tomcat-4.0.6.jar"/>
+    </testsuite>
+        <testsuite failures="0" errors="0" time="0" id="71" name="/src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/spring-boot-transaction-4.0.6.jar" package="auth-service-0.0.1-SNAPSHOT.jar: spring-boot-transaction-4.0.6.jar" skipped="0" tests="1" timestamp="2026-07-25T06:24:56.273517819">
+            <testcase classname="dependency-check" name="auth-service-0.0.1-SNAPSHOT.jar: spring-boot-transaction-4.0.6.jar"/>
+    </testsuite>
+        <testsuite failures="0" errors="0" time="0" id="72" name="/src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/spring-boot-web-server-4.0.6.jar" package="auth-service-0.0.1-SNAPSHOT.jar: spring-boot-web-server-4.0.6.jar" skipped="0" tests="1" timestamp="2026-07-25T06:24:56.273517819">
+            <testcase classname="dependency-check" name="auth-service-0.0.1-SNAPSHOT.jar: spring-boot-web-server-4.0.6.jar"/>
+    </testsuite>
+        <testsuite failures="0" errors="0" time="0" id="73" name="/src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/spring-boot-webmvc-4.0.6.jar" package="auth-service-0.0.1-SNAPSHOT.jar: spring-boot-webmvc-4.0.6.jar" skipped="0" tests="1" timestamp="2026-07-25T06:24:56.273517819">
+            <testcase classname="dependency-check" name="auth-service-0.0.1-SNAPSHOT.jar: spring-boot-webmvc-4.0.6.jar"/>
+    </testsuite>
+        <testsuite failures="16" errors="0" time="0" id="74" name="/src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/spring-core-7.0.7.jar" package="auth-service-0.0.1-SNAPSHOT.jar: spring-core-7.0.7.jar" skipped="0" tests="16" timestamp="2026-07-25T06:24:56.273517819">
+            <testcase classname="CVE-2026-41855" name="cpe:2.3:a:vmware:spring_framework:*:*:*:*:*:*:*:* versions from (including) 7.0.0; versions up to (excluding) 7.0.7.1">
+                <failure message="cvssV3: CRITICAL, score: 9.8 (CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H/E:P/RC:R/MAV:A)"/>
+            <system-out>In an untrusted JMS environment, org.springframework.jms.support.converter.MappingJackson2MessageConverter and org.springframework.jms.support.converter.JacksonJsonMessageConverter allow arbitrary class instantiation, which can lead to unauthorized actions via gadget class deserialization.
+
+Affected versions:
+Spring Framework 7.0.0 through 7.0.7; 6.2.0 through 6.2.18; 6.1.0 through 6.1.27; 5.3.0 through 5.3.48.</system-out>
+            <system-err>location: /src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/spring-core-7.0.7.jar, project-references: [  ]</system-err>
+        </testcase>
+            <testcase classname="CVE-2026-41838" name="cpe:2.3:a:vmware:spring_framework:*:*:*:*:*:*:*:* versions from (including) 7.0.0; versions up to (excluding) 7.0.7.1">
+                <failure message="cvssV3: HIGH, score: 7.5 (CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N/E:P/RC:R/MAV:A)"/>
+            <system-out>IDs for WebSocket sessions in the spring-websocket module are not cryptographically unpredictable, which may be possible to exploit in combination with inadequate authorization rules.
+
+Affected versions:
+Spring Framework 7.0.0 through 7.0.7; 6.2.0 through 6.2.18; 6.1.0 through 6.1.27; 5.3.0 through 5.3.48.</system-out>
+            <system-err>location: /src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/spring-core-7.0.7.jar, project-references: [  ]</system-err>
+        </testcase>
+            <testcase classname="CVE-2026-41842" name="cpe:2.3:a:vmware:spring_framework:*:*:*:*:*:*:*:* versions from (including) 7.0.0; versions up to (excluding) 7.0.7.1">
+                <failure message="cvssV3: HIGH, score: 7.5 (CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H/E:P/RC:R/MAV:A)"/>
+            <system-out>Spring MVC and WebFlux applications are vulnerable to Denial of Service (DoS) attacks when resolving static resources.
+
+Affected versions:
+Spring Framework 7.0.0 through 7.0.7; 6.2.0 through 6.2.18; 6.1.0 through 6.1.27; 5.3.0 through 5.3.48.</system-out>
+            <system-err>location: /src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/spring-core-7.0.7.jar, project-references: [  ]</system-err>
+        </testcase>
+            <testcase classname="CVE-2026-41848" name="cpe:2.3:a:vmware:spring_framework:*:*:*:*:*:*:*:* versions from (including) 7.0.0; versions up to (excluding) 7.0.7.1">
+                <failure message="cvssV3: HIGH, score: 7.5 (CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H/E:P/RC:R/MAV:A)"/>
+            <system-out>Applications may be vulnerable to a Regular Expression Denial of Service (ReDoS) attack if an attacker is able to provide a pattern which is then directly or indirectly supplied to one of the following methods in AntPathMatcher: match(String pattern, String path), matchStart(String pattern, String path), extractUriTemplateVariables(String pattern, String path).
+
+Affected versions:
+Spring Framework 7.0.0 through 7.0.7; 6.2.0 through 6.2.18; 6.1.0 through 6.1.27; 5.3.0 through 5.3.48.</system-out>
+            <system-err>location: /src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/spring-core-7.0.7.jar, project-references: [  ]</system-err>
+        </testcase>
+            <testcase classname="CVE-2026-41850" name="cpe:2.3:a:vmware:spring_framework:*:*:*:*:*:*:*:* versions from (including) 7.0.0; versions up to (excluding) 7.0.7.1">
+                <failure message="cvssV3: HIGH, score: 7.5 (CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H/E:P/RC:R/MAV:A)"/>
+            <system-out>Applications that evaluate user-supplied Spring Expression Language (SpEL) expressions are vulnerable to an Algorithmic Denial of Service (DoS). By providing a specially crafted expression, an attacker can trigger excessive resource consumption during evaluation, leading to application degradation or unavailability.
+
+Affected versions:
+Spring Framework 7.0.0 through 7.0.7; 6.2.0 through 6.2.18; 6.1.0 through 6.1.27; 5.3.0 through 5.3.48.</system-out>
+            <system-err>location: /src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/spring-core-7.0.7.jar, project-references: [  ]</system-err>
+        </testcase>
+            <testcase classname="CVE-2026-41851" name="cpe:2.3:a:vmware:spring_framework:*:*:*:*:*:*:*:* versions from (including) 7.0.0; versions up to (excluding) 7.0.7.1">
+                <failure message="cvssV3: HIGH, score: 7.5 (CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H/E:P/RC:R/MAV:A)"/>
+            <system-out>Applications which accept user-supplied Spring Expression Language (SpEL) expressions may be vulnerable to a Denial of Service (DoS) attack if the evaluation of a SpEL expression triggers unbounded cache growth.
+
+Affected versions:
+Spring Framework 7.0.0 through 7.0.7; 6.2.0 through 6.2.18; 6.1.0 through 6.1.27; 5.3.0 through 5.3.48.</system-out>
+            <system-err>location: /src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/spring-core-7.0.7.jar, project-references: [  ]</system-err>
+        </testcase>
+            <testcase classname="CVE-2026-41854" name="cpe:2.3:a:vmware:spring_framework:*:*:*:*:*:*:*:* versions from (including) 7.0.0; versions up to (excluding) 7.0.7.1">
+                <failure message="cvssV3: MEDIUM, score: 6.5 (CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:N/E:P/RC:R/MAV:A)"/>
+            <system-out>Due to incorrect host parsing, applications that rely on UriComponentsBuilder to parse and validate an externally provided URL string may be exposed to a server-side request forgery (SSRF) attack.
+
+Affected versions:
+Spring Framework 7.0.0 through 7.0.7; 6.2.0 through 6.2.18.</system-out>
+            <system-err>location: /src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/spring-core-7.0.7.jar, project-references: [  ]</system-err>
+        </testcase>
+            <testcase classname="CVE-2026-41844" name="cpe:2.3:a:vmware:spring_framework:*:*:*:*:*:*:*:* versions from (including) 7.0.0; versions up to (excluding) 7.0.7.1">
+                <failure message="cvssV3: MEDIUM, score: 6.1 (CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:L/I:L/A:N/E:P/RC:R/MAV:A)"/>
+            <system-out>A Spring MVC or Spring WebFlux application which configures a mapping for &quot;/**&quot; where the view name is not explicitly specified allows an attacker to craft a link resulting in a 302 redirect to an arbitrary external host via the redirect: prefix.
+
+Affected versions:
+Spring Framework 7.0.0 through 7.0.7; 6.2.0 through 6.2.18; 6.1.0 through 6.1.27; 5.3.0 through 5.3.48.</system-out>
+            <system-err>location: /src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/spring-core-7.0.7.jar, project-references: [  ]</system-err>
+        </testcase>
+            <testcase classname="CVE-2026-41845" name="cpe:2.3:a:vmware:spring_framework:*:*:*:*:*:*:*:* versions from (including) 7.0.0; versions up to (excluding) 7.0.7.1">
+                <failure message="cvssV3: MEDIUM, score: 6.1 (CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:L/I:L/A:N/E:P/RC:R/MAV:A)"/>
+            <system-out>Due to incorrect escaping, the use of JavaScriptUtils.javaScriptEscape() may lead to JavaScript code injection in the browser, potentially resulting in a cross-site scripting (XSS) vulnerability.
+
+Affected versions:
+Spring Framework 7.0.0 through 7.0.7; 6.2.0 through 6.2.18; 6.1.0 through 6.1.27; 5.3.0 through 5.3.48.</system-out>
+            <system-err>location: /src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/spring-core-7.0.7.jar, project-references: [  ]</system-err>
+        </testcase>
+            <testcase classname="CVE-2026-41846" name="cpe:2.3:a:vmware:spring_framework:*:*:*:*:*:*:*:* versions from (including) 7.0.0; versions up to (excluding) 7.0.7.1">
+                <failure message="cvssV3: MEDIUM, score: 6.1 (CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:L/I:L/A:N/E:P/RC:R/MAV:A)"/>
+            <system-out>Spring MVC applications which accept user-supplied values in the cssClass, cssErrorClass, or cssStyle attributes of JSP form tags allow arbitrary HTML/JavaScript code injection, potentially resulting in a cross-site scripting (XSS) vulnerability.
+
+Affected versions:
+Spring Framework 7.0.0 through 7.0.7; 6.2.0 through 6.2.18; 6.1.0 through 6.1.27; 5.3.0 through 5.3.48.</system-out>
+            <system-err>location: /src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/spring-core-7.0.7.jar, project-references: [  ]</system-err>
+        </testcase>
+            <testcase classname="CVE-2026-41840" name="cpe:2.3:a:vmware:spring_framework:*:*:*:*:*:*:*:* versions from (including) 7.0.0; versions up to (excluding) 7.0.7.1">
+                <failure message="cvssV3: MEDIUM, score: 5.9 (CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:N/A:H/E:P/RC:R/MAV:A)"/>
+            <system-out>Spring WebFlux applications are vulnerable to Denial of Service (DoS) attacks when processing multipart requests.
+Affected versions: Spring Framework 7.0.0 through 7.0.7, 6.2.0 through 6.2.18, 6.1.0 through 6.1.27, 5.3.0 through 5.3.48.</system-out>
+            <system-err>location: /src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/spring-core-7.0.7.jar, project-references: [  ]</system-err>
+        </testcase>
+            <testcase classname="CVE-2026-41841" name="cpe:2.3:a:vmware:spring_framework:*:*:*:*:*:*:*:* versions from (including) 7.0.0; versions up to (excluding) 7.0.7.1">
+                <failure message="cvssV3: MEDIUM, score: 5.9 (CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:N/A:N/E:P/RC:R/MAV:A)"/>
+            <system-out>Spring MVC and WebFlux applications are vulnerable to Information Disclosure attacks when resolving static resources.
+
+Affected versions:
+Spring Framework 7.0.0 through 7.0.7; 6.2.0 through 6.2.18; 6.1.0 through 6.1.27; 5.3.0 through 5.3.48.</system-out>
+            <system-err>location: /src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/spring-core-7.0.7.jar, project-references: [  ]</system-err>
+        </testcase>
+            <testcase classname="CVE-2026-41843" name="cpe:2.3:a:vmware:spring_framework:*:*:*:*:*:*:*:* versions from (including) 7.0.0; versions up to (excluding) 7.0.7.1">
+                <failure message="cvssV3: MEDIUM, score: 5.9 (CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:N/A:N/E:P/RC:R/MAV:A)"/>
+            <system-out>Spring MVC and WebFlux applications are vulnerable to Path Traversal attacks when resolving static resources.
+
+Affected versions:
+Spring Framework 7.0.0 through 7.0.7; 6.2.0 through 6.2.18; 6.1.0 through 6.1.27; 5.3.0 through 5.3.48.</system-out>
+            <system-err>location: /src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/spring-core-7.0.7.jar, project-references: [  ]</system-err>
+        </testcase>
+            <testcase classname="CVE-2026-41852" name="cpe:2.3:a:vmware:spring_framework:*:*:*:*:*:*:*:* versions from (including) 7.0.0; versions up to (excluding) 7.0.7.1">
+                <failure message="cvssV3: MEDIUM, score: 5.3 (CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:N/E:P/RC:R/MAV:A)"/>
+            <system-out>A vulnerability in Spring Expression Language (SpEL) evaluation logic allows for arbitrary zero-argument method invocation, even within restricted or read-only contexts, which may allow an attacker to invoke unintended application logic.
+
+Affected versions:
+Spring Framework 7.0.0 through 7.0.7; 6.2.0 through 6.2.18; 6.1.0 through 6.1.27; 5.3.0 through 5.3.48.</system-out>
+            <system-err>location: /src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/spring-core-7.0.7.jar, project-references: [  ]</system-err>
+        </testcase>
+            <testcase classname="CVE-2026-41853" name="cpe:2.3:a:vmware:spring_framework:*:*:*:*:*:*:*:* versions from (including) 7.0.0; versions up to (excluding) 7.0.7.1">
+                <failure message="cvssV3: MEDIUM, score: 5.3 (CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:N/E:P/RC:R/MAV:A)"/>
+            <system-out>Spring MVC and WebFlux applications are vulnerable to Multipart request smuggling attacks.
+
+Affected versions:
+Spring Framework 7.0.0 through 7.0.7; 6.2.0 through 6.2.18; 6.1.0 through 6.1.27; 5.3.0 through 5.3.48.</system-out>
+            <system-err>location: /src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/spring-core-7.0.7.jar, project-references: [  ]</system-err>
+        </testcase>
+            <testcase classname="CVE-2026-41839" name="cpe:2.3:a:vmware:spring_framework:*:*:*:*:*:*:*:* versions from (including) 7.0.0; versions up to (excluding) 7.0.8">
+                <failure message="cvssV3: MEDIUM, score: 4.2 (CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:L/I:L/A:N/E:P/RC:R/MAV:A)"/>
+            <system-out>A WebFlux application with a compromised subdomain (for example, compromised via cross-site scripting (XSS)) is vulnerable to an escalation attack exchanging a known session ID for that of an authenticated user.
+
+Affected versions:
+Spring Framework 7.0.0 through 7.0.7; 6.2.0 through 6.2.18; 6.1.0 through 6.1.27; 5.3.0 through 5.3.48.</system-out>
+            <system-err>location: /src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/spring-core-7.0.7.jar, project-references: [  ]</system-err>
+        </testcase>
+    </testsuite>
+        <testsuite failures="0" errors="0" time="0" id="75" name="/src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/spring-data-commons-4.0.5.jar" package="auth-service-0.0.1-SNAPSHOT.jar: spring-data-commons-4.0.5.jar" skipped="0" tests="1" timestamp="2026-07-25T06:24:56.273517819">
+            <testcase classname="dependency-check" name="auth-service-0.0.1-SNAPSHOT.jar: spring-data-commons-4.0.5.jar"/>
+    </testsuite>
+        <testsuite failures="0" errors="0" time="0" id="76" name="/src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/spring-data-jpa-4.0.5.jar" package="auth-service-0.0.1-SNAPSHOT.jar: spring-data-jpa-4.0.5.jar" skipped="0" tests="1" timestamp="2026-07-25T06:24:56.273517819">
+            <testcase classname="dependency-check" name="auth-service-0.0.1-SNAPSHOT.jar: spring-data-jpa-4.0.5.jar"/>
+    </testsuite>
+        <testsuite failures="1" errors="0" time="0" id="77" name="/src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/spring-security-crypto-7.0.5.jar" package="auth-service-0.0.1-SNAPSHOT.jar: spring-security-crypto-7.0.5.jar" skipped="0" tests="1" timestamp="2026-07-25T06:24:56.273517819">
+            <testcase classname="CVE-2018-1258" name="cpe:2.3:a:pivotal_software:spring_security:*:*:*:*:*:*:*:*">
+                <failure message="cvssV3: HIGH, score: 8.8 (CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H/E:P/RC:R/MAV:A)"/>
+            <system-out>Spring Framework version 5.0.5 when used in combination with any versions of Spring Security contains an authorization bypass when using method security. An unauthorized malicious user can gain unauthorized access to methods that should be restricted.</system-out>
+            <system-err>location: /src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/spring-security-crypto-7.0.5.jar, project-references: [  ]</system-err>
+        </testcase>
+    </testsuite>
+        <testsuite failures="0" errors="0" time="0" id="78" name="/src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/spring-tx-7.0.7.jar" package="auth-service-0.0.1-SNAPSHOT.jar: spring-tx-7.0.7.jar" skipped="0" tests="1" timestamp="2026-07-25T06:24:56.273517819">
+            <testcase classname="dependency-check" name="auth-service-0.0.1-SNAPSHOT.jar: spring-tx-7.0.7.jar"/>
+    </testsuite>
+        <testsuite failures="0" errors="0" time="0" id="79" name="/src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/spring-web-7.0.7.jar" package="auth-service-0.0.1-SNAPSHOT.jar: spring-web-7.0.7.jar" skipped="0" tests="1" timestamp="2026-07-25T06:24:56.273517819">
+            <testcase classname="dependency-check" name="auth-service-0.0.1-SNAPSHOT.jar: spring-web-7.0.7.jar"/>
+    </testsuite>
+        <testsuite failures="0" errors="0" time="0" id="80" name="/src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/springdoc-openapi-starter-common-2.8.5.jar" package="auth-service-0.0.1-SNAPSHOT.jar: springdoc-openapi-starter-common-2.8.5.jar" skipped="0" tests="1" timestamp="2026-07-25T06:24:56.273517819">
+            <testcase classname="dependency-check" name="auth-service-0.0.1-SNAPSHOT.jar: springdoc-openapi-starter-common-2.8.5.jar"/>
+    </testsuite>
+        <testsuite failures="0" errors="0" time="0" id="81" name="/src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/springdoc-openapi-starter-webmvc-api-2.8.5.jar" package="auth-service-0.0.1-SNAPSHOT.jar: springdoc-openapi-starter-webmvc-api-2.8.5.jar" skipped="0" tests="1" timestamp="2026-07-25T06:24:56.273517819">
+            <testcase classname="dependency-check" name="auth-service-0.0.1-SNAPSHOT.jar: springdoc-openapi-starter-webmvc-api-2.8.5.jar"/>
+    </testsuite>
+        <testsuite failures="0" errors="0" time="0" id="82" name="/src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/springdoc-openapi-starter-webmvc-ui-2.8.5.jar" package="auth-service-0.0.1-SNAPSHOT.jar: springdoc-openapi-starter-webmvc-ui-2.8.5.jar" skipped="0" tests="1" timestamp="2026-07-25T06:24:56.273517819">
+            <testcase classname="dependency-check" name="auth-service-0.0.1-SNAPSHOT.jar: springdoc-openapi-starter-webmvc-ui-2.8.5.jar"/>
+    </testsuite>
+        <testsuite failures="0" errors="0" time="0" id="83" name="/src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/swagger-core-jakarta-2.2.28.jar" package="auth-service-0.0.1-SNAPSHOT.jar: swagger-core-jakarta-2.2.28.jar" skipped="0" tests="1" timestamp="2026-07-25T06:24:56.273517819">
+            <testcase classname="dependency-check" name="auth-service-0.0.1-SNAPSHOT.jar: swagger-core-jakarta-2.2.28.jar"/>
+    </testsuite>
+        <testsuite failures="0" errors="0" time="0" id="84" name="/src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/swagger-ui-5.18.3.jar" package="auth-service-0.0.1-SNAPSHOT.jar: swagger-ui-5.18.3.jar" skipped="0" tests="1" timestamp="2026-07-25T06:24:56.273517819">
+            <testcase classname="dependency-check" name="auth-service-0.0.1-SNAPSHOT.jar: swagger-ui-5.18.3.jar"/>
+    </testsuite>
+        <testsuite failures="0" errors="0" time="0" id="85" name="/src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/swagger-ui-5.18.3.jar/META-INF/resources/webjars/swagger-ui/5.18.3/swagger-initializer.js" package="auth-service-0.0.1-SNAPSHOT.jar: swagger-ui-5.18.3.jar: swagger-initializer.js" skipped="0" tests="1" timestamp="2026-07-25T06:24:56.273517819">
+            <testcase classname="dependency-check" name="auth-service-0.0.1-SNAPSHOT.jar: swagger-ui-5.18.3.jar: swagger-initializer.js"/>
+    </testsuite>
+        <testsuite failures="19" errors="0" time="0" id="86" name="/src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/swagger-ui-5.18.3.jar/META-INF/resources/webjars/swagger-ui/5.18.3/swagger-ui-bundle.js" package="auth-service-0.0.1-SNAPSHOT.jar: swagger-ui-5.18.3.jar: swagger-ui-bundle.js" skipped="0" tests="19" timestamp="2026-07-25T06:24:56.273517819">
+            <testcase classname="CVE-2026-49978" name="pkg:javascript/DOMPurify@3.1.6">
+                <failure message="cvssV4: MEDIUM, score: 6.3 (CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:A/VC:N/VI:N/VA:N/SC:H/SI:H/SA:N/E:X/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X)"/>
+            <system-out>DOMPurify is a DOM-only cross-site scripting sanitizer for HTML, MathML, and SVG. Prior to 3.4.7, DOMPurify IN_PLACE sanitization could skip shadow contents attached to an element inside &lt;template&gt;.content, allowing attacker-controlled markup such as event handlers, JavaScript URLs, or scripts to survive and execute when an application cloned and inserted the sanitized template. This issue is fixed in version 3.4.7.</system-out>
+            <system-err>location: /src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/swagger-ui-5.18.3.jar/META-INF/resources/webjars/swagger-ui/5.18.3/swagger-ui-bundle.js, project-references: [  ]</system-err>
+        </testcase>
+            <testcase classname="CVE-2025-26791" name="pkg:javascript/DOMPurify@3.1.6">
+                <failure message="cvssV3: MEDIUM, score: 6.1 (CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:L/I:L/A:N/E:P/RC:R/MAV:A)"/>
+            <system-out>DOMPurify before 3.2.4 has an incorrect template literal regular expression, sometimes leading to mutation cross-site scripting (mXSS).</system-out>
+            <system-err>location: /src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/swagger-ui-5.18.3.jar/META-INF/resources/webjars/swagger-ui/5.18.3/swagger-ui-bundle.js, project-references: [  ]</system-err>
+        </testcase>
+            <testcase classname="CVE-2026-49458" name="pkg:javascript/DOMPurify@3.1.6">
+                <failure message="cvssV3: MEDIUM, score: 6.1 (CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:L/I:L/A:N/E:P/RC:R/MAV:A)"/>
+            <system-out>DOMPurify is a DOM-only cross-site scripting sanitizer for HTML, MathML, and SVG. Prior to 3.4.6, DOMPurify.sanitize(node, { IN_PLACE: true }) accepted same-origin foreign-realm DOM nodes while follow-on checks used parent-realm constructors, causing instanceof checks for forms, named node maps, document fragments, and elements to fail and skip clobber, template-content, and shadow-DOM sanitization branches so executable markup could survive. This issue is fixed in version 3.4.6.</system-out>
+            <system-err>location: /src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/swagger-ui-5.18.3.jar/META-INF/resources/webjars/swagger-ui/5.18.3/swagger-ui-bundle.js, project-references: [  ]</system-err>
+        </testcase>
+            <testcase classname="CVE-2026-49459" name="pkg:javascript/DOMPurify@3.1.6">
+                <failure message="cvssV3: MEDIUM, score: 6.1 (CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:L/I:L/A:N/E:P/RC:R/MAV:A)"/>
+            <system-out>DOMPurify is a DOM-only cross-site scripting sanitizer for HTML, MathML, and SVG. Prior to 3.4.6, DOMPurify.sanitize(root, { IN_PLACE: true }) could preserve event-handler attributes on an attacker-controlled &lt;form&gt; root when a descendant name clobbered properties checked by _isClobbered, because _forceRemove no-opped on the parent-less root and _sanitizeAttributes returned early. This issue is fixed in version 3.4.6.</system-out>
+            <system-err>location: /src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/swagger-ui-5.18.3.jar/META-INF/resources/webjars/swagger-ui/5.18.3/swagger-ui-bundle.js, project-references: [  ]</system-err>
+        </testcase>
+            <testcase classname="CVE-2026-41240" name="pkg:javascript/DOMPurify@3.1.6">
+                <failure message="cvssV4: MEDIUM, score: 6.0 (CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:P/VC:N/VI:H/VA:N/SC:N/SI:N/SA:N/E:X/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X)"/>
+            <system-out>DOMPurify is a DOM-only cross-site scripting sanitizer for HTML, MathML, and SVG. Versions prior to 3.4.0 have an inconsistency between FORBID_TAGS and FORBID_ATTR handling when function-based ADD_TAGS is used. Commit c361baa added an early exit for FORBID_ATTR at line 1214. The same fix was not applied to FORBID_TAGS. At line 1118-1123, when EXTRA_ELEMENT_HANDLING.tagCheck returns true, the short-circuit evaluation skips the FORBID_TAGS check entirely. This allows forbidden elements to survive sanitization with their attributes intact. Version 3.4.0 patches the issue.</system-out>
+            <system-err>location: /src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/swagger-ui-5.18.3.jar/META-INF/resources/webjars/swagger-ui/5.18.3/swagger-ui-bundle.js, project-references: [  ]</system-err>
+        </testcase>
+            <testcase classname="CVE-2026-0540" name="pkg:javascript/DOMPurify@3.1.6">
+                <failure message="cvssV4: MEDIUM, score: 5.3 (CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:P/VC:N/VI:N/VA:N/SC:L/SI:L/SA:N/E:X/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X)"/>
+            <system-out>DOMPurify 3.1.3 through 3.3.1 and 2.5.3 through 2.5.8, fixed in commit 2726c74, contain a cross-site scripting vulnerability that allows attackers to bypass attribute sanitization by exploiting five missing rawtext elements (noscript, xmp, noembed, noframes, iframe) in the SAFE_FOR_XML regex. Attackers can include payloads like &lt;/noscript&gt;&lt;img src=x onerror=alert(1)&gt; in attribute values to execute JavaScript when sanitized output is placed inside these unprotected rawtext contexts.</system-out>
+            <system-err>location: /src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/swagger-ui-5.18.3.jar/META-INF/resources/webjars/swagger-ui/5.18.3/swagger-ui-bundle.js, project-references: [  ]</system-err>
+        </testcase>
+            <testcase classname="CVE-2025-15599" name="pkg:javascript/DOMPurify@3.1.6">
+                <failure message="cvssV4: MEDIUM, score: 5.1 (CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:A/VC:N/VI:N/VA:N/SC:L/SI:L/SA:N/E:X/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X)"/>
+            <system-out>DOMPurify 3.1.3 through 3.2.6 and 2.5.3 through 2.5.8 contain a cross-site scripting vulnerability that allows attackers to bypass attribute sanitization by exploiting missing textarea rawtext element validation in the SAFE_FOR_XML regex. Attackers can include closing rawtext tags like &lt;/textarea&gt; in attribute values to break out of rawtext contexts and execute JavaScript when sanitized output is placed inside rawtext elements. The 3.x branch was fixed in 3.2.7; the 2.x branch was never patched.</system-out>
+            <system-err>location: /src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/swagger-ui-5.18.3.jar/META-INF/resources/webjars/swagger-ui/5.18.3/swagger-ui-bundle.js, project-references: [  ]</system-err>
+        </testcase>
+            <testcase classname="CVE-2026-41238" name="pkg:javascript/DOMPurify@3.1.6">
+                <failure message="unscored severity: medium"/>
+            <system-out>DOMPurify versions 3.0.1 through 3.3.3 are vulnerable to an XSS bypass via prototype pollution. When no CUSTOM_ELEMENT_HANDLING is specified, the fallback plain object inherits from Object.prototype; if an attacker has polluted Object.prototype.tagNameCheck and Object.prototype.attributeNameCheck with permissive regexes, DOMPurify allows arbitrary custom elements with event handler attributes through sanitization.</system-out>
+            <system-err>location: /src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/swagger-ui-5.18.3.jar/META-INF/resources/webjars/swagger-ui/5.18.3/swagger-ui-bundle.js, project-references: [  ]</system-err>
+        </testcase>
+            <testcase classname="CVE-2026-41239" name="pkg:javascript/DOMPurify@3.1.6">
+                <failure message="unscored severity: medium"/>
+            <system-out>DOMPurify&apos;s SAFE_FOR_TEMPLATES feature fails to strip Mustache/template expressions when RETURN_DOM or RETURN_DOM_FRAGMENT is used. The final string-scrubbing pass that removes expressions like {{...}} is skipped in DOM-return mode, and split text nodes (e.g. from removed intermediate tags) can rejoin to form a complete expression that template-evaluating frameworks like Vue 2 will execute.</system-out>
+            <system-err>location: /src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/swagger-ui-5.18.3.jar/META-INF/resources/webjars/swagger-ui/5.18.3/swagger-ui-bundle.js, project-references: [  ]</system-err>
+        </testcase>
+            <testcase classname="CVE-2026-65898" name="pkg:javascript/DOMPurify@3.1.6">
+                <failure message="unscored severity: medium"/>
+            <system-out>DOMPurify: Permanent `ALLOWED_ATTR` pollution via `setConfig()` bypassing the hook clone-guard (incomplete fix of the 3.4.7 hook-pollution patch)</system-out>
+            <system-err>location: /src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/swagger-ui-5.18.3.jar/META-INF/resources/webjars/swagger-ui/5.18.3/swagger-ui-bundle.js, project-references: [  ]</system-err>
+        </testcase>
+            <testcase classname="CVE-2026-65902" name="pkg:javascript/DOMPurify@3.1.6">
+                <failure message="unscored severity: medium"/>
+            <system-out>DOMPurify: Hook mutation of `data.allowedTags` / `data.allowedAttributes` permanently pollutes `DEFAULT_ALLOWED_TAGS` / `DEFAULT_ALLOWED_ATTR`</system-out>
+            <system-err>location: /src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/swagger-ui-5.18.3.jar/META-INF/resources/webjars/swagger-ui/5.18.3/swagger-ui-bundle.js, project-references: [  ]</system-err>
+        </testcase>
+            <testcase classname="CVE-2026-65903" name="pkg:javascript/DOMPurify@3.1.6">
+                <failure message="unscored severity: medium"/>
+            <system-out>DOMPurify has a logic inconsistency where FORBID_TAGS is not checked when a function-based ADD_TAGS (tagCheck) returns true. Due to short-circuit evaluation, the FORBID_TAGS check is never evaluated, allowing explicitly forbidden elements to pass through sanitization when EXTRA_ELEMENT_HANDLING.tagCheck is configured.</system-out>
+            <system-err>location: /src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/swagger-ui-5.18.3.jar/META-INF/resources/webjars/swagger-ui/5.18.3/swagger-ui-bundle.js, project-references: [  ]</system-err>
+        </testcase>
+            <testcase classname="CVE-2026-65912" name="pkg:javascript/DOMPurify@3.1.6">
+                <failure message="unscored severity: medium"/>
+            <system-out>DOMPurify&apos;s ADD_ATTR predicate function mechanism (via EXTRA_ELEMENT_HANDLING.attributeCheck) short-circuits URI validation when the predicate returns true. This allows unsafe protocols such as javascript: to survive sanitization in href and similar attributes, enabling DOM-based XSS when such links are activated.</system-out>
+            <system-err>location: /src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/swagger-ui-5.18.3.jar/META-INF/resources/webjars/swagger-ui/5.18.3/swagger-ui-bundle.js, project-references: [  ]</system-err>
+        </testcase>
+            <testcase classname="CVE-2026-65913" name="pkg:javascript/DOMPurify@3.1.6">
+                <failure message="unscored severity: medium"/>
+            <system-out>When USE_PROFILES is enabled, DOMPurify rebuilds ALLOWED_ATTR as a plain array whose properties are looked up by name, making it susceptible to prototype pollution. If Array.prototype has been polluted with an event handler attribute name (e.g. onclick), DOMPurify will allow that event handler to survive sanitization, resulting in DOM-based XSS.</system-out>
+            <system-err>location: /src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/swagger-ui-5.18.3.jar/META-INF/resources/webjars/swagger-ui/5.18.3/swagger-ui-bundle.js, project-references: [  ]</system-err>
+        </testcase>
+            <testcase classname="CVE-2026-65914" name="pkg:javascript/DOMPurify@3.1.6">
+                <failure message="unscored severity: medium"/>
+            <system-out>DOMPurify is vulnerable to mutation-XSS (mXSS) when sanitized HTML is embedded into special raw-text wrapper elements such as xmp, script, iframe, noembed, noframes, or noscript before being assigned via innerHTML. Attacker-controlled sequences like &lt;/xmp&gt; inside attribute values close the raw-text context during the second parse, causing the sanitized output to mutate into executable markup.</system-out>
+            <system-err>location: /src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/swagger-ui-5.18.3.jar/META-INF/resources/webjars/swagger-ui/5.18.3/swagger-ui-bundle.js, project-references: [  ]</system-err>
+        </testcase>
+            <testcase classname="CVE-2026-65899" name="pkg:javascript/DOMPurify@3.1.6">
+                <failure message="unscored severity: low"/>
+            <system-out>DOMPurify: Trusted Types policy survives `clearConfig()` and can poison later `RETURN_TRUSTED_TYPE` output</system-out>
+            <system-err>location: /src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/swagger-ui-5.18.3.jar/META-INF/resources/webjars/swagger-ui/5.18.3/swagger-ui-bundle.js, project-references: [  ]</system-err>
+        </testcase>
+            <testcase classname="CVE-2026-65900" name="pkg:javascript/DOMPurify@3.1.6">
+                <failure message="unscored severity: low"/>
+            <system-out>DOMPurify: SAFE_FOR_TEMPLATES bypass - template expressions survive sanitization inside &lt;template&gt; content when using DOM output modes</system-out>
+            <system-err>location: /src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/swagger-ui-5.18.3.jar/META-INF/resources/webjars/swagger-ui/5.18.3/swagger-ui-bundle.js, project-references: [  ]</system-err>
+        </testcase>
+            <testcase classname="CVE-2026-65901" name="pkg:javascript/DOMPurify@3.1.6">
+                <failure message="unscored severity: low"/>
+            <system-out>DOMPurify: `IN_PLACE` mode trusts attacker-controlled `nodeName` on live non-form nodes, allowing script retention and XSS via attacker-supplied DOM objects</system-out>
+            <system-err>location: /src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/swagger-ui-5.18.3.jar/META-INF/resources/webjars/swagger-ui/5.18.3/swagger-ui-bundle.js, project-references: [  ]</system-err>
+        </testcase>
+            <testcase classname="GHSA-c2j3-45gr-mqc4" name="pkg:javascript/DOMPurify@3.1.6">
+                <failure message="unscored severity: low"/>
+            <system-out>DOMPurify: `CUSTOM_ELEMENT_HANDLING` bypasses `afterSanitizeElements` for allowed custom elements.</system-out>
+            <system-err>location: /src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/swagger-ui-5.18.3.jar/META-INF/resources/webjars/swagger-ui/5.18.3/swagger-ui-bundle.js, project-references: [  ]</system-err>
+        </testcase>
+    </testsuite>
+        <testsuite failures="0" errors="0" time="0" id="87" name="/src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/swagger-ui-5.18.3.jar/META-INF/resources/webjars/swagger-ui/5.18.3/swagger-ui-es-bundle-core.js" package="auth-service-0.0.1-SNAPSHOT.jar: swagger-ui-5.18.3.jar: swagger-ui-es-bundle-core.js" skipped="0" tests="1" timestamp="2026-07-25T06:24:56.273517819">
+            <testcase classname="dependency-check" name="auth-service-0.0.1-SNAPSHOT.jar: swagger-ui-5.18.3.jar: swagger-ui-es-bundle-core.js"/>
+    </testsuite>
+        <testsuite failures="19" errors="0" time="0" id="88" name="/src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/swagger-ui-5.18.3.jar/META-INF/resources/webjars/swagger-ui/5.18.3/swagger-ui-es-bundle.js" package="auth-service-0.0.1-SNAPSHOT.jar: swagger-ui-5.18.3.jar: swagger-ui-es-bundle.js" skipped="0" tests="19" timestamp="2026-07-25T06:24:56.273517819">
+            <testcase classname="CVE-2026-49978" name="pkg:javascript/DOMPurify@3.1.6">
+                <failure message="cvssV4: MEDIUM, score: 6.3 (CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:A/VC:N/VI:N/VA:N/SC:H/SI:H/SA:N/E:X/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X)"/>
+            <system-out>DOMPurify is a DOM-only cross-site scripting sanitizer for HTML, MathML, and SVG. Prior to 3.4.7, DOMPurify IN_PLACE sanitization could skip shadow contents attached to an element inside &lt;template&gt;.content, allowing attacker-controlled markup such as event handlers, JavaScript URLs, or scripts to survive and execute when an application cloned and inserted the sanitized template. This issue is fixed in version 3.4.7.</system-out>
+            <system-err>location: /src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/swagger-ui-5.18.3.jar/META-INF/resources/webjars/swagger-ui/5.18.3/swagger-ui-es-bundle.js, project-references: [  ]</system-err>
+        </testcase>
+            <testcase classname="CVE-2025-26791" name="pkg:javascript/DOMPurify@3.1.6">
+                <failure message="cvssV3: MEDIUM, score: 6.1 (CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:L/I:L/A:N/E:P/RC:R/MAV:A)"/>
+            <system-out>DOMPurify before 3.2.4 has an incorrect template literal regular expression, sometimes leading to mutation cross-site scripting (mXSS).</system-out>
+            <system-err>location: /src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/swagger-ui-5.18.3.jar/META-INF/resources/webjars/swagger-ui/5.18.3/swagger-ui-es-bundle.js, project-references: [  ]</system-err>
+        </testcase>
+            <testcase classname="CVE-2026-49458" name="pkg:javascript/DOMPurify@3.1.6">
+                <failure message="cvssV3: MEDIUM, score: 6.1 (CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:L/I:L/A:N/E:P/RC:R/MAV:A)"/>
+            <system-out>DOMPurify is a DOM-only cross-site scripting sanitizer for HTML, MathML, and SVG. Prior to 3.4.6, DOMPurify.sanitize(node, { IN_PLACE: true }) accepted same-origin foreign-realm DOM nodes while follow-on checks used parent-realm constructors, causing instanceof checks for forms, named node maps, document fragments, and elements to fail and skip clobber, template-content, and shadow-DOM sanitization branches so executable markup could survive. This issue is fixed in version 3.4.6.</system-out>
+            <system-err>location: /src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/swagger-ui-5.18.3.jar/META-INF/resources/webjars/swagger-ui/5.18.3/swagger-ui-es-bundle.js, project-references: [  ]</system-err>
+        </testcase>
+            <testcase classname="CVE-2026-49459" name="pkg:javascript/DOMPurify@3.1.6">
+                <failure message="cvssV3: MEDIUM, score: 6.1 (CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:L/I:L/A:N/E:P/RC:R/MAV:A)"/>
+            <system-out>DOMPurify is a DOM-only cross-site scripting sanitizer for HTML, MathML, and SVG. Prior to 3.4.6, DOMPurify.sanitize(root, { IN_PLACE: true }) could preserve event-handler attributes on an attacker-controlled &lt;form&gt; root when a descendant name clobbered properties checked by _isClobbered, because _forceRemove no-opped on the parent-less root and _sanitizeAttributes returned early. This issue is fixed in version 3.4.6.</system-out>
+            <system-err>location: /src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/swagger-ui-5.18.3.jar/META-INF/resources/webjars/swagger-ui/5.18.3/swagger-ui-es-bundle.js, project-references: [  ]</system-err>
+        </testcase>
+            <testcase classname="CVE-2026-41240" name="pkg:javascript/DOMPurify@3.1.6">
+                <failure message="cvssV4: MEDIUM, score: 6.0 (CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:P/VC:N/VI:H/VA:N/SC:N/SI:N/SA:N/E:X/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X)"/>
+            <system-out>DOMPurify is a DOM-only cross-site scripting sanitizer for HTML, MathML, and SVG. Versions prior to 3.4.0 have an inconsistency between FORBID_TAGS and FORBID_ATTR handling when function-based ADD_TAGS is used. Commit c361baa added an early exit for FORBID_ATTR at line 1214. The same fix was not applied to FORBID_TAGS. At line 1118-1123, when EXTRA_ELEMENT_HANDLING.tagCheck returns true, the short-circuit evaluation skips the FORBID_TAGS check entirely. This allows forbidden elements to survive sanitization with their attributes intact. Version 3.4.0 patches the issue.</system-out>
+            <system-err>location: /src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/swagger-ui-5.18.3.jar/META-INF/resources/webjars/swagger-ui/5.18.3/swagger-ui-es-bundle.js, project-references: [  ]</system-err>
+        </testcase>
+            <testcase classname="CVE-2026-0540" name="pkg:javascript/DOMPurify@3.1.6">
+                <failure message="cvssV4: MEDIUM, score: 5.3 (CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:P/VC:N/VI:N/VA:N/SC:L/SI:L/SA:N/E:X/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X)"/>
+            <system-out>DOMPurify 3.1.3 through 3.3.1 and 2.5.3 through 2.5.8, fixed in commit 2726c74, contain a cross-site scripting vulnerability that allows attackers to bypass attribute sanitization by exploiting five missing rawtext elements (noscript, xmp, noembed, noframes, iframe) in the SAFE_FOR_XML regex. Attackers can include payloads like &lt;/noscript&gt;&lt;img src=x onerror=alert(1)&gt; in attribute values to execute JavaScript when sanitized output is placed inside these unprotected rawtext contexts.</system-out>
+            <system-err>location: /src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/swagger-ui-5.18.3.jar/META-INF/resources/webjars/swagger-ui/5.18.3/swagger-ui-es-bundle.js, project-references: [  ]</system-err>
+        </testcase>
+            <testcase classname="CVE-2025-15599" name="pkg:javascript/DOMPurify@3.1.6">
+                <failure message="cvssV4: MEDIUM, score: 5.1 (CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:A/VC:N/VI:N/VA:N/SC:L/SI:L/SA:N/E:X/CR:X/IR:X/AR:X/MAV:X/MAC:X/MAT:X/MPR:X/MUI:X/MVC:X/MVI:X/MVA:X/MSC:X/MSI:X/MSA:X/S:X/AU:X/R:X/V:X/RE:X/U:X)"/>
+            <system-out>DOMPurify 3.1.3 through 3.2.6 and 2.5.3 through 2.5.8 contain a cross-site scripting vulnerability that allows attackers to bypass attribute sanitization by exploiting missing textarea rawtext element validation in the SAFE_FOR_XML regex. Attackers can include closing rawtext tags like &lt;/textarea&gt; in attribute values to break out of rawtext contexts and execute JavaScript when sanitized output is placed inside rawtext elements. The 3.x branch was fixed in 3.2.7; the 2.x branch was never patched.</system-out>
+            <system-err>location: /src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/swagger-ui-5.18.3.jar/META-INF/resources/webjars/swagger-ui/5.18.3/swagger-ui-es-bundle.js, project-references: [  ]</system-err>
+        </testcase>
+            <testcase classname="CVE-2026-41238" name="pkg:javascript/DOMPurify@3.1.6">
+                <failure message="unscored severity: medium"/>
+            <system-out>DOMPurify versions 3.0.1 through 3.3.3 are vulnerable to an XSS bypass via prototype pollution. When no CUSTOM_ELEMENT_HANDLING is specified, the fallback plain object inherits from Object.prototype; if an attacker has polluted Object.prototype.tagNameCheck and Object.prototype.attributeNameCheck with permissive regexes, DOMPurify allows arbitrary custom elements with event handler attributes through sanitization.</system-out>
+            <system-err>location: /src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/swagger-ui-5.18.3.jar/META-INF/resources/webjars/swagger-ui/5.18.3/swagger-ui-es-bundle.js, project-references: [  ]</system-err>
+        </testcase>
+            <testcase classname="CVE-2026-41239" name="pkg:javascript/DOMPurify@3.1.6">
+                <failure message="unscored severity: medium"/>
+            <system-out>DOMPurify&apos;s SAFE_FOR_TEMPLATES feature fails to strip Mustache/template expressions when RETURN_DOM or RETURN_DOM_FRAGMENT is used. The final string-scrubbing pass that removes expressions like {{...}} is skipped in DOM-return mode, and split text nodes (e.g. from removed intermediate tags) can rejoin to form a complete expression that template-evaluating frameworks like Vue 2 will execute.</system-out>
+            <system-err>location: /src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/swagger-ui-5.18.3.jar/META-INF/resources/webjars/swagger-ui/5.18.3/swagger-ui-es-bundle.js, project-references: [  ]</system-err>
+        </testcase>
+            <testcase classname="CVE-2026-65898" name="pkg:javascript/DOMPurify@3.1.6">
+                <failure message="unscored severity: medium"/>
+            <system-out>DOMPurify: Permanent `ALLOWED_ATTR` pollution via `setConfig()` bypassing the hook clone-guard (incomplete fix of the 3.4.7 hook-pollution patch)</system-out>
+            <system-err>location: /src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/swagger-ui-5.18.3.jar/META-INF/resources/webjars/swagger-ui/5.18.3/swagger-ui-es-bundle.js, project-references: [  ]</system-err>
+        </testcase>
+            <testcase classname="CVE-2026-65902" name="pkg:javascript/DOMPurify@3.1.6">
+                <failure message="unscored severity: medium"/>
+            <system-out>DOMPurify: Hook mutation of `data.allowedTags` / `data.allowedAttributes` permanently pollutes `DEFAULT_ALLOWED_TAGS` / `DEFAULT_ALLOWED_ATTR`</system-out>
+            <system-err>location: /src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/swagger-ui-5.18.3.jar/META-INF/resources/webjars/swagger-ui/5.18.3/swagger-ui-es-bundle.js, project-references: [  ]</system-err>
+        </testcase>
+            <testcase classname="CVE-2026-65903" name="pkg:javascript/DOMPurify@3.1.6">
+                <failure message="unscored severity: medium"/>
+            <system-out>DOMPurify has a logic inconsistency where FORBID_TAGS is not checked when a function-based ADD_TAGS (tagCheck) returns true. Due to short-circuit evaluation, the FORBID_TAGS check is never evaluated, allowing explicitly forbidden elements to pass through sanitization when EXTRA_ELEMENT_HANDLING.tagCheck is configured.</system-out>
+            <system-err>location: /src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/swagger-ui-5.18.3.jar/META-INF/resources/webjars/swagger-ui/5.18.3/swagger-ui-es-bundle.js, project-references: [  ]</system-err>
+        </testcase>
+            <testcase classname="CVE-2026-65912" name="pkg:javascript/DOMPurify@3.1.6">
+                <failure message="unscored severity: medium"/>
+            <system-out>DOMPurify&apos;s ADD_ATTR predicate function mechanism (via EXTRA_ELEMENT_HANDLING.attributeCheck) short-circuits URI validation when the predicate returns true. This allows unsafe protocols such as javascript: to survive sanitization in href and similar attributes, enabling DOM-based XSS when such links are activated.</system-out>
+            <system-err>location: /src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/swagger-ui-5.18.3.jar/META-INF/resources/webjars/swagger-ui/5.18.3/swagger-ui-es-bundle.js, project-references: [  ]</system-err>
+        </testcase>
+            <testcase classname="CVE-2026-65913" name="pkg:javascript/DOMPurify@3.1.6">
+                <failure message="unscored severity: medium"/>
+            <system-out>When USE_PROFILES is enabled, DOMPurify rebuilds ALLOWED_ATTR as a plain array whose properties are looked up by name, making it susceptible to prototype pollution. If Array.prototype has been polluted with an event handler attribute name (e.g. onclick), DOMPurify will allow that event handler to survive sanitization, resulting in DOM-based XSS.</system-out>
+            <system-err>location: /src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/swagger-ui-5.18.3.jar/META-INF/resources/webjars/swagger-ui/5.18.3/swagger-ui-es-bundle.js, project-references: [  ]</system-err>
+        </testcase>
+            <testcase classname="CVE-2026-65914" name="pkg:javascript/DOMPurify@3.1.6">
+                <failure message="unscored severity: medium"/>
+            <system-out>DOMPurify is vulnerable to mutation-XSS (mXSS) when sanitized HTML is embedded into special raw-text wrapper elements such as xmp, script, iframe, noembed, noframes, or noscript before being assigned via innerHTML. Attacker-controlled sequences like &lt;/xmp&gt; inside attribute values close the raw-text context during the second parse, causing the sanitized output to mutate into executable markup.</system-out>
+            <system-err>location: /src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/swagger-ui-5.18.3.jar/META-INF/resources/webjars/swagger-ui/5.18.3/swagger-ui-es-bundle.js, project-references: [  ]</system-err>
+        </testcase>
+            <testcase classname="CVE-2026-65899" name="pkg:javascript/DOMPurify@3.1.6">
+                <failure message="unscored severity: low"/>
+            <system-out>DOMPurify: Trusted Types policy survives `clearConfig()` and can poison later `RETURN_TRUSTED_TYPE` output</system-out>
+            <system-err>location: /src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/swagger-ui-5.18.3.jar/META-INF/resources/webjars/swagger-ui/5.18.3/swagger-ui-es-bundle.js, project-references: [  ]</system-err>
+        </testcase>
+            <testcase classname="CVE-2026-65900" name="pkg:javascript/DOMPurify@3.1.6">
+                <failure message="unscored severity: low"/>
+            <system-out>DOMPurify: SAFE_FOR_TEMPLATES bypass - template expressions survive sanitization inside &lt;template&gt; content when using DOM output modes</system-out>
+            <system-err>location: /src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/swagger-ui-5.18.3.jar/META-INF/resources/webjars/swagger-ui/5.18.3/swagger-ui-es-bundle.js, project-references: [  ]</system-err>
+        </testcase>
+            <testcase classname="CVE-2026-65901" name="pkg:javascript/DOMPurify@3.1.6">
+                <failure message="unscored severity: low"/>
+            <system-out>DOMPurify: `IN_PLACE` mode trusts attacker-controlled `nodeName` on live non-form nodes, allowing script retention and XSS via attacker-supplied DOM objects</system-out>
+            <system-err>location: /src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/swagger-ui-5.18.3.jar/META-INF/resources/webjars/swagger-ui/5.18.3/swagger-ui-es-bundle.js, project-references: [  ]</system-err>
+        </testcase>
+            <testcase classname="GHSA-c2j3-45gr-mqc4" name="pkg:javascript/DOMPurify@3.1.6">
+                <failure message="unscored severity: low"/>
+            <system-out>DOMPurify: `CUSTOM_ELEMENT_HANDLING` bypasses `afterSanitizeElements` for allowed custom elements.</system-out>
+            <system-err>location: /src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/swagger-ui-5.18.3.jar/META-INF/resources/webjars/swagger-ui/5.18.3/swagger-ui-es-bundle.js, project-references: [  ]</system-err>
+        </testcase>
+    </testsuite>
+        <testsuite failures="0" errors="0" time="0" id="89" name="/src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/swagger-ui-5.18.3.jar/META-INF/resources/webjars/swagger-ui/5.18.3/swagger-ui-standalone-preset.js" package="auth-service-0.0.1-SNAPSHOT.jar: swagger-ui-5.18.3.jar: swagger-ui-standalone-preset.js" skipped="0" tests="1" timestamp="2026-07-25T06:24:56.273517819">
+            <testcase classname="dependency-check" name="auth-service-0.0.1-SNAPSHOT.jar: swagger-ui-5.18.3.jar: swagger-ui-standalone-preset.js"/>
+    </testsuite>
+        <testsuite failures="0" errors="0" time="0" id="90" name="/src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/swagger-ui-5.18.3.jar/META-INF/resources/webjars/swagger-ui/5.18.3/swagger-ui.js" package="auth-service-0.0.1-SNAPSHOT.jar: swagger-ui-5.18.3.jar: swagger-ui.js" skipped="0" tests="1" timestamp="2026-07-25T06:24:56.273517819">
+            <testcase classname="dependency-check" name="auth-service-0.0.1-SNAPSHOT.jar: swagger-ui-5.18.3.jar: swagger-ui.js"/>
+    </testsuite>
+        <testsuite failures="15" errors="0" time="0" id="91" name="/src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/tomcat-embed-core-11.0.21.jar" package="auth-service-0.0.1-SNAPSHOT.jar: tomcat-embed-core-11.0.21.jar" skipped="0" tests="15" timestamp="2026-07-25T06:24:56.273517819">
+            <testcase classname="CVE-2026-41293" name="pkg:maven/org.apache.tomcat.embed/tomcat-embed-core@11.0.21">
+                <failure message="cvssV3: CRITICAL, score: 9.8 (CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H/E:P/RC:R/MAV:A)"/>
+            <system-out>Improper Input Validation vulnerability in Apache Tomcat.
+
+This issue affects Apache Tomcat: from 11.0.0-M1 through 11.0.21, from 10.1.0-M1 through 10.1.54, from 9.0.0.M1 through 9.0.117, from 10.0.0-M1 through 10.0.27.
+Older, end of support versions may also be affected.
+
+Users are recommended to upgrade to version [FIXED_VERSION], which fixes the issue.</system-out>
+            <system-err>location: /src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/tomcat-embed-core-11.0.21.jar, project-references: [  ]</system-err>
+        </testcase>
+            <testcase classname="CVE-2026-43512" name="pkg:maven/org.apache.tomcat.embed/tomcat-embed-core@11.0.21">
+                <failure message="cvssV3: CRITICAL, score: 9.8 (CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H/E:P/RC:R/MAV:A)"/>
+            <system-out>DEPRECATED: Authentication Bypass Issues vulnerability in digest authentication in Apache Tomcat.
+
+This issue affects Apache Tomcat: from 11.0.0-M1 through 11.0.21, from 10.1.0-M1 through 10.1.54, from 9.0.0.M1 through 9.0.117, from 8.5.0 through 8.5.100, from before 7.0.0.
+Older unsupported versions any also be affect
+
+Users are recommended to upgrade to version 11.0.22, 10.1.55 or 9.0.118 which fix the issue.</system-out>
+            <system-err>location: /src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/tomcat-embed-core-11.0.21.jar, project-references: [  ]</system-err>
+        </testcase>
+            <testcase classname="CVE-2026-43515" name="pkg:maven/org.apache.tomcat.embed/tomcat-embed-core@11.0.21">
+                <failure message="cvssV3: CRITICAL, score: 9.1 (CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:N/E:P/RC:R/MAV:A)"/>
+            <system-out>Improper Authorization vulnerability when multiple method constraints define an HTTP method for the same extension in Apache Tomcat.
+
+This issue affects Apache Tomcat: from 11.0.0-M1 through 11.0.21, from 10.1.0-M1 through 10.1.54, from 9.0.0.M1 through 9.0.117, from 8.5.0 through 8.5.100, from 7.0.0 through 7.0.109.
+
+Users are recommended to upgrade to version 11.0.22, 10.1.55 or 9.0.118 which fix the issue.</system-out>
+            <system-err>location: /src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/tomcat-embed-core-11.0.21.jar, project-references: [  ]</system-err>
+        </testcase>
+            <testcase classname="CVE-2026-53434" name="pkg:maven/org.apache.tomcat.embed/tomcat-embed-core@11.0.21">
+                <failure message="cvssV3: CRITICAL, score: 9.1 (CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:N/E:P/RC:R/MAV:A)"/>
+            <system-out>Detection of Error Condition Without Action vulnerability in Apache Tomcat when configuring CRLs for a FFM based connector.
+
+This issue affects Apache Tomcat: from 11.0.0-M1 through 11.0.22, from 10.1.0-M7 through 10.1.55, from 9.0.83 through 9.0.118.
+
+Users are recommended to upgrade to version 11.0.23, 10.1.56 or 9.0.119, which fixes the issue.</system-out>
+            <system-err>location: /src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/tomcat-embed-core-11.0.21.jar, project-references: [  ]</system-err>
+        </testcase>
+            <testcase classname="CVE-2026-55276" name="pkg:maven/org.apache.tomcat.embed/tomcat-embed-core@11.0.21">
+                <failure message="cvssV3: CRITICAL, score: 9.1 (CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:N/E:P/RC:R/MAV:A)"/>
+            <system-out>Always-Incorrect Control Flow Implementation vulnerability in Apache Tomcat meant that special roles and empty authorisation constraints were not included when the effective web.xml was logged.
+
+This issue affects Apache Tomcat: from 11.0.0-M1 through 11.0.22, from 10.1.0-M1 through 10.1.55, from 9.0.0.M1 through 9.0.118, from 8.5.0 through 8.5.100. Other versions that have reached end of support may also be affected.
+
+Users are recommended to upgrade to version 11.0.23, 10.1.56 or 9.0.119 which fixes the issue.</system-out>
+            <system-err>location: /src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/tomcat-embed-core-11.0.21.jar, project-references: [  ]</system-err>
+        </testcase>
+            <testcase classname="CVE-2026-59083" name="pkg:maven/org.apache.tomcat.embed/tomcat-embed-core@11.0.21">
+                <failure message="cvssV3: CRITICAL, score: 9.1 (CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:N/E:P/RC:R/MAV:A)"/>
+            <system-out>Improper Handling of URL Encoding (Hex Encoding) vulnerability in Apache Tomcat&apos;s rewrite valve allowed security constraint bypass for some configurations.
+
+This issue affects Apache Tomcat: from 11.0.0-M1 through 11.0.23, from 10.1.0-M1 through 10.1.56, from 9.0.0.M1 through 9.0.119, from 8.5.0 through 8.5.100. Other versions that have reached end of support may also be affected.
+
+Users are recommended to upgrade to version 11.0.24, 10.1.57 or 9.0.120, which fix the issue.</system-out>
+            <system-err>location: /src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/tomcat-embed-core-11.0.21.jar, project-references: [  ]</system-err>
+        </testcase>
+            <testcase classname="CVE-2026-59084" name="pkg:maven/org.apache.tomcat.embed/tomcat-embed-core@11.0.21">
+                <failure message="cvssV3: CRITICAL, score: 9.1 (CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:N/E:P/RC:R/MAV:A)"/>
+            <system-out>Insufficient Technical Documentation vulnerability in Apache Tomcat since the requirements to securely configure the EncryptInterceptor were not clearly documented.
+
+This issue affects Apache Tomcat: from 11.0.0-M1 through 11.0.23, from 10.1.0-M1 through 10.1.56, from 9.0.13 through 9.0.119, from 8.5.38 through 8.5.100, from 7.0.100 through 7.0.109. Other versions that have reached end of support may also be affected.
+
+Users are recommended to upgrade to version 11.0.24, 10.1.57 or 9.0.120 which fix the issue.</system-out>
+            <system-err>location: /src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/tomcat-embed-core-11.0.21.jar, project-references: [  ]</system-err>
+        </testcase>
+            <testcase classname="CVE-2026-41284" name="pkg:maven/org.apache.tomcat.embed/tomcat-embed-core@11.0.21">
+                <failure message="cvssV3: HIGH, score: 7.5 (CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H/E:P/RC:R/MAV:A)"/>
+            <system-out>Allocation of Resources Without Limits or Throttling vulnerability in Apache Tomcat.
+
+This issue affects Apache Tomcat: from 11.0.0-M1 through 11.0.21, from 10.1.0-M1 through 10.1.54, from 9.0.0.M1 through 9.0.117.
+Older, unsupported versions may also be affected.
+
+Users are recommended to upgrade to version [FIXED_VERSION], which fixes the issue.</system-out>
+            <system-err>location: /src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/tomcat-embed-core-11.0.21.jar, project-references: [  ]</system-err>
+        </testcase>
+            <testcase classname="CVE-2026-43513" name="pkg:maven/org.apache.tomcat.embed/tomcat-embed-core@11.0.21">
+                <failure message="cvssV3: HIGH, score: 7.5 (CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N/E:P/RC:R/MAV:A)"/>
+            <system-out>Improper Handling of Case Sensitivity vulnerability in LockOutRealm in Apache Tomcat.
+
+This issue affects Apache Tomcat: from 11.0.0-M1 through 11.0.21, from 10.1.0-M1 through 10.1.54, from 9.0.0.M1 through 9.0.117, from 8.5.0 through 8.5.100, from 7.0.0 through 7.0.109.
+Older unsupported versions may also be affected.
+
+Users are recommended to upgrade to version 11.0.22, 10.1.55 or 9.0.118 which fix the issue.</system-out>
+            <system-err>location: /src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/tomcat-embed-core-11.0.21.jar, project-references: [  ]</system-err>
+        </testcase>
+            <testcase classname="CVE-2026-42498" name="pkg:maven/org.apache.tomcat.embed/tomcat-embed-core@11.0.21">
+                <failure message="cvssV3: HIGH, score: 7.3 (CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:L/E:P/RC:R/MAV:A)"/>
+            <system-out>Exposure of HTTP Authentication Header to unexpected hosts during WebSocket authentication vulnerability in Apache Tomcat.
+
+This issue affects Apache Tomcat: from 11.0.0-M1 through 11.0.21, from 10.1.0-M1 through 10.1.54, from 9.0.2 through 9.0.117, from 8.5.24 through 8.5.100, from 7.0.83 through 7.0.109.
+
+Users are recommended to upgrade to version 11.0.22, 10.1.55 or 9.0.118, which fix the issue.</system-out>
+            <system-err>location: /src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/tomcat-embed-core-11.0.21.jar, project-references: [  ]</system-err>
+        </testcase>
+            <testcase classname="CVE-2026-53404" name="pkg:maven/org.apache.tomcat.embed/tomcat-embed-core@11.0.21">
+                <failure message="cvssV3: HIGH, score: 7.3 (CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:L/E:P/RC:R/MAV:A)"/>
+            <system-out>Always-Incorrect Control Flow Implementation vulnerability in Apache Tomcat&apos;s rewrite valve meant that if the first condition in an OR chain matched, subsequent non-OR conditions were skipped.
+
+This issue affects Apache Tomcat: from 11.0.0-M1 through 11.0.22, from 10.1.0-M1 through 10.1.55, from 9.0.0.M1 through 9.0.118, from 8.5.0 through 8.5.100. Other versions that have reached end of support may also be affected.
+
+Users are recommended to upgrade to version 11.0.23, 10.1.56 or 9.0.119, which fix the issue.</system-out>
+            <system-err>location: /src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/tomcat-embed-core-11.0.21.jar, project-references: [  ]</system-err>
+        </testcase>
+            <testcase classname="CVE-2026-55955" name="pkg:maven/org.apache.tomcat.embed/tomcat-embed-core@11.0.21">
+                <failure message="cvssV3: MEDIUM, score: 6.5 (CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:N/E:P/RC:R/MAV:A)"/>
+            <system-out>Improper Authentication vulnerability in Apache Tomcat allowed a replay attack against the EncryptionInterceptor in the cluster component.
+
+This issue affects Apache Tomcat: from 11.0.0-M1 through 11.0.22, from 10.1.0-M1 through 10.1.55, from 9.0.13 through 9.0.18, from 8.5.38 through 8.5.100, from 7.0.100 through 7.0.109.
+
+Users are recommended to upgrade to version 11.0.23, 10.1.56, 9.0.119, which fixes the issue.</system-out>
+            <system-err>location: /src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/tomcat-embed-core-11.0.21.jar, project-references: [  ]</system-err>
+        </testcase>
+            <testcase classname="CVE-2026-55956" name="pkg:maven/org.apache.tomcat.embed/tomcat-embed-core@11.0.21">
+                <failure message="cvssV3: MEDIUM, score: 6.5 (CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:L/A:N/E:P/RC:R/MAV:A)"/>
+            <system-out>Improper Authorization vulnerability in Apache Tomcat leads to security constraints specified for the default servlet ignoring any method or method omission configured as part of the constraint.
+
+This issue affects Apache Tomcat: from 11.0.0-M1 through 11.0.22, from 10.1.0-M1 through 10.1.55, from 9.0.0.M1 through 9.0.118, from 8.5.0 through 8.5.100, from 7.0.0 through 7.0.109. Other versions that have reached end of support may also be affected.
+
+Users are recommended to upgrade to version 11.0.23, 10.1.56 or 9.0.119, which fix the issue.</system-out>
+            <system-err>location: /src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/tomcat-embed-core-11.0.21.jar, project-references: [  ]</system-err>
+        </testcase>
+            <testcase classname="CVE-2026-50229" name="pkg:maven/org.apache.tomcat.embed/tomcat-embed-core@11.0.21">
+                <failure message="cvssV3: MEDIUM, score: 6.1 (CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:L/I:L/A:N/E:P/RC:R/MAV:A)"/>
+            <system-out>Improper Neutralization of Script-Related HTML Tags in a Web Page (Basic XSS) vulnerability in the number guess example for Apache Tomcat.
+
+This issue affects Apache Tomcat: from 11.0.0-M1 through 11.0.22, from 10.1.0-M1 through 10.1.55, from 9.0.0.M1 through 9.0.118, from 8.5.0 through 8.5.100, from 7.0.0 through 7.0.109. Other versions that have reached end of support may also be affected.
+
+Users are recommended to upgrade to version 11.0.23, 10.1.56 or 9.0.119, which fix the issue.</system-out>
+            <system-err>location: /src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/tomcat-embed-core-11.0.21.jar, project-references: [  ]</system-err>
+        </testcase>
+            <testcase classname="CVE-2026-43514" name="pkg:maven/org.apache.tomcat.embed/tomcat-embed-core@11.0.21">
+                <failure message="cvssV3: LOW, score: 3.7 (CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:L/I:N/A:N/E:P/RC:R/MAV:A)"/>
+            <system-out>Observable Timing Discrepancy vulnerability when comparing AJP secret in Apache Tomcat.
+
+This issue affects Apache Tomcat: from 11.0.0-M1 through 11.0.21, from 10.1.0-M1 through 10.1.54, from 9.0.0.M1 through 9.0.117, from 8.5.0 through 8.5.100, from 7.0.0 through 7.0.109.
+Older unsupported versions may also be affected.
+
+Users are recommended to upgrade to version 11.0.22, 10.1.55 or 9.0.118 which fix the issue.</system-out>
+            <system-err>location: /src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/tomcat-embed-core-11.0.21.jar, project-references: [  ]</system-err>
+        </testcase>
+    </testsuite>
+        <testsuite failures="0" errors="0" time="0" id="92" name="/src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/tomcat-embed-el-11.0.21.jar" package="auth-service-0.0.1-SNAPSHOT.jar: tomcat-embed-el-11.0.21.jar" skipped="0" tests="1" timestamp="2026-07-25T06:24:56.273517819">
+            <testcase classname="dependency-check" name="auth-service-0.0.1-SNAPSHOT.jar: tomcat-embed-el-11.0.21.jar"/>
+    </testsuite>
+        <testsuite failures="0" errors="0" time="0" id="93" name="/src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/txw2-4.0.6.jar" package="auth-service-0.0.1-SNAPSHOT.jar: txw2-4.0.6.jar" skipped="0" tests="1" timestamp="2026-07-25T06:24:56.273517819">
+            <testcase classname="dependency-check" name="auth-service-0.0.1-SNAPSHOT.jar: txw2-4.0.6.jar"/>
+    </testsuite>
+        <testsuite failures="0" errors="0" time="0" id="94" name="/src/target/auth-service-0.0.1-SNAPSHOT.jar/BOOT-INF/lib/webjars-locator-lite-1.1.3.jar" package="auth-service-0.0.1-SNAPSHOT.jar: webjars-locator-lite-1.1.3.jar" skipped="0" tests="1" timestamp="2026-07-25T06:24:56.273517819">
+            <testcase classname="dependency-check" name="auth-service-0.0.1-SNAPSHOT.jar: webjars-locator-lite-1.1.3.jar"/>
+    </testsuite>
+        <testsuite failures="0" errors="0" time="0" id="95" name="/src/package.json" package="package.json" skipped="0" tests="1" timestamp="2026-07-25T06:24:56.273517819">
+            <testcase classname="dependency-check" name="package.json"/>
+    </testsuite>
+</testsuites>
