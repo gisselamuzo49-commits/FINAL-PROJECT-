@@ -5,7 +5,7 @@ describe('Login y navegación', () => {
     cy.get('input[type="password"]').type('password123')
     cy.get('button[type="submit"]').click()
     cy.url().should('include', '/home')
-    cy.contains('Mis Postulaciones').should('be.visible')
+    cy.get('.lg\\:block').contains('Mis Postulaciones').should('be.visible')
   })
 
   it('TUTOR puede hacer login', () => {
