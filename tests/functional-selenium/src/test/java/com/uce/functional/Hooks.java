@@ -9,11 +9,6 @@ import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
-import org.openqa.selenium.logging.LogEntries;
-import org.openqa.selenium.logging.LogEntry;
-import org.openqa.selenium.logging.LogType;
-import org.openqa.selenium.logging.LoggingPreferences;
-import org.openqa.selenium.remote.CapabilityType;
 
 import java.io.File;
 import java.io.IOException;
@@ -23,7 +18,6 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.logging.Level;
 
 public class Hooks {
 
@@ -38,10 +32,6 @@ public class Hooks {
         // Crear directorio de capturas si no existe
         Files.createDirectories(Paths.get(SCREENSHOTS_DIR));
 
-        // ── Logging preferences para capturar logs de consola del browser ──────
-        LoggingPreferences logPrefs = new LoggingPreferences();
-        logPrefs.enable(LogType.BROWSER, Level.ALL);
-
         // Configurar WebDriver
         ChromeOptions options = new ChromeOptions();
         options.addArguments("--headless=new");
@@ -50,7 +40,6 @@ public class Hooks {
         options.addArguments("--disable-gpu");
         options.addArguments("--window-size=1920,1080");
         options.addArguments("--remote-allow-origins=*");
-        options.setCapability(CapabilityType.LOGGING_PREFS, logPrefs);
 
         String os = System.getProperty("os.name").toLowerCase();
         if (os.contains("linux")) {
@@ -66,33 +55,10 @@ public class Hooks {
         driver.manage().window().maximize();
     }
 
-    /**
-     * Vuelca los logs de consola del navegador a stdout.
-     * Llamar desde StepDefinitions cuando se quiera capturar logs de la transición.
-     */
-    static void dumpBrowserLogs(String contexto) {
-        try {
-            LogEntries logs = driver.manage().logs().get(LogType.BROWSER);
-            if (logs.getAll().isEmpty()) {
-                System.out.println("[BROWSER LOG] " + contexto + " → (sin mensajes de consola)");
-            } else {
-                for (LogEntry entry : logs.getAll()) {
-                    System.out.printf("[BROWSER LOG] %s | %s | %s%n",
-                            contexto, entry.getLevel(), entry.getMessage());
-                }
-            }
-        } catch (Exception e) {
-            System.out.println("[BROWSER LOG ERROR] No se pudo leer la consola del browser: " + e.getMessage());
-        }
-    }
-
     @After
     public void tearDown(Scenario scenario) {
         if (driver != null) {
             try {
-                // Volcar logs de consola del browser al finalizar el escenario
-                dumpBrowserLogs("@After[" + scenario.getName() + "]");
-
                 // Determinar resultado
                 String resultado = scenario.isFailed() ? "FAIL" : "PASS";
 
