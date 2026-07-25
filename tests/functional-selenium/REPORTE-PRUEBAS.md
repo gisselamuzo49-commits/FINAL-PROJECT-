@@ -1,6 +1,6 @@
 # REPORTE DE PRUEBAS FUNCIONALES — Sistema de Pasantías y Vinculación UCE
 
-**Generado automáticamente el:** 2026-07-24 23:37:47
+**Generado automáticamente el:** 2026-07-25 02:33:44
 **Entorno:** QA — `http://54.227.79.26`
 **Framework:** Cucumber 7 + Selenium 4 + JUnit 5
 
@@ -20,7 +20,7 @@
 
 **Objetivo:** Verificar que los usuarios (Estudiante y Tutor) pueden autenticarse correctamente y son redirigidos al panel según su rol, y que credenciales incorrectas son rechazadas.
 
-**Resultado general:** ❌ FAIL
+**Resultado general:** ✅ PASS
 
 ### Camino de éxito
 
@@ -33,9 +33,9 @@
 - el usuario debería ser redirigido a la página de inicio "/home"
 - debería ver el menú de navegación con "Mis Postulaciones"
 
-**Resultado:** ❌ FAIL
+**Resultado:** ✅ PASS
 
-**Captura:** _No disponible (ejecutar tests para generar capturas)_
+**Captura:** ![Camino de éxito - Estudiante puede hacer login correctamente](screenshots/camino-de-éxito-estudiante-puede-hacer-login-correctamente-PASS-20260725-022509.png)
 
 ### Camino alterno
 
@@ -51,9 +51,9 @@
 - hace clic en el botón de iniciar sesión
 - debería ver un mensaje de alerta que dice "Credenciales incorrectas"
 
-**Resultado:** ❌ FAIL
+**Resultado:** ✅ PASS
 
-**Captura:** _No disponible (ejecutar tests para generar capturas)_
+**Captura:** ![Excepción - Intento de login con credenciales incorrectas](screenshots/excepción-intento-de-login-con-credenciales-incorrectas-PASS-20260725-022529.png)
 
 ---
 
@@ -76,7 +76,7 @@
 
 **Resultado:** ❌ FAIL
 
-**Captura:** _No disponible (ejecutar tests para generar capturas)_
+**Captura:** ![Camino de éxito - Estudiante realiza una postulación correctamente](screenshots/camino-de-éxito-estudiante-realiza-una-postulación-correctamente-FAIL-20260725-022611.png)
 
 ### Camino alterno
 
@@ -91,7 +91,7 @@
 
 **Resultado:** ❌ FAIL
 
-**Captura:** _No disponible (ejecutar tests para generar capturas)_
+**Captura:** ![Camino alterno - Coordinador cambia el estado de la postulación](screenshots/camino-alterno-coordinador-cambia-el-estado-de-la-postulación-FAIL-20260725-022659.png)
 
 ### Excepción
 
@@ -102,9 +102,9 @@
 - intenta enviar la postulación dejando los campos requeridos vacíos
 - la interfaz debe bloquear el envío y mostrar un mensaje de error "Campos requeridos faltantes"
 
-**Resultado:** ❌ FAIL
+**Resultado:** ✅ PASS
 
-**Captura:** _No disponible (ejecutar tests para generar capturas)_
+**Captura:** ![Excepción - Intento de postulación con campos vacíos](screenshots/excepción-intento-de-postulación-con-campos-vacíos-PASS-20260725-022812.png)
 
 ---
 
@@ -112,7 +112,7 @@
 
 **Objetivo:** Verificar que un estudiante puede registrar horas válidas (en PENDIENTE), que el tutor puede validarlas (a VALIDADO/RECHAZADO), y que valores inválidos (negativos o fecha futura) son rechazados.
 
-**Resultado general:** ❌ FAIL
+**Resultado general:** ✅ PASS
 
 ### Camino de éxito
 
@@ -125,9 +125,9 @@
 - hace clic en enviar
 - el registro de horas es creado en estado "PENDIENTE"
 
-**Resultado:** ❌ FAIL
+**Resultado:** ✅ PASS
 
-**Captura:** _No disponible (ejecutar tests para generar capturas)_
+**Captura:** ![Camino de éxito - Estudiante registra horas correctamente](screenshots/camino-de-éxito-estudiante-registra-horas-correctamente-PASS-20260725-022855.png)
 
 ### Camino alterno
 
@@ -140,9 +140,9 @@
 - aprueba las horas registradas por el estudiante
 - el estado de las horas cambia a "VALIDADO"
 
-**Resultado:** ❌ FAIL
+**Resultado:** ✅ PASS
 
-**Captura:** _No disponible (ejecutar tests para generar capturas)_
+**Captura:** ![Camino alterno - Tutor valida el registro de horas](screenshots/camino-alterno-tutor-valida-el-registro-de-horas-PASS-20260725-023008.png)
 
 ### Excepción
 
@@ -156,11 +156,9 @@
 - el sistema no debería permitir el envío
 - debería mostrar un error de validación en la interfaz
 
-**Resultado:** ❌ FAIL
+**Resultado:** ✅ PASS
 
-**Captura:** _No disponible (ejecutar tests para generar capturas)_
-
-> ⚠️ **FALLA ESPERADA** — relacionada a DEF-API-001 (ausencia de Bean Validation en hours-service)
+**Captura:** ![Excepción - Registro de horas negativas o con fecha futura (Defecto DEF-API-001)](screenshots/excepción-registro-de-horas-negativas-o-con-fecha-futura-defecto-defapi001-PASS-20260725-023021.png)
 
 ---
 
@@ -181,9 +179,9 @@
 - envía el formulario
 - la evaluación debe registrarse correctamente
 
-**Resultado:** ❌ FAIL
+**Resultado:** ✅ PASS
 
-**Captura:** _No disponible (ejecutar tests para generar capturas)_
+**Captura:** ![Camino de éxito - Tutor califica al estudiante con nota válida](screenshots/camino-de-éxito-tutor-califica-al-estudiante-con-nota-válida-PASS-20260725-023104.png)
 
 ### Camino alterno
 
@@ -195,9 +193,9 @@
 - ingresa una calificación de "15"
 - el formulario de evaluación debe impedir el envío y mostrar error de rango
 
-**Resultado:** ❌ FAIL
+**Resultado:** ✅ PASS
 
-**Captura:** _No disponible (ejecutar tests para generar capturas)_
+**Captura:** ![Camino alterno - Tutor intenta ingresar nota fuera de rango](screenshots/camino-alterno-tutor-intenta-ingresar-nota-fuera-de-rango-PASS-20260725-023116.png)
 
 ### Excepción
 
@@ -210,7 +208,7 @@
 
 **Resultado:** ❌ FAIL
 
-**Captura:** _No disponible (ejecutar tests para generar capturas)_
+**Captura:** ![Excepción - Estudiante intenta ingresar a evaluaciones de tutor](screenshots/excepción-estudiante-intenta-ingresar-a-evaluaciones-de-tutor-FAIL-20260725-023158.png)
 
 ---
 
@@ -218,7 +216,7 @@
 
 **Objetivo:** Verificar que un usuario puede marcar notificaciones como leídas, filtrar el listado y que el acceso al API de notificaciones sin token JWT es rechazado con 401/403 por el Gateway.
 
-**Resultado general:** ❌ FAIL
+**Resultado general:** ✅ PASS
 
 ### Camino de éxito
 
@@ -231,9 +229,9 @@
 - hace clic en "Marcar como leída"
 - la notificación debe cambiar su estado a leída y desaparecer del listado de pendientes
 
-**Resultado:** ❌ FAIL
+**Resultado:** ✅ PASS
 
-**Captura:** _No disponible (ejecutar tests para generar capturas)_
+**Captura:** ![Camino de éxito - Usuario marca notificación como leída](screenshots/camino-de-éxito-usuario-marca-notificación-como-leída-PASS-20260725-023242.png)
 
 ### Camino alterno
 
@@ -245,9 +243,9 @@
 - selecciona el filtro de notificaciones "Leídas"
 - debe visualizar la lista que contiene solo las notificaciones leídas previamente
 
-**Resultado:** ❌ FAIL
+**Resultado:** ✅ PASS
 
-**Captura:** _No disponible (ejecutar tests para generar capturas)_
+**Captura:** ![Camino alterno - Listado filtrado de notificaciones](screenshots/camino-alterno-listado-filtrado-de-notificaciones-PASS-20260725-023324.png)
 
 ### Excepción
 
@@ -258,9 +256,9 @@
 - intenta realizar una petición GET directa a "/api/notifications" en el gateway
 - la petición debe ser rechazada con código "401" o "403" por el Gateway
 
-**Resultado:** ❌ FAIL
+**Resultado:** ✅ PASS
 
-**Captura:** _No disponible (ejecutar tests para generar capturas)_
+**Captura:** ![Excepción - Acceso directo sin token de autenticación](screenshots/excepción-acceso-directo-sin-token-de-autenticación-PASS-20260725-023331.png)
 
 ---
 
@@ -268,11 +266,11 @@
 
 | # | Caso de Prueba | Camino éxito | Camino alterno | Excepción | Defecto relacionado |
 |---|----------------|:------------:|:--------------:|:---------:|---------------------|
-| 1 | Login y Navegación de Usuarios | ❌ FAIL | — | ❌ FAIL | — |
-| 2 | Postulaciones a Pasantías | ❌ FAIL | ❌ FAIL | ❌ FAIL | — |
-| 3 | Registro y Validación de Horas de Vinculación | ❌ FAIL | ❌ FAIL | ❌ FAIL | DEF-API-001 (ausencia de Bean Validation en hours-service) |
-| 4 | Calificación y Evaluaciones de Pasantías | ❌ FAIL | ❌ FAIL | ❌ FAIL | — |
-| 5 | Notificaciones y Seguridad de Acceso | ❌ FAIL | ❌ FAIL | ❌ FAIL | — |
+| 1 | Login y Navegación de Usuarios | ✅ PASS | — | ✅ PASS | — |
+| 2 | Postulaciones a Pasantías | ❌ FAIL | ❌ FAIL | ✅ PASS | — |
+| 3 | Registro y Validación de Horas de Vinculación | ✅ PASS | ✅ PASS | ✅ PASS | — |
+| 4 | Calificación y Evaluaciones de Pasantías | ✅ PASS | ✅ PASS | ❌ FAIL | — |
+| 5 | Notificaciones y Seguridad de Acceso | ✅ PASS | ✅ PASS | ✅ PASS | — |
 
 ---
 
